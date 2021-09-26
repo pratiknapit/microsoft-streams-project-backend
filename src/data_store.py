@@ -26,7 +26,11 @@ Example usage:
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'users': [],
+    'email': "",
+    'password': "",
+    'name_first': "",
+    'name_last': "",
+
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
