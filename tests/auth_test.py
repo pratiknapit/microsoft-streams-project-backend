@@ -4,14 +4,6 @@ from src.error import InputError
 from src.auth import auth_register_v1
 
 
-#def test_check(email):
-#		if (re.fullmatch(regex, email)) == None:            # If email is invalid
-#			with pytest.raises(InputError)
-#                assert auth_register_v1("yuchaocool.com", "", "", "")
-
-
-
-
 def test_auth_register_email_invalid():
     with pytest.raises(InputError):
         assert auth_register_v1("yuchaocool.com", "password", "yuchao", "zhu")                  # Invalid email- no @

@@ -33,14 +33,14 @@ initial_object = {
 
 def add_user(email, password, name_first, name_last):
     
-    store = data_store.get()                                   # gets user data from initial object
+    store = data_store.get()                                            # gets user data from initial_object
     u_id = len(name_first) +len(name_last) +len(email) + randrange(100000)
-    user = make_user(email, password, name_first, name_last, u_id)   # Remember to Add more fields
+    user = make_user(email, password, name_first, name_last, u_id)   
 #    data_store.set(store)
     store['user'].append(user)
     return user
 
-def make_user(email, password, name_first, name_last, u_id):
+def make_user(email, password, name_first, name_last, u_id):            # Remember to Add more fields
 
     return {
             'u_id': u_id,
@@ -53,19 +53,18 @@ def make_user(email, password, name_first, name_last, u_id):
 
 def create_handle(first_name, last_name):
     
-    sample_handle = first_name + last_name                       # Concatenation of first and last name
-    sample_handle = sample_handle.lower()                        # lowercased string
+    prototype_handle = first_name + last_name                       # Concatenation of first and last name
+    prototype_handle = prototype_handle.lower()                        # lowercased string
 
-    if handle_check(sample_handle):                              # If passes handle_check 
-        sample_handle = sample_handle + str(randrange(25000))    # Generate unique handle based on random generator
+    if handle_check(prototype_handle):                              # If same handle
+        prototype_handle = prototype_handle + str(randrange(10000))    # Generate unique handle based on random generator (security)
 
-    if len(sample_handle) > 20:                                  # Ensure handle size less than 20 chars
-        sample_handle = sample_handle[0:20]
+    if len(prototype_handle) > 20:                                  # Ensure handle size less than 20 chars
+        prototype_handle = prototype_handle[0:20]
 
-    return sample_handle
+    return prototype_handle
 
-def handle_check(handle_str):                                   # Function to check handle
-#    data = get_user_store()
+def handle_check(handle_str):                                   # Function to check handle uniqueness
     data = data_store.get()
     for user in data['users']:
         if user['handle_str'] == handle_str:
