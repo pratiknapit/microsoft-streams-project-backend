@@ -1,17 +1,17 @@
 ###########
 #Functions#
 ###########
-from src.data_store import data_store, add_user, make_user, create_handle 
+from data_store import data_store, add_user, make_user, create_handle 
 
 ##########################
 # Helper Check Functions #
 ##########################
-from src.data_store import email_check, email_repeat_check, handle_check, auth_user_id_check, password_check
+from data_store import email_check, email_repeat_check, handle_check, auth_user_id_check, password_check
 
 ###################
 # Error Functions #
 ###################
-from src.error import InputError
+from error import InputError
 
 def auth_login_v1(email, password):
     if not email_check(email): 
