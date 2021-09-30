@@ -38,6 +38,7 @@ def add_user(email, password, name_first, name_last):
     auth_user_id = len(name_first) +len(name_last) +len(email) + random.randrange(1, 1000)
     user = make_user(email, password, name_first, name_last, auth_user_id)   
     store['user'].append(user)
+    data_store.set(store)
     return user
 
 def make_user(email, password, name_first, name_last, auth_user_id):                    # Remember to Add more fields
