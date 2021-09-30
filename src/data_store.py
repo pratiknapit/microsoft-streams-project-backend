@@ -24,6 +24,7 @@ Example usage:
     data_store.set(store)
 '''
 import re
+import random
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
@@ -33,42 +34,48 @@ initial_object = {
 
 def add_user(email, password, name_first, name_last):
     
-    store = data_store.get()                                            # gets user data from initial_object
-    u_id = len(name_first) +len(name_last) +len(email) + randrange(100000)
-    user = make_user(email, password, name_first, name_last, u_id)   
-#    data_store.set(store)
+    store = data_store.get()                                                    # gets user data from initial_object
+    auth_user_id = len(name_first) +len(name_last) +len(email) + random.randrange(1, 1000)
+    user = make_user(email, password, name_first, name_last, auth_user_id)   
     store['user'].append(user)
     return user
 
-def make_user(email, password, name_first, name_last, u_id):            # Remember to Add more fields
+def make_user(email, password, name_first, name_last, auth_user_id):                    # Remember to Add more fields
 
     return {
-            'u_id': u_id,
+            'auth_user_id': auth_user_id,
             'email': email,  
             'password': password, 
             'name_first': name_first,
             'name_last': name_last, 
-            'handle_str': create_handle(name_first, name_last),
+            'handle': create_handle(name_first, name_last),
     }
 
 def create_handle(first_name, last_name):
     
-    prototype_handle = first_name + last_name                       # Concatenation of first and last name
-    prototype_handle = prototype_handle.lower()                        # lowercased string
+    prototype_handle = first_name + last_name                                   # Concatenation of first and last name
+    prototype_handle = prototype_handle.lower()                                 # lowercased string
 
-    if handle_check(prototype_handle):                              # If same handle
-        prototype_handle = prototype_handle + str(randrange(10000))    # Generate unique handle based on random generator (security)
+    if handle_check(prototype_handle):                                          # If same handle
+        prototype_handle = prototype_handle + str(random.randrange(1, 1000))             # Generate unique handle based on random generator (security)
 
-    if len(prototype_handle) > 20:                                  # Ensure handle size less than 20 chars
+    if len(prototype_handle) > 20:                                              # Ensure handle size less than 20 chars
         prototype_handle = prototype_handle[0:20]
 
     return prototype_handle
 
-def handle_check(handle_str):                                   # Function to check handle uniqueness
+def handle_check(handle):                                                   # Function to check handle uniqueness
     data = data_store.get()
-    for user in data['users']:
-        if user['handle_str'] == handle_str:
+    for user in data['user']:
+        if user['handle'] == handle:
             return True
+    return False
+
+def auth_user_id_check(auth_user_id):
+    data = data_store.get()
+    for user in data['user']:
+        if int(user['auth_user_id']) == int(auth_user_id):
+            return user
     return False
 
 def email_check(email):
@@ -77,6 +84,28 @@ def email_check(email):
         return True
     else:
         return False
+
+def email_repeat_check(email):
+    data = data_store.get()
+    for user in data['user']:
+        if user['email'] == email:
+            return True
+    return False
+
+def login_email(email):
+    data = data_store.get()
+    for user in data['user']:
+        if user['email'] == email:
+            return user
+    return False
+
+def password_check(password):
+    data = data_store.get()
+    for user in data['user']:
+        if user['password'] == password:
+            return user
+    return False
+
 
 
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
