@@ -17,14 +17,33 @@ def test_invalid_channel_details():
         channel_details_v1(steven_dummy['auth_user_id'], 543210)
 
 def test_valid_channel_details():
-    assert(channel_details_v1(steven_dummy['auth_user_id'], steven_dummy['channel_id']) ==
+    steven_channel_details = channel_details_v1(steven_dummy['auth_user_id'], steven['channel_id'])
+    value = False
+    if steven_channel_details['name'] == 'steven_channel':
+        if steven_channel_details['is_public'] == True:
+            for member in steven_channel_details['owner_members']:
+                if member == steven_dummy['auth_user_id']:
+                    for mem in steven_channel_details['all_members']:
+                        if mem == steven_dummy['auth_user_id']:
+                            value = True
+    else: 
+        value = False
+    
+    assert (value == True)
+    
+    '''
+    assert(channel_details_v1(steven_dummy['auth_user_id'], steven['channel_id']) ==
+   
     {
         'name': 'steven_channel',
 
+        'is_public': True,
+
         'owner_members': [{'name_first': steven_dummy['name_first'],
-        'name_last': steven_dummy['name_last'], 'u_id': steven_dummy['u_id']}],
+        'name_last': steven_dummy['name_last'], 'auth_user_id': steven_dummy['auth_user_id']}],
 
         'all_members': [{'name_first': steven_dummy['name_first'],
-        'name_last': steven_dummy['name_last'], 'u_id': steven_dummy['u_id']}],
+        'name_last': steven_dummy['name_last'], 'auth_user_id': steven_dummy['auth_user_id']}],
     }
     )
+    '''

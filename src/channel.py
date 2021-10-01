@@ -1,6 +1,6 @@
-
-
 from src.error import InputError, AccessError
+from src.data_store import channel_id_check, check_if_user_is_channel_member
+
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
     }
@@ -25,7 +25,7 @@ def channel_details_v1(auth_user_id, channel_id):
     channel_details_dictionary['owner_members'] = extract_channel_details['owner_members']
     channel_details_dictionary['all_members'] = extract_channel_details['all_members']
     
-    return channel_details_dictionery
+    return channel_details_dictionary
     
 
 def channel_messages_v1(auth_user_id, channel_id, start):
@@ -33,7 +33,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if channel_check(channel_id) == False:                          # Does not refer valid channel
         raise InputError
 
-    if check_if_user_in_channel_member(, channel_id) == False: # Valid channel_id & auth_user_id not part of channel
+    if check_if_user_in_channel_member(auth_user_id, channel_id) == False: # Valid channel_id & auth_user_id not part of channel
         raise AccessError
 
     total_messages = 0   
