@@ -101,8 +101,6 @@ def channels_create_v1(auth_user_id, name, is_public):
         'channel_id': added_channel['channel_id']
     }
 
-
-
 #this is a basic prints to see what our functions output.
 if __name__ == '__main__':
     print(channels_create_v1(1233241324, "School", True))

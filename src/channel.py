@@ -26,14 +26,36 @@ def channel_details_v1(auth_user_id, channel_id):
     channel_details_dictionary['all_members'] = extract_channel_details['all_members']
     
     return channel_details_dictionary
-    
+'''
+return {
+        'name': 'Hayden',
+        'owner_members': [
+            {
+                'u_id': 1,
+                'email': 'example@gmail.com',
+                'name_first': 'Hayden',
+                'name_last': 'Jacobs',
+                'handle_str': 'haydenjacobs',
+            }
+        ],
+        'all_members': [
+            {
+                'u_id': 1,
+                'email': 'example@gmail.com',
+                'name_first': 'Hayden',
+                'name_last': 'Jacobs',
+                'handle_str': 'haydenjacobs',
+            }
+        ],
+    }
+'''
 
 def channel_messages_v1(auth_user_id, channel_id, start):
 
-    if channel_check(channel_id) == False:                          # Does not refer valid channel
+    if channel_id_check(channel_id) == False:                          # Does not refer valid channel
         raise InputError
 
-    if check_if_user_in_channel_member(auth_user_id, channel_id) == False: # Valid channel_id & auth_user_id not part of channel
+    if check_if_user_is_channel_member(auth_user_id, channel_id) == False: # Valid channel_id & auth_user_id not part of channel
         raise AccessError
 
     total_messages = 0   
