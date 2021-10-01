@@ -17,7 +17,7 @@ def test_invalid_channel_details():
         channel_details_v1(steven_dummy['auth_user_id'], 543210)
 
 def test_valid_channel_details():
-    assert(channel_details(steven_dummy['auth_user_id'], steven_dummy['channel_id']) ==
+    assert(channel_details_v1(steven_dummy['auth_user_id'], steven_dummy['channel_id']) ==
     {
         'name': 'steven_channel',
 
