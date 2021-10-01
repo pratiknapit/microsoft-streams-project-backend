@@ -12,7 +12,6 @@ good_dummy = auth_register_v1('baddummy@gmail.com', 'passsssword', 'good', 'dumm
 # Creating a new channel with the first member as an owner and member
 bad_dummy_channel = channel_create_v1(bad_dummy['auth_user_id'], 'new_bad_dummy_channel', True) # true means public channel
 
-
 def test_channel_invite_invalid():
     with pytest.raises(AccessError):
         # Correct auth_user_id but the inviter is not a member of the channel 
@@ -26,8 +25,6 @@ def test_channel_invite_invalid():
         # Everything is incorrect
         channel_invite_v1(dumba['auth_user_id'], bad_duma['channel_id'], goomba['auth_id'])
 
-
-
     with pytest.raises(InputError):
         #correct  auth_user_id and channel id but incorrect user id
         channel_invite_v1(bad_dummy['auth_user_id'], bad_dummy_channel['channel_id'], dumdum['auth_id'])
@@ -35,10 +32,6 @@ def test_channel_invite_invalid():
         channel_invite_v1(bad_dummy['auth_user_id'], bad_duma_channel['channel_id'], dumdum['auth_id'])
         # correct auth_user_id and u_id but incorrect channel_id
         channel_invite_v1(bad_dummy['auth_user_id'], bad_duma_channel['channel_id'], dummy['auth_id'])
-
-
-
-        
 
 
 def test_channel_invite_valid():
