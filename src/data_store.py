@@ -54,6 +54,7 @@ def make_user(email, password, name_first, name_last, auth_user_id):            
             'handle_str': create_handle(name_first, name_last),
 
     }
+    
 '''
 def add_message(message, channel_id, u_id, time_created):
     store = data_store.get()  
