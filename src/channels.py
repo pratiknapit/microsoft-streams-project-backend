@@ -1,5 +1,5 @@
-from data_store import user_channels, add_channel
-from error import InputError
+from src.data_store import data_store, user_channels, add_channel
+from src.error import InputError
 
 
 def channels_list_v1(auth_user_id):
@@ -56,7 +56,17 @@ def channels_create_v1(auth_user_id, name, is_public):
     channels = stored_data['channels']
     print(channels) #this will print a list of all the channels
     """
-    
+    return added_channel
+    """
     return { #here we return dictionary containing channel of the recently added chanel 
         'channel_id': added_channel['channel_id']
     }
+    """
+
+if __name__ == '__main__':
+    print(channels_create_v1("1233241324", "School", "yes"))
+    print(channels_create_v1("1233241324", "ChannelForSport", "yes"))
+    print(channels_create_v1("1233241324", "ChannelForFriends", "no"))
+    print(channels_create_v1('345', 'FavChannel', "yes"))
+    print(channels_list_v1("1233241324"))
+
