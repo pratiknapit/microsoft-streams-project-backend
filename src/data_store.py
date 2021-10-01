@@ -27,12 +27,49 @@ import re
 import random
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
+
+
 initial_object = {
     'user': [    
-    ]
-#    'Messages': [
-#    ]
+    ],
+    'channels': [
+
+    ],
+#   'Messages': [
+#    ] 
 }
+
+
+#Channels functions - made by Pratik 
+
+# def function to make channel dictionary
+
+def make_channel(auth_user_id, channel_id, name, is_public):
+
+    return {
+        'channel_id': channel_id, #need to make this in another function
+        'name': name,
+        'is_public': is_public,
+        'owner_members': [auth_user_id],
+        'all_members': [auth_user_id]
+    }
+
+
+# def function to add channel to list 
+
+def add_channel(auth_user_id, name, is_public):
+    store = data_store.get() #retrieve our initial object data
+    channel_id = len(store['channels']) + 1 #use this function above to get channel id, we might not even need the function 
+    channel = make_channel(auth_user_id, channel_id, name, is_public)
+    store['channels'].append(channel)
+
+
+    data_store.set(store) #believe that this should just make sure that the data is still a dictionary
+    #need to make a new list which only returns { channel_id }
+    return channel
+
+# def function to return list of channels that user is part of 
+
 
 def add_user(email, password, name_first, name_last):
     
@@ -94,8 +131,45 @@ def create_handle(first_name, last_name):
     if len(prototype_handle) > 20:                                              # Ensure handle size less than 20 chars
         prototype_handle = prototype_handle[0:20]
 
-    return prototype_handle
+def user_channels(auth_user_id):
+    store = data_store.get()
+    user_list_channel = {
+        'channels': [
 
+        ],
+    } #this is empty list that we will append to
+    for channel in store['channels']: 
+        for member in channel['all_members']:
+            if member == auth_user_id:
+                user_list_channel['channels'].append(channel)
+        
+    return user_list_channel
+
+# def function to return list of channels that user is part of  including priv channels
+
+def user_all_channels(auth_user_id):
+    store = data_store.get()    
+
+    user_list_channel = { 'channels': store['channels'] }
+         
+    return user_list_channel
+
+# def functions to help with Channel create, channels list and channels list all 
+
+#check if channel is in our database and returns it. 
+def channel_check(channel_id):
+    store = data_store.get()
+
+    for channel in store['channels']:
+        if int(channel['channel_id']) == int(channel_id):
+            return channel 
+    
+    return False
+
+def is_public_check(is_public):
+    if is_public == True or is_public == False:
+        return True
+    return False 
 def handle_check(handle):                                                   # Function to check handle uniqueness
     data = data_store.get()
     for user in data['user']:
