@@ -31,19 +31,3 @@ def test_valid_channel_details():
     
     assert (value == True)
     
-    '''
-    assert(channel_details_v1(steven_dummy['auth_user_id'], steven['channel_id']) ==
-   
-    {
-        'name': 'steven_channel',
-
-        'is_public': True,
-
-        'owner_members': [{'name_first': steven_dummy['name_first'],
-        'name_last': steven_dummy['name_last'], 'auth_user_id': steven_dummy['auth_user_id']}],
-
-        'all_members': [{'name_first': steven_dummy['name_first'],
-        'name_last': steven_dummy['name_last'], 'auth_user_id': steven_dummy['auth_user_id']}],
-    }
-    )
-    '''
