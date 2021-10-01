@@ -216,6 +216,29 @@ def message_check(message_id):
             return message
     return None
 
+def channel_id_check(channel_id):
+	store = data_store.get()
+	for channel in store['channels']:
+		if int(channel['channel_id']) == int(channel_id):
+			return channel
+	
+	return False
+
+def check_if_user_is_channel_member(auth_user_id, channel_id):
+    store = data_store.get()
+    user = auth_user_id_check(auth_user_id) 
+    value = False 
+    for Dict in store['channels']:
+        if int(Dict['channel_id']) == int(channel_id):
+            for member in Dict['all_members']:
+               #if member["auth_user_id"] == user["auth_user_id"]:
+                if member == user['auth_user_id']:
+                    value = True 
+    return value
+
+
+
+
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
 class Datastore:
