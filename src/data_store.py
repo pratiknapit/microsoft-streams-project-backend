@@ -72,7 +72,7 @@ def user_channels(auth_user_id):
         ],
     } #this is empty list that we will append to
     for channel in store['channels']: 
-        for member in channel['channel_members']:
+        for member in channel['all_members']:
             if member == auth_user_id:
                 user_list_channel['channels'].append(channel)
     
