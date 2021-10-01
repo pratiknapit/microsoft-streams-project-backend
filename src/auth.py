@@ -1,7 +1,7 @@
 ###########
 #Functions#
 ###########
-from src.data_store import data_store, add_user, make_user, create_handle 
+from src.data_store import data_store, add_user, make_user, create_handle, login_email
 
 ##########################
 # Helper Check Functions #
