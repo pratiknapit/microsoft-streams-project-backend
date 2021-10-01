@@ -107,8 +107,31 @@ def password_check(password):
             return user
     return False
 
+def channel_id_check(channel_id):
+    data = data_store.get()
+    for channel in data['Channels']:
+        if int(channel['channel_id']) == int(channel_id):
+            return channel
+    return False
 
+def user_id_check(u_id):
+    data = data_store.get()
+    for user in data['user']:
+        if int(user['u_id']) == int(u_id):
+            return user
+    return False
 
+def check_if_user_is_channel_member(auth_user_id, channel_id):
+    user = auth_user_id_check(auth_user_id) 
+    store = data_store.get()
+    check = False	
+    for Dict in store['Channels']:
+        if int(Dict['channel_id']) == int(channel_id):
+            for member in Dict['all_members']:
+                if int(member["u_id"]) == int(user["u_id"]):
+                        check = True 
+    return check
+    
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
 class Datastore:
