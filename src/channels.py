@@ -1,14 +1,30 @@
-from src.data_store import data_store, user_channels, add_channel
+from src.data_store import data_store, is_public_check, user_channels, add_channel, user_all_channels
 from src.error import InputError
 
 
+
+"""
+**********************************************************************
+  
+   channels_list_v1() should take in a user id and output a list of 
+   channels that the user is a member of, regardless of if it is public 
+   or private channel.
+
+**********************************************************************
+"""
+
 def channels_list_v1(auth_user_id):
     
-    #check user id -- need to create function in data_store
     """
+    #require this function to be made by steven or jacky.
+    We need this function to check if the authorised user is part of the streams 
+    database.
+
     if user_id_check(auth_user_id) == False:
-        raise Input Error
+        raise InputError
     """
+    
+
     #this will just return a dictionary that looks like the stub below
     return user_channels(auth_user_id) 
 
@@ -25,7 +41,28 @@ def channels_list_v1(auth_user_id):
 
 
 
+"""
+**********************************************************************
+  
+   channels_listall_v1() should take in a user id and output a list of 
+   channels all channels that have been made in Streams, regardless of if 
+   the authorised user is a member of the channel or not.
+
+**********************************************************************
+"""
+
 def channels_listall_v1(auth_user_id):
+    
+    """
+    #require this function to be made by steven or jacky.
+
+    if user_id_check(auth_user_id) == False:
+        raise InputError
+     """
+
+    return user_all_channels(auth_user_id)
+    
+    """
     return {
         'channels': [
         	{
@@ -34,39 +71,52 @@ def channels_listall_v1(auth_user_id):
         	}
         ],
     }
+    """
 
 
+
+"""
+**********************************************************************
+  
+   channels_create_v1() should make a new channel and details and add
+   it to the global variable/our data store with the user as an owner 
+   and a member of the channel, as well as a channel id. 
+
+**********************************************************************
+"""
 
 def channels_create_v1(auth_user_id, name, is_public):
-
-    #check user id -- need to create function in data_store
 
     if len(name) < 1 or len(name) > 20:
         raise InputError
 
-    added_channel = add_channel(auth_user_id, name, is_public) #i need a function to add channel
-    
     """
-    if user_id_check(auth_user_id) == False:
-        raise Input Error
-    """
+    #require this function to be made by steven or jacky. 
+    This will basically check if the user is part of our database or not.
 
-    """
-    stored_data = data_store.get() #this will retrieve the initial object
-    channels = stored_data['channels']
-    print(channels) #this will print a list of all the channels
-    """
-    return added_channel
-    """
+    if user_id_check(auth_user_id) == False:
+        raise InputError
+     """
+
+    if is_public_check(is_public) == False:
+        raise InputError
+
+    added_channel = add_channel(auth_user_id, name, is_public) #i need a function to add channel
+   
     return { #here we return dictionary containing channel of the recently added chanel 
         'channel_id': added_channel['channel_id']
     }
-    """
 
+
+
+#this is a basic prints to see what our functions output.
 if __name__ == '__main__':
-    print(channels_create_v1("1233241324", "School", "yes"))
-    print(channels_create_v1("1233241324", "ChannelForSport", "yes"))
-    print(channels_create_v1("1233241324", "ChannelForFriends", "no"))
-    print(channels_create_v1('345', 'FavChannel', "yes"))
+    print(channels_create_v1("1233241324", "School", True))
+    print(channels_create_v1("1233241324", "ChannelForSport", True))
+    print(channels_create_v1("1233241324", "ChannelForFriends", False))
+    print(channels_create_v1('345', 'FavChannel', True))
     print(channels_list_v1("1233241324"))
+    print("")
+    print(channels_listall_v1("1233241324")) 
+    
 
