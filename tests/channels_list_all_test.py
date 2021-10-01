@@ -6,9 +6,6 @@ from src.channels import channels_listall_v1, channels_create_v1
 from src.other import clear_v1
 
 """
-the below test should return a input error if the auth user is not 
-part of the database.
-
 def test_channels_create_invalid_user_id(): #user id is invalid
     clear_v1()
     with pytest.raises(InputError): #invalid auth user id. 

@@ -1,4 +1,5 @@
 from src.data_store import data_store, is_public_check, user_channels, add_channel, user_all_channels
+from src.data_store import auth_user_id_check 
 from src.error import InputError
 
 
@@ -16,15 +17,11 @@ from src.error import InputError
 def channels_list_v1(auth_user_id):
     
     """
-    #require this function to be made by steven or jacky.
-    We need this function to check if the authorised user is part of the streams 
-    database.
-
-    if user_id_check(auth_user_id) == False:
+    if auth_user_id_check(auth_user_id) == False:
         raise InputError
     """
     
-
+    
     #this will just return a dictionary that looks like the stub below
     return user_channels(auth_user_id) 
 
@@ -54,11 +51,10 @@ def channels_list_v1(auth_user_id):
 def channels_listall_v1(auth_user_id):
     
     """
-    #require this function to be made by steven or jacky.
-
-    if user_id_check(auth_user_id) == False:
+    if auth_user_id_check(auth_user_id) == False:
         raise InputError
-     """
+    """
+
 
     return user_all_channels(auth_user_id)
     
@@ -91,12 +87,10 @@ def channels_create_v1(auth_user_id, name, is_public):
         raise InputError
 
     """
-    #require this function to be made by steven or jacky. 
-    This will basically check if the user is part of our database or not.
-
-    if user_id_check(auth_user_id) == False:
+    if auth_user_id_check(auth_user_id) == False:
         raise InputError
-     """
+    """
+    
 
     if is_public_check(is_public) == False:
         raise InputError
@@ -111,12 +105,12 @@ def channels_create_v1(auth_user_id, name, is_public):
 
 #this is a basic prints to see what our functions output.
 if __name__ == '__main__':
-    print(channels_create_v1("1233241324", "School", True))
-    print(channels_create_v1("1233241324", "ChannelForSport", True))
-    print(channels_create_v1("1233241324", "ChannelForFriends", False))
-    print(channels_create_v1('345', 'FavChannel', True))
-    print(channels_list_v1("1233241324"))
+    print(channels_create_v1(1233241324, "School", True))
+    print(channels_create_v1(1233241324, "ChannelForSport", True))
+    print(channels_create_v1(1233241324, "ChannelForFriends", False))
+    print(channels_create_v1(345, 'FavChannel', True))
+    print(channels_list_v1(1233241324))
     print("")
-    print(channels_listall_v1("1233241324")) 
+    print(channels_listall_v1(1233241324)) 
     
 
