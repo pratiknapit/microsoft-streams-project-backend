@@ -51,7 +51,7 @@ def make_user(email, password, name_first, name_last, auth_user_id):            
             'password': password, 
             'name_first': name_first,
             'name_last': name_last, 
-            'handle': create_handle(name_first, name_last),
+            'handle_str': create_handle(name_first, name_last),
 
     }
 
@@ -96,10 +96,10 @@ def create_handle(first_name, last_name):
 
     return prototype_handle
 
-def handle_check(handle):                                                   # Function to check handle uniqueness
+def handle_check(handle_str):                                                   # Function to check handle uniqueness
     data = data_store.get()
     for user in data['user']:
-        if user['handle'] == handle:
+        if user['handle_str'] == handle_str:
             return True
     return False
 
