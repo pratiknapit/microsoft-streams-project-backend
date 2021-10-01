@@ -117,9 +117,6 @@ def make_user(email, password, name_first, name_last, auth_user_id):            
 
 
 
-
-
-
 def create_handle(first_name, last_name):
     
     prototype_handle = first_name + last_name                                   # Concatenation of first and last name
