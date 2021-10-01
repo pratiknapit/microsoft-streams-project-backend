@@ -25,6 +25,8 @@ Example usage:
 '''
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
+
+
 initial_object = {
     'user': [    
     ],
@@ -75,11 +77,34 @@ def user_channels(auth_user_id):
         for member in channel['all_members']:
             if member == auth_user_id:
                 user_list_channel['channels'].append(channel)
-    
-
+        
     return user_list_channel
 
+# def function to return list of channels that user is part of  including priv channels
 
+def user_all_channels(auth_user_id):
+    store = data_store.get()    
+
+    user_list_channel = { 'channels': store['channels'] }
+         
+    return user_list_channel
+
+# def functions to help with Channel create, channels list and channels list all 
+
+#check if channel is in our database and returns it. 
+def channel_check(channel_id):
+    store = data_store.get()
+
+    for channel in store['channels']:
+        if int(channel['channel_id']) == int(channel_id):
+            return channel 
+    
+    return False
+
+def is_public_check(is_public):
+    if is_public == True or is_public == False:
+        return True
+    return False 
 
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
