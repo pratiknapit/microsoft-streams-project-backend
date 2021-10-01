@@ -29,9 +29,9 @@ import random
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'user': [    
+    ], 
+    'Messages': [
     ]
-#    'Messages': [
-#    ]
 }
 
 def add_user(email, password, name_first, name_last):
