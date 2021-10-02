@@ -7,6 +7,8 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
 def channel_details_v1(auth_user_id, channel_id):
     
+    if not auth_user_id_check(auth_user_id):
+        raise AccessError
     #Check if channel_id is valid
     if channel_id_check(channel_id) == False:       
         raise InputError("channel id not valid")
@@ -120,6 +122,9 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 #    }
 
 def channel_join_v1(auth_user_id, channel_id):
+
+    if not auth_user_id_check(auth_user_id):
+        raise AccessError
 
     if channel_id_check(channel_id) == False:
         raise InputError
