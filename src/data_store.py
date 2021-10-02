@@ -251,6 +251,13 @@ def check_if_user_is_channel_member(auth_user_id, channel_id):
                     value = True 
     return value
 
+def check_if_channel_is_public_or_private(channel_id):
+    store = data_store.get()
+    channel_storage = channel_id_check(channel_id)
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_storage['channel_id']:
+            return channel['is_public']
+            
 def user_id_check(u_id):
     data = data_store.get()
     for user in data['users']:
