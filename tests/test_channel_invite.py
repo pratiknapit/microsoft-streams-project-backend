@@ -26,25 +26,42 @@ def clear():
     clear_v1()
 
 def test_channel_invite_user_invalid(clear, dummy_cases):
-    with pytest.raises(AccessError):
-        # Correct auth_user_id but the inviter is not a member of the channel 
-        channel_invite_v1(dummy_cases['dummy_user_1']['auth_user_id'],
-        dummy_cases['dummy_user_2_channel']['channel_id'], 
-        dummy_cases['dummy_user_2']['auth_user_id'])
+    pass
+
 
 def test_channel_invite_channel_invalid(clear, dummy_cases):
     pass
 
 def test_channel_invite_no_user_invalid(clear, dummy_cases):
+
+
     pass
 
 def test_channel_invite_self_invalid(clear, dummy_cases):
-    pass
+    # user 2 is trying to send himself an invite, even though user 2 is already in the channel
+    with pytest.raises(AccessError):
+        channel_invite_v1(dummy_cases['dummy_user_2']['auth_user_id'],
+        dummy_cases['dummy_user_2_channel']['channel_id'], 
+        dummy_cases['dummy_user_2']['auth_user_id'])
+
 
 def test_channel_invite_no_user_in_channel_invalid(clear, dummy_cases):
-    pass
+    with pytest.raises(AccessError):
+        # Correct auth_user_id but the inviter is not a member of the channel
+        # user 1 is not part of channel but they trying to create a channel invite for user 3
+        channel_invite_v1(dummy_cases['dummy_user_1']['auth_user_id'],
+        dummy_cases['dummy_user_2_channel']['channel_id'], 
+        dummy_cases['dummy_user_3']['auth_user_id'])
 
 def test_channel_invite_already_in_channel_invalid(clear, dummy_cases):
+    '''
+    # user 2 already in channel but is being sent another channel inviteby user 1
+    # need to do channel join to add user 1, then allow him to invite user 2 to check that 
+    with pytest.raises(AccessError):
+        channel_invite_v1(dummy_cases['dummy_user_1']['auth_user_id'],
+        dummy_cases['dummy_user_2_channel']['channel_id'], 
+        dummy_cases['dummy_user_2']['auth_user_id'])
+    '''
     pass
 
 
