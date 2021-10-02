@@ -78,26 +78,25 @@ return {
         ],
     }
 '''
-'''
+
 def channel_messages_v1(auth_user_id, channel_id, start):
 
     if not auth_user_id_check(auth_user_id):   
-        raise AccessError                            # User not exist at all
+        raise AccessError                                                  # User not exist at all
 
-    if channel_id_check(channel_id) == False:                              # Channel does not exist
+    if not channel_id_check(channel_id):                                   # Channel does not exist
         raise InputError
 
-    if check_if_user_is_channel_member(auth_user_id, channel_id) == False: # auth_user_id is not a member of channel
+    if not check_if_user_is_channel_member(auth_user_id, channel_id):      # auth_user_id is not a member of channel
         raise AccessError
 
     total_messages = 0   
     store = data_store.get()
     
-    for i in store['Messages']:
-            if i['channel_id'] == channel_id:
-                total_messages += 1
+    for message in store['Messages']:
+        total_messages += 1
     
-    if start > total_messages:                                      # Start is greater than the total number of messages in channel
+    if start > total_messages:                                             # Start is greater than the total number of messages in channel
         raise InputError
 
     dict_start = {
@@ -109,31 +108,26 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
     dict_start = data_store.get()['Messages']
    
-    counter = 0
+    count = 0
     if len(dict_start) != 0:
-        for message in reversed(dict_start):
-  
-            if int(message['channel_id']) == int(channel_id):
-             
-                if counter >= start:
-                  
-                    dict = {
-                        'message_id': message['message_id'],
-                        'u_id': message['auth_user_id'],
-                        'message': message['message'],
-                        'time_created': message['time_created'].replace(tzinfo=timezone.utc).timestamp(),
-                        
-                    }
-                    dict_finish['messages'].append(dict)    
-                counter = counter + 1
-            if counter >= 50:
-                counter = -1
+        for msg in reversed(dict_start):            
+            if count >= start:                 
+                fields = {
+                    'message_id': msg['message_id'],
+                    'u_id': msg['auth_user_id'],
+                    'message': msg['message'],
+                    'time_created': msg['time_created'],                        
+                }
+                dict_finish['messages'].append(fields)    
+                count += 1
+            if count >= 50:
+                count = -1
                 break
     
     dict_finish['start'] = start
-    dict_finish['end'] = counter
+    dict_finish['end'] = count
     return dict_finish
-'''
+
 ####
 #    return {
 #        'messages': [
