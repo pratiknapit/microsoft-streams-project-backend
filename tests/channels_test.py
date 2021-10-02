@@ -9,11 +9,22 @@ from src.other import clear_v1
 #The first part of the testing is to test if the inputs are valid. 
 
 #we might have to check if the user id that is inputted is valid 
-
+'''
 dummy1 = auth_register_v1("dummyvariableone@gmail.com", "password", "pratik", "napit")
 dummy2 = auth_register_v1("dummyvariabletwo@gmail.com", "password", "conor", "mishra")
 dummy1_id = dummy1['auth_user_id']
 dummy2_id = dummy2['auth_user_id']
+'''
+
+dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
+dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
+
+dummy1_id = dummy_user_1['auth_user_id']
+dummy2_id = dummy_user_2['auth_user_id']
+
+
+dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
 
 #Testing Errors
 def test_user_is_valid(): 
@@ -41,6 +52,11 @@ def test_channels_create_wrong_public_input():
 
 def test_channels_create():
     clear_v1()
+
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+
+    dummy1_id = dummy_user_1['auth_user_id']
+
     channel_id = channels_create_v1(dummy1_id, "School", True)  #this will just return the channel id
     channel_list = channels_list_v1(dummy1_id) #this should return a list of channels
     for channel in channel_list['channels']:
@@ -52,6 +68,14 @@ def test_channels_create():
 
 def test_multiple_channels_create():
     clear_v1()
+
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
+    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
+
+    dummy1_id = dummy_user_1['auth_user_id']
+    dummy2_id = dummy_user_2['auth_user_id']
+
     channel_1 = channels_create_v1(dummy1_id, "School", True) #this shud return
     channel_2 = channels_create_v1(dummy2_id, "Play", True)
     channel_3 = channels_create_v1(dummy1_id, "Tutoring", True) #this shud return

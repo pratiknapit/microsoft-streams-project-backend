@@ -1,17 +1,21 @@
 import pytest
-
 from src.error import InputError
 from src.auth import auth_register_v1, auth_login_v1
 from src.other import clear_v1
 
+@pytest.fixture
+def clear():
+    clear_v1()
+
 def test_auth_register_email_invalid():
     clear_v1()
     with pytest.raises(InputError):
-        assert auth_register_v1("yuchaocool.com", "password", "yuchao", "zhu")                  # Invalid email- no @
-def test_auth_register_duplicate_email_invalid():
+        assert auth_register_v1("yuchaocool.com", "password", "yuchao", "zhu")                          # Invalid email- no @
+def test_auth_register_duplicate_email_invalid(clear):
     clear_v1()
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
     with pytest.raises(InputError):
-        assert auth_register_v1("smartdummy@gmail.com", "password", "yuchao", "zhu")            # Same user email_repeat_check() 
+        assert auth_register_v1('dummyuser1@gmail.com', 'password', 'Alpha', 'AA')            # Same user email_repeat_check() 
 def test_auth_register_password_invalid():
     clear_v1()
     with pytest.raises(InputError):
@@ -48,8 +52,9 @@ def test_auth_register_user_valid():
     assert(valid_user == {"auth_user_id": valid_user["auth_user_id"]})
 
 
-dummy = auth_register_v1("smartdummy@gmail.com", "password", "smart", "dummy")
-def test_auth_register_test_dummy():
+def test_auth_register_test_dummy(clear):
     clear_v1()
-    dummy_id = auth_login_v1("smartdummy@gmail.com", "password")
-    assert(dummy == dummy_id)
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+    dummy_id = auth_login_v1("dummyuser1@gmail.com", "passworddd")
+    assert(dummy_user_1['auth_user_id'] == dummy_id['auth_user_id'])
+
