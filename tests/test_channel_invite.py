@@ -1,8 +1,8 @@
 import pytest
 from src.error import InputError, AccessError
 from src.auth import auth_register_v1
-from src.channels import channels_create_v1, channel_details_v1
-from src.channel import channel_invite_v1
+from src.channels import channels_create_v1
+from src.channel import channel_invite_v1, channel_details_v1
 
 
 # Dummy case created for testing of different parts of channel_invite_v1
@@ -18,19 +18,19 @@ def test_channel_invite_user_invalid():
         channel_invite_v1(dummyy['auth_user_id'], bad_dummy_channel['channel_id'], bad_dummy['auth_user_id'])
 
 def test_channel_invite_channel_invalid():
-    ok
+    pass
 
 def test_channel_invite_no_user_invalid():
-    ok
+    pass
 
 def test_channel_invite_self_invalid():
-    ok
+    pass
 
 def test_channel_invite_no_user_in_channel_invalid():
-    ok
+    pass
 
 def test_channel_invite_already_in_channel_invalid():
-    ok
+    pass
 
 
 

@@ -55,7 +55,7 @@ def channel_details_v1(auth_user_id, channel_id):
             }
         ],
     }
-
+'''
 def channel_messages_v1(auth_user_id, channel_id, start):
 
     if not auth_user_id_check(auth_user_id):   
@@ -110,6 +110,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     dict_finish['start'] = start
     dict_finish['end'] = counter
     return dict_finish
+'''
 
 def channel_join_v1(auth_user_id, channel_id):
     return {

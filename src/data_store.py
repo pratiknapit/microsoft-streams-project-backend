@@ -244,7 +244,15 @@ def check_if_user_is_channel_member(auth_user_id, channel_id):
                         check = True 
     return check
 
+def user_id_check(u_id):
+    data = data_store.get()
+    for user in data['user']:
+        if int(user['u_id']) == int(u_id):
+            return user
+    return False
 
+
+    
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
 class Datastore:
