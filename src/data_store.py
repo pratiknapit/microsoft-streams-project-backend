@@ -25,7 +25,7 @@ Example usage:
 '''
 import re
 import random
-
+from datetime import timezone
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 
 
@@ -90,35 +90,6 @@ def make_user(email, password, name_first, name_last, u_id):                    
             'channel_id_owners': [],
             'channel_id_members': [],
     }
-    
-'''
-def add_message(message, channel_id, u_id, time_created):
-    store = data_store.get()  
-    user = user_id_check(u_id)
-    message_id = len(message) + random.randrange(1, 1000)
-     if time_created == 0: 
-        time_created = datetime.utcnow()        
-    make_msg = make_message(message, message_id, channel_id, u_id, time_created) 
-    user['messages_created'].append(message)
-
-    store['Messages'].append(make_msg)
-    data_store.set(store)
-    return message_id
-
-def make_message(message, message_id, channel_id, u_id, time_created): 
-    
-    return {
-            'channel_id': channel_id, 
-            'message_id': message_id,  
-            'u_id': u_id, 
-            'message': message,
-            'time_created': time_created,
-    }
-'''
-
-
-
-
 
 
 def create_handle(first_name, last_name):
