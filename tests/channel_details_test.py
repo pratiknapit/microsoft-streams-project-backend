@@ -39,11 +39,6 @@ def test_invalid_channel_details(clear):
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
     dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
 
-    with pytest.raises(AccessError):
-        channel_details_v1(dummy_user_3['auth_user_id'], dummy_user_2_channel['channel_id'])
-    with pytest.raises(InputError):
-        channel_details_v1(dummy_user_2['auth_user_id'], 63043)
-
 def test_valid_channel_details(clear):
     clear_v1()
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
