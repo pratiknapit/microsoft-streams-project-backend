@@ -92,7 +92,8 @@ def channels_create_v1(auth_user_id, name, is_public):
     added_channel = add_channel(auth_user_id, name, is_public) #i need a function to add channel
    
     return { #here we return dictionary containing channel of the recently added chanel 
-        'channel_id': added_channel['channel_id']
+        'channel_id': added_channel['channel_id'],
+        'name': added_channel['name']
     }
 
 #this is a basic prints to see what our functions output.
