@@ -4,7 +4,6 @@ from src.auth import auth_register_v1
 from src.channels import channels_create_v1
 from src.channel import channel_invite_v1, channel_details_v1
 
-
 # Dummy case created for testing of different parts of channel_invite_v1
 dummyy = auth_register_v1('smarttdummy@gmail.com', 'passworddd', 'smartt', 'dummy')
 bad_dummy = auth_register_v1('baddummy@gmail.com', 'yessword', 'bad', 'dummy')
@@ -105,4 +104,9 @@ channel_invite_v1(dumba['auth_user_id'], bad_dummy_channel['channel_id'], domba[
 channel_invite_v1(gooba['auth_user_id'], bad_dummy_channel['channel_id'], dummy['auth_id'])
 # Everything is incorrect
 channel_invite_v1(dumba['auth_user_id'], bad_duma['channel_id'], goomba['auth_id'])
+
+def test_channel_invite_valid():
+    channel_invite_v1(channel_id_bad_dummy['channel_id'], good_dummy['u_id'])
+    assert(channel_invite_v1(bad_dummy['auth_user_id'], bad_dummy_channel['channel_id'], dummy['auth_id']))
+           
 '''
