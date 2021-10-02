@@ -1,6 +1,7 @@
 from src.data_store import data_store, is_public_check, user_channels, add_channel, user_all_channels
 from src.data_store import auth_user_id_check 
-from src.error import InputError
+from src.auth import auth_register_v1
+from src.error import AccessError, InputError
 
 
 
@@ -18,7 +19,7 @@ def channels_list_v1(auth_user_id):
     
 
     if auth_user_id_check(auth_user_id) == False:
-        raise InputError
+        raise AccessError
     
     
     #this will just return a dictionary that looks like the stub below
@@ -50,7 +51,7 @@ def channels_list_v1(auth_user_id):
 def channels_listall_v1(auth_user_id):
     
     if auth_user_id_check(auth_user_id) == False:
-        raise InputError
+        raise AccessError
     
 
     return user_all_channels(auth_user_id)
@@ -81,7 +82,7 @@ def channels_listall_v1(auth_user_id):
 def channels_create_v1(auth_user_id, name, is_public):
 
     if auth_user_id_check(auth_user_id) == False:
-        raise InputError
+        raise AccessError
 
     if len(name) < 1 or len(name) > 20:
         raise InputError
@@ -98,12 +99,21 @@ def channels_create_v1(auth_user_id, name, is_public):
 
 #this is a basic prints to see what our functions output.
 if __name__ == '__main__':
-    print(channels_create_v1(1233241324, "School", True))
-    print(channels_create_v1(1233241324, "ChannelForSport", True))
-    print(channels_create_v1(1233241324, "ChannelForFriends", False))
-    print(channels_create_v1(345, 'FavChannel', True))
-    print(channels_list_v1(1233241324))
+
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
+    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
+
+    print(channels_create_v1(dummy_user_1['auth_user_id'], 'dummy_user_1_channel', True))
     print("")
-    print(channels_listall_v1(1233241324)) 
+    print(channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True))
+    print("")
+    print(channels_create_v1(dummy_user_3['auth_user_id'], 'dummy_user_3_channel', True))
+    print("")
+    print(channels_create_v1(dummy_user_1['auth_user_id'], 'dummy_user_4_channel', True))
+    print("")
+    print(channels_list_v1(dummy_user_1['auth_user_id']))
+    print("")
+    print(channels_listall_v1(dummy_user_1['auth_user_id'])) 
     
 

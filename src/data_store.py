@@ -113,7 +113,9 @@ def user_channels(u_id):
     for channel in store['channels']: 
         for member in channel['all_members']:
             if member == u_id:
-                user_list_channel['channels'].append(channel)
+                user_list_channel['channels'].append(
+                    {'channel_id': channel['channel_id'], 'name': channel['name']}
+                )
         
     return user_list_channel
 
@@ -122,9 +124,17 @@ def user_channels(u_id):
 def user_all_channels(u_id):
     store = data_store.get()    
 
-    user_list_channel = { 'channels': store['channels'] }
-         
-    return user_list_channel
+    all_channels_list = {
+        'channels': [
+
+        ],
+    }
+    for channel in store['channels']:
+        all_channels_list['channels'].append(
+            {'channel_id': channel['channel_id'], 'name': channel['name']}
+        )
+  
+    return all_channels_list
 
 # def functions to help with Channel create, channels list and channels list all 
 
@@ -213,6 +223,13 @@ def check_if_user_is_channel_member(auth_user_id, channel_id):
                     value = True 
     return value
 
+def check_if_channel_is_public_or_private(channel_id):
+    store = data_store.get()
+    channel_storage = channel_id_check(channel_id)
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_storage['channel_id']:
+            return channel['is_public']
+            
 def user_id_check(u_id):
     data = data_store.get()
     for user in data['users']:

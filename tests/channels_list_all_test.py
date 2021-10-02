@@ -1,21 +1,23 @@
 import pytest
 
-from src.error import InputError
+from src.error import AccessError, InputError
 from src.auth import auth_register_v1
 from src.channels import channels_listall_v1, channels_create_v1 
 from src.other import clear_v1
 
 
 #Creating Dummy Variables
+"""
 dummy1 = auth_register_v1("dummyvariable1@gmail.com", "dummy1pw", "dummy1", "variable")
 dummy2 = auth_register_v1("dummyvariable2@gmail.com", "dummy2pw", "dummy2", "variable")
 dummy1_id = dummy1['auth_user_id']
 dummy2_id = dummy2['auth_user_id']
+"""
 
 #Testing Errors
 def test_user_is_valid(): 
     clear_v1()
-    with pytest.raises(InputError): 
+    with pytest.raises(AccessError): 
         channels_listall_v1(12345)
 
 #Testing functionality
