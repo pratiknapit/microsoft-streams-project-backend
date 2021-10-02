@@ -5,6 +5,7 @@ from src.channels import channels_create_v1
 from src.channel import channel_join_v1
 from src.channel import channel_details_v1
 from src.other import clear_v1
+from src.data_store import auth_user_id_check
 
 steven = auth_register_v1("stevensmart@gmail.com", "password", "stevenn", "chenn")
 steven_channel_id = channels_create_v1(steven['auth_user_id'], 'steven_channel', True)
