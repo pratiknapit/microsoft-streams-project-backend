@@ -1,4 +1,5 @@
 from src.error import InputError, AccessError
+from src.data_store import auth_user_id_check, channel_id_check, check_if_user_is_channel_member, data_store, check_if_channel_is_public_or_private
 from src.data_store import channel_id_check, check_if_user_is_channel_member, auth_user_id_check
 from src.data_store import data_store
 
@@ -33,6 +34,8 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
 def channel_details_v1(auth_user_id, channel_id):
     
+    if not auth_user_id_check(auth_user_id):
+        raise AccessError
     #Check if channel_id is valid
     if channel_id_check(channel_id) == False:       
         raise InputError("channel id not valid")
@@ -146,5 +149,27 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 #    }
 
 def channel_join_v1(auth_user_id, channel_id):
-    return {
-    }
+
+    if not auth_user_id_check(auth_user_id):
+        raise AccessError
+
+    if channel_id_check(channel_id) == False:
+        raise InputError
+
+    if check_if_user_is_channel_member(auth_user_id, channel_id) == True:
+        raise InputError 
+
+    if check_if_channel_is_public_or_private(channel_id) == False: 
+        raise AccessError
+
+    
+    All_channels_storage = data_store.get()
+    channel_to_join = channel_id_check(channel_id)
+    access_user = auth_user_id_check(auth_user_id)
+
+    for channel in All_channels_storage['channels']:
+        if channel['channel_id'] == channel_to_join['channel_id']:
+            channel['all_members'].append(auth_user_id)
+
+    return {}
+
