@@ -23,7 +23,7 @@ def auth_login_v1(email, password):
 
     cur_user = login_email(email) 
     return {
-        "auth_user_id": cur_user["auth_user_id"],
+        "auth_user_id": cur_user["u_id"],
     }
 
 def auth_register_v1(email, password, name_first, name_last):                     # Add_user
@@ -41,5 +41,5 @@ def auth_register_v1(email, password, name_first, name_last):                   
 
     added_user = add_user(email, password, name_first, name_last)
     return {
-        "auth_user_id": added_user["auth_user_id"],
+        "auth_user_id": added_user["u_id"],
     }
