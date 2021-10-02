@@ -45,7 +45,7 @@ def test_auth_login_email_invalid():
 def test_auth_register_user_valid():
     clear_v1()
     valid_user = auth_register_v1("validummy@gmail.com", "password", "smart", "dummy")
-    assert(valid_user == {"auth_user_id": valid_user["auth_user_id"]})
+    assert(valid_user == {"auth_user_id": valid_user["u_id"]})
 
 
 dummy = auth_register_v1("smartdummy@gmail.com", "password", "smart", "dummy")

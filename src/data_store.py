@@ -30,7 +30,7 @@ import random
 
 
 initial_object = {
-    'user': [    
+    'users': [    
     ],
     'channels': [
     ],
@@ -72,16 +72,16 @@ def add_channel(auth_user_id, name, is_public):
 def add_user(email, password, name_first, name_last):
     
     store = data_store.get()                                                    # gets user data from initial_object
-    auth_user_id = len(name_first) + len(name_last) + len(email) + random.randrange(1, 1000)
-    user = make_user(email, password, name_first, name_last, auth_user_id)   
-    store['user'].append(user)
+    u_id = len(name_first) + len(name_last) + len(email) + random.randrange(1, 1000)
+    user = make_user(email, password, name_first, name_last, u_id)   
+    store['users'].append(user)
     data_store.set(store)
     return user
 
-def make_user(email, password, name_first, name_last, auth_user_id):                    # Remember to Add more fields
+def make_user(email, password, name_first, name_last, u_id):                    # Remember to Add more fields
 
     return {
-            'auth_user_id': auth_user_id,
+            'u_id': u_id,
             'email': email,  
             'password': password, 
             'name_first': name_first,
@@ -174,14 +174,14 @@ def is_public_check(is_public):
 # Function Checks - Yuchao
 def handle_check(handle_str):                                                   # Function to check handle uniqueness
     data = data_store.get()
-    for user in data['user']:
+    for user in data['users']:
         if user['handle_str'] == handle_str:
             return True
     return False
 
 def auth_user_id_check(auth_user_id):
     data = data_store.get()
-    for user in data['user']:
+    for user in data['users']:
         if int(user['auth_user_id']) == int(auth_user_id):
             return user
     return False
@@ -195,21 +195,21 @@ def email_check(email):
 
 def email_repeat_check(email):
     data = data_store.get()
-    for user in data['user']:
+    for user in data['users']:
         if user['email'] == email:
             return True
     return False
 
 def login_email(email):
     data = data_store.get()
-    for user in data['user']:
+    for user in data['users']:
         if user['email'] == email:
             return user
     return False
 
 def password_check(password):
     data = data_store.get()
-    for user in data['user']:
+    for user in data['users']:
         if user['password'] == password:
             return user
     return False
