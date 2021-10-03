@@ -77,7 +77,7 @@ def test_channels_list_all_return_type():
     })
 
 
-def test_channels_list_all_multiple():
+def test_channels_list_all_multiple_by_user_2():
     clear_v1()
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
@@ -102,4 +102,26 @@ def test_channels_list_all_multiple():
 
 #def test if channels list all works with different other functions in the iteration
 
+def test_channels_list_all_multiple_by_user_3():
+    clear_v1()
+    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
+    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
+    dummy_user_4 = auth_register_v1('dummyuser4@gmail.com', 'passsssworddd', 'Deal', 'DD')
+
+    dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
+    dummy_user_3_channel = channels_create_v1(dummy_user_3['auth_user_id'], 'dummy_user_3_channel', True) 
+    dummy_user_4_channel = channels_create_v1(dummy_user_4['auth_user_id'], 'dummy_user_4_channel', True)
+
+    #Dummy user 2 is calling channel list all.
+    dummy_user_3_channels_list_all = channels_listall_v1(dummy_user_3['auth_user_id'])
+
+    result = 0
+    for channel in dummy_user_3_channels_list_all['channels']:
+        if channel['channel_id'] == dummy_user_2_channel['channel_id'] and channel['name'] == "dummy_user_2_channel":
+            result += 1
+        if channel['channel_id'] == dummy_user_3_channel['channel_id'] and channel['name'] == "dummy_user_3_channel":
+            result += 1
+        if channel['channel_id'] == dummy_user_4_channel['channel_id'] and channel['name'] == "dummy_user_4_channel":
+            result += 1
+    assert (result == 3)
 
