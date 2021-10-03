@@ -30,8 +30,6 @@ initial_object = {
     ],
     'channels': [
     ],
-    'Messages': [
-    ], 
 }
 # Channels Helper Check Functions 
 
@@ -43,7 +41,8 @@ def make_channel(u_id, channel_id, name, is_public):
         'name': name,
         'is_public': is_public,
         'owner_members': [u_id],
-        'all_members': [u_id]
+        'all_members': [u_id],
+        'Messages': [],
     }
 
 
