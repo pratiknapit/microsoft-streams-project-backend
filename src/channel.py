@@ -50,6 +50,18 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {}
 
 def channel_details_v1(auth_user_id, channel_id):
+    '''
+    Arguments:
+        auth_user_id (int)          - Autherisation hash of the user that is in the channel.
+        channel_id (int)            - The id of channel we need details from.
+    
+    Exceptions: 
+        InputError      - Occurs when the inputted channel_id is not valid.
+        AccessError     - Occurs when user is not autherised and when user is not a member of the channel.
+    
+    Return Value:
+        Returns a dictionery containing information about the channel such as 'name', 'is_public', 'owner_members', 'all_members'
+    '''
     
     if not auth_user_id_check(auth_user_id):
         raise AccessError
@@ -188,7 +200,18 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 #    }
 
 def channel_join_v1(auth_user_id, channel_id):
-
+    '''
+    Arguments:
+        auth_user_id (int)          - Autherisation hash of the user that is trying to join the channel
+        channel_id (int)            - The id of the channel that the user is trying to join
+    
+    Exceptions: 
+        InputError      - Occurs when the inputted channel_id is not valid and user is not a channel member
+        AccessError     - Occurs when user is not autherised and when user is trying to join a private channel
+    
+    Return Value:
+        Returns an empty dictionery
+    '''
     if not auth_user_id_check(auth_user_id):
         raise AccessError
 
