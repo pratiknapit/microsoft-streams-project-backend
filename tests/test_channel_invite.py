@@ -26,31 +26,21 @@ def clear():
     clear_v1()
 
 
-
 def test_channel_invite_channel_invalid(clear, dummy_cases):
     # channel id is incorrect (no such channel id exists)
     with pytest.raises(InputError):
-         assert channel_invite_v1(dummy_cases['dummy_user_2']['auth_user_id'], 23455,
+        assert channel_invite_v1(dummy_cases['dummy_user_2']['auth_user_id'], 23455,
         dummy_cases['dummy_user_1']['auth_user_id'])
 
-'''
-def test_channel_invite_no_user_or_incorrect_user_invalid(clear, dummy_cases):
+
+def test_channel_invite_incorrect_user_invalid(clear, dummy_cases):
     #user id is incorrect (no such user id exists)
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channel_invite_v1(dummy_cases['dummy_user_2']['auth_user_id'],
         dummy_cases['dummy_user_2_channel']['channel_id'], 
-        234)
-'''
+        23453364)
 
-def test_channel_invite_self_invalid(clear, dummy_cases):
-    # user 2 is trying to send himself an invite, even though user 2 is already in the channel
-    with pytest.raises(AccessError):
-        channel_invite_v1(dummy_cases['dummy_user_2']['auth_user_id'],
-        dummy_cases['dummy_user_2_channel']['channel_id'], 
-        dummy_cases['dummy_user_2']['auth_user_id'])
-
-
-def test_channel_invite_no_user_in_channel_invalid(clear, dummy_cases):
+def test_channel_invite_auth_not_in_channel_invalid(clear, dummy_cases):
     with pytest.raises(AccessError):
         # Correct auth_user_id but the inviter is not a member of the channel
         # user 1 is not part of channel but they trying to create a channel invite for user 3
@@ -63,13 +53,12 @@ def test_channel_invite_already_in_channel_invalid(clear, dummy_cases):
     # next user 1 tries to inviter user 2 even though user 2 is already in channel
     channel_join_v1(dummy_cases['dummy_user_1']['auth_user_id'], 
     dummy_cases['dummy_user_2_channel']['channel_id'])
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channel_invite_v1(dummy_cases['dummy_user_1']['auth_user_id'],
         dummy_cases['dummy_user_2_channel']['channel_id'], 
         dummy_cases['dummy_user_2']['auth_user_id'])
 
-
-#testing functionality
+#testing functionality of channel_invite
 def test_channel_invite_valid(clear, dummy_cases):    
     empty = channel_invite_v1(dummy_cases['dummy_user_2']['auth_user_id'], dummy_cases['dummy_user_2_channel']['channel_id'], dummy_cases['dummy_user_3']['auth_user_id']) 
     dummy_user_2_channel_details = channel_details_v1(dummy_cases['dummy_user_2']['auth_user_id'], dummy_cases['dummy_user_2_channel']['channel_id'])

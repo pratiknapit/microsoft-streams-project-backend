@@ -1,6 +1,6 @@
 from src.error import InputError, AccessError
 from src.data_store import auth_user_id_check, channel_id_check, check_if_user_is_channel_member, data_store, check_if_channel_is_public_or_private
-from src.data_store import channel_id_check, check_if_user_is_channel_member, auth_user_id_check
+from src.data_store import channel_id_check, check_if_user_is_channel_member, auth_user_id_check, user_id_check
 from src.data_store import data_store
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
@@ -8,22 +8,21 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     if not channel_id_check(channel_id): 
             raise InputError
 
-    # check if user id correct otherwise return Input Error (not valid  user id or user 
-    # already in channel)
+    # checks if user_id is correct, if not, it raises an InputError
+    if not user_id_check(u_id):
+            raise InputError
+
+    # check if auth_user_id correct otherwise return InputError
     if not auth_user_id_check(auth_user_id):
-            raise AccessError
+            raise InputError
     
-    # check when channel id corect but user(who invited) not part of channel
-    if check_if_user_is_channel_member(u_id, channel_id) == True:
-            raise AccessError
-    
-    #check if the user invited is already part of channel
+    # check if channel id correct but auth user is not a member of the channel
     if check_if_user_is_channel_member(auth_user_id, channel_id) == False:
         raise AccessError 
 
-    #check if user is inviting himself
-    if auth_user_id == u_id:
-        raise AccessError
+    #check if the user invited is already part of channel
+    if check_if_user_is_channel_member(u_id, channel_id) == True:
+        raise InputError 
     
     data = data_store.get()
     user = auth_user_id_check(auth_user_id)
