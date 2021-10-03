@@ -235,13 +235,6 @@ def user_id_check(u_id):
             return user
     return False
 
-def msg_channel_check(channel_id):
-    data = data_store.get()
-    for msg in data['Messages']:
-        if msg['channel_id'] == channel_id:
-            return True
-    return False
-
 
 ###################################################################
 class Datastore:

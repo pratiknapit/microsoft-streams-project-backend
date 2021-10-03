@@ -167,6 +167,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     messages_dictionary["end"] = end
 
     return messages_dictionary
+    
 
 def channel_join_v1(auth_user_id, channel_id):
     '''
