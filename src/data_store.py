@@ -212,6 +212,8 @@ def channel_id_check(channel_id):
 def check_if_user_is_channel_member(auth_user_id, channel_id):
     store = data_store.get()
     user = auth_user_id_check(auth_user_id) 
+    if user == False:
+        return False
     value = False 
     for Dict in store['channels']:
         if int(Dict['channel_id']) == int(channel_id):
