@@ -41,7 +41,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         raise InputError 
     
     data = data_store.get()
-    user = auth_user_id_check(auth_user_id)
+    user = auth_user_id_check(u_id)
     for channel in data["channels"]:
         if channel["channel_id"] == channel_id:
             channel["all_members"].append(user["u_id"])
