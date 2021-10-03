@@ -1,6 +1,6 @@
 from src.error import InputError, AccessError
 from src.data_store import auth_user_id_check, channel_id_check, check_if_user_is_channel_member, data_store, check_if_channel_is_public_or_private
-from src.data_store import channel_id_check, check_if_user_is_channel_member, auth_user_id_check
+from src.data_store import channel_id_check, check_if_user_is_channel_member, auth_user_id_check, msg_channel_check
 from src.data_store import data_store
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
@@ -149,51 +149,55 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     dict_finish = {
         'messages':[]
     }
-    dict_start = data_store.get()['Messages']
-   
-    count = 0
+    dict_start = store['Messages']
+    msg_count = 0
     if len(dict_start) != 0:
-        for msg in reversed(dict_start):            
-            if count >= start:                 
+        for msg in reversed(dict_start): 
+            if msg_channel_check(channel_id) and msg_count >= start:
+                      
                 fields = {
                     'message_id': msg['message_id'],
-                    'u_id': msg['auth_user_id'],
+                    'u_id': msg['u_id'],
                     'message': msg['message'],
                     'time_created': msg['time_created'],                        
                 }
                 dict_finish['messages'].append(fields)    
-                count += 1
-            if count >= 50:
-                count = -1
-                break
+                msg_count += 1
+                if msg_count > total_messages:
+                    msg_count = -1
+                    break
+                elif msg_count > 50:
+                    msg_count = -1
+                    break
+                    
     
     dict_finish['start'] = start
-    dict_finish['end'] = count
+    dict_finish['end'] = msg_count
     return dict_finish
 
-####
-#    return {
-#        'messages': [
-#            {
-#                'message_id': 1,
-#                'u_id': 1,
-#                'message': 'Hello world',
-#                'time_created': 1582426789,
-#            }
-#        ],
-#        'start': 0,
-#        'end': 50,
-#    }
-
+'''
+    return {
+        'messages': [
+            {
+                'message_id': 1,
+                'u_id': 1,
+                'message': 'Hello world',
+                'time_created': 1582426789,
+            }
+        ],
+        'start': 0,
+        'end': 50,
+    }
+'''
 def channel_join_v1(auth_user_id, channel_id):
     '''
     Arguments:
-        auth_user_id (int)          - Autherisation hash of the user that is trying to join the channel
+        auth_user_id (int)          - Authorisation hash of the user that is trying to join the channel
         channel_id (int)            - The id of the channel that the user is trying to join
     
     Exceptions: 
         InputError      - Occurs when the inputted channel_id is not valid and user is not a channel member
-        AccessError     - Occurs when user is not autherised and when user is trying to join a private channel
+        AccessError     - Occurs when user is not authorised and when user is trying to join a private channel
     
     Return Value:
         Returns an empty dictionery

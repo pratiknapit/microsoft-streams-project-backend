@@ -118,7 +118,7 @@ def user_channels(u_id):
         
     return user_list_channel
 
-# def function to return list of channels that user is part of including priv channels
+# def function to return list of channels that user is part of including private channels
 
 def user_all_channels(u_id):
     store = data_store.get()    
@@ -135,7 +135,7 @@ def user_all_channels(u_id):
   
     return all_channels_list
 
-# def functions to help with Channel create, channels list and channels list all 
+# def functions to help with Channel create, channels_list and channels_listall 
 
 #check if channel is in our database and returns it. 
 def channel_check(channel_id):
@@ -234,6 +234,12 @@ def user_id_check(u_id):
             return user
     return False
 
+def msg_channel_check(channel_id):
+    data = data_store.get()
+    for msg in data['Messages']:
+        if msg['channel_id'] == channel_id:
+            return True
+    return False
 
 
 ###################################################################
