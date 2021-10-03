@@ -46,9 +46,9 @@ def test_valid_channel_details(clear):
     if channel['name'] == 'dummy_user_2_channel':
         if channel['is_public'] == True:
             for member in channel['owner_members']:
-                if member == dummy_user_2['auth_user_id']:
+                if member['u_id'] == dummy_user_2['auth_user_id']:
                     for mem in channel['all_members']:
-                        if mem == dummy_user_2['auth_user_id']:
+                        if mem['u_id'] == dummy_user_2['auth_user_id']:
                             value = True 
     else: 
         value = False

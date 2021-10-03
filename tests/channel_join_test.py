@@ -52,7 +52,7 @@ def test_if_joining_works():
     value = False
 
     for member in channel_data['all_members']:
-        if member == dummy_user_3['auth_user_id']:
+        if member['u_id'] == dummy_user_3['auth_user_id']:
             value = True
 
     assert (value == True)

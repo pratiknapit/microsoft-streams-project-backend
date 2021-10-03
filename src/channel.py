@@ -14,6 +14,9 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
             raise AccessError
             #not inputerror
 
+    if not auth_user_id_check(u_id):
+            raise AccessError
+
     # check when channel id corect but user(who invited) not part of channel
     if not check_if_user_is_channel_member(auth_user_id, channel_id):
             raise AccessError
@@ -47,13 +50,41 @@ def channel_details_v1(auth_user_id, channel_id):
     channel_details_dictionary = {      
     }
 
+    
+
     #Something that will let me access the channels dictionary
     extract_channel_details = channel_id_check(channel_id)            
     channel_details_dictionary['name'] = extract_channel_details['name']                        
     channel_details_dictionary['is_public'] = extract_channel_details['is_public']
-    channel_details_dictionary['owner_members'] = extract_channel_details['owner_members']
-    channel_details_dictionary['all_members'] = extract_channel_details['all_members']
     
+    owner_auth_id = extract_channel_details['owner_members']
+    channel_details_dictionary['owner_members'] = []
+    new_owner_ids = {
+
+    }
+    owner_id = auth_user_id_check(owner_auth_id[0])
+    new_owner_ids['u_id'] = owner_id['u_id']
+    new_owner_ids['email'] = owner_id['email']
+    new_owner_ids['name_first'] = owner_id['name_first']
+    new_owner_ids['name_last'] = owner_id['name_last']
+    new_owner_ids['handle_str'] = owner_id['handle_str']
+    channel_details_dictionary['owner_members'].append(new_owner_ids)
+    
+    member_id = extract_channel_details['all_members']
+    channel_details_dictionary['all_members'] = []
+    
+    for member in member_id:
+        member_dict = {
+
+        }
+        mem_id = auth_user_id_check(member)
+        member_dict['u_id'] = mem_id['u_id']
+        member_dict['email'] = mem_id['email']
+        member_dict['name_first'] = mem_id['name_first']
+        member_dict['name_last'] = mem_id['name_last']
+        member_dict['handle_str'] = mem_id['handle_str']
+        channel_details_dictionary['all_members'].append(member_dict)
+
     return channel_details_dictionary
 '''
 return {
@@ -153,8 +184,11 @@ def channel_join_v1(auth_user_id, channel_id):
     if check_if_user_is_channel_member(auth_user_id, channel_id) == True:
         raise InputError 
 
-    if check_if_channel_is_public_or_private(channel_id) == False: 
-        raise AccessError
+    user_detail = auth_user_id_check(auth_user_id)
+    if user_detail['is_global_owner'] == 2:
+        if check_if_channel_is_public_or_private(channel_id) == False: 
+            raise AccessError
+        
 
     
     All_channels_storage = data_store.get()

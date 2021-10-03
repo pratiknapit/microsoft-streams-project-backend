@@ -24,9 +24,6 @@ Example usage:
     data_store.set(store)
 '''
 import re
-import random
-## YOU SHOULD MODIFY THIS OBJECT BELOW
-
 
 initial_object = {
     'users': [    
@@ -36,16 +33,13 @@ initial_object = {
     'Messages': [
     ], 
 }
+# Channels Helper Check Functions 
 
-
-#Channels functions - made by Pratik 
-
-# def function to make channel dictionary
-
+# Function to make_channel dictionary
 def make_channel(u_id, channel_id, name, is_public):
 
     return {
-        'channel_id': channel_id, #need to make this in another function
+        'channel_id': channel_id, 
         'name': name,
         'is_public': is_public,
         'owner_members': [u_id],
@@ -53,31 +47,32 @@ def make_channel(u_id, channel_id, name, is_public):
     }
 
 
-# def function to add channel to list 
-
+# Function to add_channel to list 
 def add_channel(u_id, name, is_public):
-    store = data_store.get() #retrieve our initial object data
-    channel_id = len(store['channels']) + 1 #use this function above to get channel id, we might not even need the function 
+    store = data_store.get()                                                    # retrieve data from initial_object data base
+    channel_id = len(store['channels']) + 1                                   
     channel = make_channel(u_id, channel_id, name, is_public)
     store['channels'].append(channel)
 
-    data_store.set(store) #believe that this should just make sure that the data is still a dictionary
-    #need to make a new list which only returns { channel_id }
+    data_store.set(store) 
     return channel
 
-# def function to return list of channels that user is part of 
-
-
+# Function to add_user to list 
 def add_user(email, password, name_first, name_last):
-    
-    store = data_store.get()                                                    # gets user data from initial_object
-    u_id = len(name_first) + len(name_last) + len(email) + random.randrange(1, 1000)
+
+    store = data_store.get()                                                  
+    u_id = len(store['users']) + 1
     user = make_user(email, password, name_first, name_last, u_id)   
     store['users'].append(user)
     data_store.set(store)
     return user
 
-def make_user(email, password, name_first, name_last, u_id):                    # Remember to Add more fields
+# Function to make user
+def make_user(email, password, name_first, name_last, u_id):                    
+    store = data_store.get() 
+    is_global_owner = 2
+    if len(store['users']) == 0:
+        is_global_owner = 1
 
     return {
             'u_id': u_id,
@@ -88,27 +83,32 @@ def make_user(email, password, name_first, name_last, u_id):                    
             'handle_str': create_handle(name_first, name_last),
             'channel_id_owners': [],
             'channel_id_members': [],
+            'is_global_owner': is_global_owner
     }
 
-
+# Function to create_handle
 def create_handle(first_name, last_name):
-    
+
     prototype_handle = first_name + last_name                                   # Concatenation of first and last name
     prototype_handle = prototype_handle.lower()                                 # lowercased string
 
-    if handle_check(prototype_handle):                                          # If same handle
-        prototype_handle = prototype_handle + str(count)             # Generate unique handle based on random generator (security)
-
     if len(prototype_handle) > 20:                                              # Ensure handle size less than 20 chars
-        prototype_handle = prototype_handle[0:20]
+            prototype_handle = prototype_handle[0:20]
+    
+    first_proto = prototype_handle
+    count = 0
+    while handle_check(prototype_handle) == True:
+        prototype_handle = first_proto + str(count)
+        count += 1   
+    return prototype_handle
+        
 
 def user_channels(u_id):
     store = data_store.get()
     user_list_channel = {
         'channels': [
-
         ],
-    } #this is empty list that we will append to
+    }
     for channel in store['channels']: 
         for member in channel['all_members']:
             if member == u_id:
@@ -118,7 +118,7 @@ def user_channels(u_id):
         
     return user_list_channel
 
-# def function to return list of channels that user is part of  including priv channels
+# def function to return list of channels that user is part of including priv channels
 
 def user_all_channels(u_id):
     store = data_store.get()    
@@ -152,7 +152,6 @@ def is_public_check(is_public):
         return True
     return False 
 
-# Function Checks - Yuchao
 def handle_check(handle_str):                                                   # Function to check handle uniqueness
     data = data_store.get()
     for user in data['users']:
@@ -209,7 +208,7 @@ def channel_id_check(channel_id):
 			return channel
 	
 	return False
-#####################
+
 def check_if_user_is_channel_member(auth_user_id, channel_id):
     store = data_store.get()
     user = auth_user_id_check(auth_user_id) 
@@ -217,7 +216,6 @@ def check_if_user_is_channel_member(auth_user_id, channel_id):
     for Dict in store['channels']:
         if int(Dict['channel_id']) == int(channel_id):
             for member in Dict['all_members']:
-               #if member["auth_user_id"] == user["auth_user_id"]:
                 if member == user['u_id']:
                     value = True 
     return value
@@ -238,8 +236,7 @@ def user_id_check(u_id):
 
 
 
-## YOU SHOULD MODIFY THIS OBJECT ABOVE
-
+###################################################################
 class Datastore:
     def __init__(self):
         self.__store = initial_object
