@@ -22,15 +22,15 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     # check if corect channel id otherwise return Input error (not valid channel)
     if not channel_id_check(channel_id): 
-            raise InputError
+        raise InputError
 
     # checks if user_id is correct, if not, it raises an InputError
     if not user_id_check(u_id):
-            raise InputError
+        raise InputError
 
     # check if auth_user_id correct otherwise return InputError
     if not auth_user_id_check(auth_user_id):
-            raise InputError
+        raise InputError
     
     # check if channel id correct but auth user is not a member of the channel
     if check_if_user_is_channel_member(auth_user_id, channel_id) == False:
@@ -76,8 +76,6 @@ def channel_details_v1(auth_user_id, channel_id):
     channel_details_dictionary = {      
     }
 
-    
-
     #Something that will let me access the channels dictionary
     extract_channel_details = channel_id_check(channel_id)            
     channel_details_dictionary['name'] = extract_channel_details['name']                        
@@ -86,7 +84,6 @@ def channel_details_v1(auth_user_id, channel_id):
     owner_auth_id = extract_channel_details['owner_members']
     channel_details_dictionary['owner_members'] = []
     new_owner_ids = {
-
     }
     owner_id = auth_user_id_check(owner_auth_id[0])
     new_owner_ids['u_id'] = owner_id['u_id']
@@ -226,13 +223,11 @@ def channel_join_v1(auth_user_id, channel_id):
         if check_if_channel_is_public_or_private(channel_id) == False: 
             raise AccessError
         
-
-    
-    All_channels_storage = data_store.get()
+    store = data_store.get()
     channel_to_join = channel_id_check(channel_id)
     access_user = auth_user_id_check(auth_user_id)
 
-    for channel in All_channels_storage['channels']:
+    for channel in store['channels']:
         if channel['channel_id'] == channel_to_join['channel_id']:
             channel['all_members'].append(auth_user_id)
 
