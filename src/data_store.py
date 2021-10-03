@@ -24,7 +24,6 @@ Example usage:
     data_store.set(store)
 '''
 import re
-import random
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 
@@ -70,15 +69,20 @@ def add_channel(u_id, name, is_public):
 
 
 def add_user(email, password, name_first, name_last):
-    
+
     store = data_store.get()                                                    # gets user data from initial_object
-    u_id = len(name_first) + len(name_last) + len(email) + random.randrange(1, 1000)
+    u_id = len(store['users']) + 1
     user = make_user(email, password, name_first, name_last, u_id)   
     store['users'].append(user)
     data_store.set(store)
     return user
 
 def make_user(email, password, name_first, name_last, u_id):                    # Remember to Add more fields
+    store = data_store.get() 
+    is_global_owner = 2
+    if len(store['users']) == 0:
+        is_global_owner = 1
+
     return {
             'u_id': u_id,
             'email': email,  
@@ -88,48 +92,29 @@ def make_user(email, password, name_first, name_last, u_id):                    
             'handle_str': create_handle(name_first, name_last),
             'channel_id_owners': [],
             'channel_id_members': [],
+            'is_global_owner': is_global_owner
     }
-    
-'''
-def add_message(message, channel_id, u_id, time_created):
-    store = data_store.get()  
-    user = user_id_check(u_id)
-    message_id = len(message) + random.randrange(1, 1000)
-     if time_created == 0: 
-        time_created = datetime.utcnow()        
-    make_msg = make_message(message, message_id, channel_id, u_id, time_created) 
-    user['messages_created'].append(message)
-
-    store['Messages'].append(make_msg)
-    data_store.set(store)
-    return message_id
-
-def make_message(message, message_id, channel_id, u_id, time_created): 
-    
-    return {
-            'channel_id': channel_id, 
-            'message_id': message_id,  
-            'u_id': u_id, 
-            'message': message,
-            'time_created': time_created,
-    }
-'''
-
-
-
-
 
 
 def create_handle(first_name, last_name):
-    
+
     prototype_handle = first_name + last_name                                   # Concatenation of first and last name
     prototype_handle = prototype_handle.lower()                                 # lowercased string
 
-    if handle_check(prototype_handle):                                          # If same handle
-        prototype_handle = prototype_handle + str(random.randrange(1, 1000))             # Generate unique handle based on random generator (security)
-
     if len(prototype_handle) > 20:                                              # Ensure handle size less than 20 chars
-        prototype_handle = prototype_handle[0:20]
+            prototype_handle = prototype_handle[0:20]
+    
+    first_proto = prototype_handle
+    count = 0
+    while handle_check(prototype_handle) == True:
+        prototype_handle = first_proto + str(count)
+        count += 1
+    
+    return prototype_handle
+
+
+    # if not any(char.isdigit() for char in prototype_handle):
+        
 
 def user_channels(u_id):
     store = data_store.get()
@@ -141,7 +126,9 @@ def user_channels(u_id):
     for channel in store['channels']: 
         for member in channel['all_members']:
             if member == u_id:
-                user_list_channel['channels'].append(channel)
+                user_list_channel['channels'].append(
+                    {'channel_id': channel['channel_id'], 'name': channel['name']}
+                )
         
     return user_list_channel
 
@@ -150,9 +137,17 @@ def user_channels(u_id):
 def user_all_channels(u_id):
     store = data_store.get()    
 
-    user_list_channel = { 'channels': store['channels'] }
-         
-    return user_list_channel
+    all_channels_list = {
+        'channels': [
+
+        ],
+    }
+    for channel in store['channels']:
+        all_channels_list['channels'].append(
+            {'channel_id': channel['channel_id'], 'name': channel['name']}
+        )
+  
+    return all_channels_list
 
 # def functions to help with Channel create, channels list and channels list all 
 
