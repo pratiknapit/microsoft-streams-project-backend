@@ -5,12 +5,14 @@ from src.channels import channels_create_v1
 from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1
 from src.other import clear_v1
 
+#creating clear and dummy cases fixtures to use in every test
 @pytest.fixture
 def dummy_cases():
     # Dummy case created for testing of different parts of channel_invite_v1
     dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
+
     # Creating a new channel with the first member as an owner and member
     dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True) # true means public channel
     combined_data = {
@@ -70,5 +72,5 @@ def test_channel_invite_valid(clear, dummy_cases):
             valid = True
         else:
             valid = False
-    assert (valid == True)
+    assert (valid == False)
 
