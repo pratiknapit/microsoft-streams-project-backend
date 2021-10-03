@@ -87,6 +87,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     if len(name) < 1 or len(name) > 20:
         raise InputError
 
+
     if is_public_check(is_public) == False:
         raise InputError
 
@@ -96,6 +97,9 @@ def channels_create_v1(auth_user_id, name, is_public):
         'channel_id': added_channel['channel_id'],
         'name': added_channel['name']
     }
+
+
+
 
 #this is a basic prints to see what our functions output.
 if __name__ == '__main__':
