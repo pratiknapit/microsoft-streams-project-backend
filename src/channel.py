@@ -17,7 +17,6 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     if check_if_user_is_channel_member(u_id, channel_id) == True:
             raise AccessError
     
-    
     #check if the user invited is already part of channel
     if check_if_user_is_channel_member(auth_user_id, channel_id) == False:
         raise AccessError 
