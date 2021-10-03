@@ -25,7 +25,6 @@ Example usage:
 '''
 import re
 import random
-from datetime import timezone
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 
 
@@ -98,7 +97,7 @@ def create_handle(first_name, last_name):
     prototype_handle = prototype_handle.lower()                                 # lowercased string
 
     if handle_check(prototype_handle):                                          # If same handle
-        prototype_handle = prototype_handle + str(random.randrange(1, 1000))             # Generate unique handle based on random generator (security)
+        prototype_handle = prototype_handle + str(count)             # Generate unique handle based on random generator (security)
 
     if len(prototype_handle) > 20:                                              # Ensure handle size less than 20 chars
         prototype_handle = prototype_handle[0:20]
