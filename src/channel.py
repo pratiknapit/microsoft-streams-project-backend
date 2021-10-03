@@ -1,30 +1,44 @@
 from src.error import InputError, AccessError
 from src.data_store import auth_user_id_check, channel_id_check, check_if_user_is_channel_member, data_store, check_if_channel_is_public_or_private
-from src.data_store import channel_id_check, check_if_user_is_channel_member, auth_user_id_check
+from src.data_store import channel_id_check, check_if_user_is_channel_member, auth_user_id_check, user_id_check
 from src.data_store import data_store
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
+    '''
+    Arguments:
+        auth_user_id (int)          - Authorisation hash of a user after regiseration from auth_register
+        channel_id (int)            - The id of a channel
+        u_id (int)                  - The auth_user_id of someone else
+
+    Exceptions:
+        InputError      - Occurs when channel_id does not refer to a valid channel
+        InputError      - Occurs when u_id does not refer to a valid user
+        InputError      - Occurs when u_id refers to a user who is already part of the selected channel
+        AccessError     - Occurs when channel_id is valid but the auth_user_id (who is inviting) is not a member of the channel
+
+    Return Value:
+        Returns nothing on the condition that auth_user_id, channel_id and u_id are all correct
+    '''
+
     # check if corect channel id otherwise return Input error (not valid channel)
     if not channel_id_check(channel_id): 
             raise InputError
 
-    # check if user id correct otherwise return Input Error (not valid  user id or user 
-    # already in channel)
+    # checks if user_id is correct, if not, it raises an InputError
+    if not user_id_check(u_id):
+            raise InputError
+
+    # check if auth_user_id correct otherwise return InputError
     if not auth_user_id_check(auth_user_id):
-            raise AccessError
-            #not inputerror
+            raise InputError
+    
+    # check if channel id correct but auth user is not a member of the channel
+    if check_if_user_is_channel_member(auth_user_id, channel_id) == False:
+        raise AccessError 
 
-    if not auth_user_id_check(u_id):
-            raise AccessError
-
-    # check when channel id corect but user(who invited) not part of channel
-    if not check_if_user_is_channel_member(auth_user_id, channel_id):
-            raise AccessError
-
-
-    #check if user is inviting himself
-    if auth_user_id == u_id:
-        raise AccessError
+    # check if the user invited is already part of channel
+    if check_if_user_is_channel_member(u_id, channel_id) == True:
+        raise InputError 
     
     data = data_store.get()
     user = auth_user_id_check(u_id)
@@ -36,6 +50,18 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {}
 
 def channel_details_v1(auth_user_id, channel_id):
+    '''
+    Arguments:
+        auth_user_id (int)          - Autherisation hash of the user that is in the channel.
+        channel_id (int)            - The id of channel we need details from.
+    
+    Exceptions: 
+        InputError      - Occurs when the inputted channel_id is not valid.
+        AccessError     - Occurs when user is not autherised and when user is not a member of the channel.
+    
+    Return Value:
+        Returns a dictionery containing information about the channel such as 'name', 'is_public', 'owner_members', 'all_members'
+    '''
     
     if not auth_user_id_check(auth_user_id):
         raise AccessError
@@ -174,7 +200,18 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 #    }
 
 def channel_join_v1(auth_user_id, channel_id):
-
+    '''
+    Arguments:
+        auth_user_id (int)          - Autherisation hash of the user that is trying to join the channel
+        channel_id (int)            - The id of the channel that the user is trying to join
+    
+    Exceptions: 
+        InputError      - Occurs when the inputted channel_id is not valid and user is not a channel member
+        AccessError     - Occurs when user is not autherised and when user is trying to join a private channel
+    
+    Return Value:
+        Returns an empty dictionery
+    '''
     if not auth_user_id_check(auth_user_id):
         raise AccessError
 
