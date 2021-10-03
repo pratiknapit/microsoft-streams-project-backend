@@ -24,8 +24,7 @@ Example usage:
     data_store.set(store)
 '''
 import re
-import random
-from datetime import timezone
+
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 
 
@@ -80,9 +79,9 @@ def add_user(email, password, name_first, name_last):
 
 def make_user(email, password, name_first, name_last, u_id):                    # Remember to Add more fields
     store = data_store.get() 
-    is_global_owner = False
+    is_global_owner = 2
     if len(store['users']) == 0:
-        is_global_owner = True
+        is_global_owner = 1
 
     return {
             'u_id': u_id,

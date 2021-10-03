@@ -14,6 +14,9 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
             raise AccessError
             #not inputerror
 
+    if not auth_user_id_check(u_id):
+            raise AccessError
+
     # check when channel id corect but user(who invited) not part of channel
     if not check_if_user_is_channel_member(auth_user_id, channel_id):
             raise AccessError
@@ -181,8 +184,11 @@ def channel_join_v1(auth_user_id, channel_id):
     if check_if_user_is_channel_member(auth_user_id, channel_id) == True:
         raise InputError 
 
-    if check_if_channel_is_public_or_private(channel_id) == False: 
-        raise AccessError
+    user_detail = auth_user_id_check(auth_user_id)
+    if user_detail['is_global_owner'] == 2:
+        if check_if_channel_is_public_or_private(channel_id) == False: 
+            raise AccessError
+        
 
     
     All_channels_storage = data_store.get()
