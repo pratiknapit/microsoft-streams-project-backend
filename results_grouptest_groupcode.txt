@@ -1,0 +1,54 @@
+============================= test session starts ==============================
+platform linux -- Python 3.7.3, pytest-6.2.5, py-1.10.0, pluggy-1.0.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+hypothesis profile 'default' -> database=DirectoryBasedExampleDatabase('/tmp_amd/kamen/export/kamen/3/cs1531/project-automarking/tempstore/.hypothesis/examples')
+rootdir: /tmp_amd/kamen/export/kamen/3/cs1531/project-automarking/tempstore, configfile: pytest.ini
+plugins: forked-1.3.0, xdist-2.2.1, hypothesis-6.1.1, timeout-1.4.2
+collecting ... collected 41 items
+
+tests/auth_test.py::test_auth_register_email_invalid PASSED              [  2%]
+tests/auth_test.py::test_auth_register_duplicate_email_invalid PASSED    [  4%]
+tests/auth_test.py::test_auth_register_password_invalid PASSED           [  7%]
+tests/auth_test.py::test_auth_register_first_min_invalid PASSED          [  9%]
+tests/auth_test.py::test_auth_register_last_min_invalid PASSED           [ 12%]
+tests/auth_test.py::test_auth_register_first_max_invalid PASSED          [ 14%]
+tests/auth_test.py::test_auth_register_last_max_invalid PASSED           [ 17%]
+tests/auth_test.py::test_auth_login_email_invalid PASSED                 [ 19%]
+tests/auth_test.py::test_auth_register_user_valid PASSED                 [ 21%]
+tests/auth_test.py::test_auth_register_test_dummy PASSED                 [ 24%]
+tests/channel_details_test.py::test_invalid_channel_details PASSED       [ 26%]
+tests/channel_details_test.py::test_valid_channel_details PASSED         [ 29%]
+tests/channel_invite_test.py::test_channel_invite_channel_invalid PASSED [ 31%]
+tests/channel_invite_test.py::test_channel_invite_incorrect_user_invalid PASSED [ 34%]
+tests/channel_invite_test.py::test_channel_invite_auth_not_in_channel_invalid PASSED [ 36%]
+tests/channel_invite_test.py::test_channel_invite_already_in_channel_invalid PASSED [ 39%]
+tests/channel_invite_test.py::test_channel_invite_valid PASSED           [ 41%]
+tests/channel_join_test.py::test_channel_join_invalid_id PASSED          [ 43%]
+tests/channel_join_test.py::test_channel_join_private_channel PASSED     [ 46%]
+tests/channel_join_test.py::test_user_is_already_member PASSED           [ 48%]
+tests/channel_join_test.py::test_if_joining_works PASSED                 [ 51%]
+tests/channel_list_test.py::test_user_is_valid PASSED                    [ 53%]
+tests/channel_list_test.py::test_user_is_valid2 PASSED                   [ 56%]
+tests/channel_list_test.py::test_channels_list_non_member PASSED         [ 58%]
+tests/channel_list_test.py::test_channels_list_member PASSED             [ 60%]
+tests/channel_list_test.py::test_channels_list_member_and_join_member PASSED [ 63%]
+tests/channel_list_test.py::test_channels_list_member_and_join_member2 PASSED [ 65%]
+tests/channel_list_test.py::test_channels_list_member_and_invite_member PASSED [ 68%]
+tests/channel_list_test.py::test_channels_list_member_and_invite_member2 PASSED [ 70%]
+tests/channels_list_all_test.py::test_user_is_valid PASSED               [ 73%]
+tests/channels_list_all_test.py::test_user_is_valid2 PASSED              [ 75%]
+tests/channels_list_all_test.py::test_channels_list_all_nonmember_user PASSED [ 78%]
+tests/channels_list_all_test.py::test_channels_list_all_return_type PASSED [ 80%]
+tests/channels_list_all_test.py::test_channels_list_all_multiple_by_user_2 PASSED [ 82%]
+tests/channels_list_all_test.py::test_channels_list_all_multiple_by_user_3 PASSED [ 85%]
+tests/channels_test.py::test_user_is_valid PASSED                        [ 87%]
+tests/channels_test.py::test_channels_create_min_invalid_name PASSED     [ 90%]
+tests/channels_test.py::test_channels_create_max_invalid_name PASSED     [ 92%]
+tests/channels_test.py::test_channels_create PASSED                      [ 95%]
+tests/channels_test.py::test_channels_create_return_type PASSED          [ 97%]
+tests/channels_test.py::test_multiple_channels_create PASSED             [100%]
+
+====== Marks recorded: 41.00 ======
+
+
+============================== 41 passed in 0.22s ==============================
