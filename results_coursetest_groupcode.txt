@@ -381,7 +381,7 @@ zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id='zer
 
     def test_invitation_from_non_channel_member(user_woody, user_buzz, zergs_private_lair):
         with pytest.raises(err.AccessError):
->           channel_invite_v1(user_woody, zergs_private_lair.channel_id, user_buzz.u_id)
+>           channel_invite_v1(user_woody.token, zergs_private_lair.channel_id, user_buzz.u_id)
 
 tests/channel_tests/channel_invite_test.py:47: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
@@ -714,4 +714,4 @@ FAILED tests/channel_tests/channel_messages_test.py::test_access_error_when_user
 FAILED tests/channels_tests/channels_listall_test.py::test_when_one_channel_exists_private
 FAILED tests/channels_tests/channels_listall_test.py::test_when_one_channel_exists_public
 FAILED tests/channels_tests/channels_listall_test.py::test_when_multiple_channels_exist
-======================== 24 failed, 47 passed in 1.04s =========================
+======================== 24 failed, 47 passed in 1.03s =========================

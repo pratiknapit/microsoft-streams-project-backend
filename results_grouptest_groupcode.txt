@@ -51,4 +51,4 @@ tests/channels_test.py::test_multiple_channels_create PASSED             [100%]
 ====== Marks recorded: 41.00 ======
 
 
-============================== 41 passed in 0.22s ==============================
+============================== 41 passed in 0.39s ==============================
