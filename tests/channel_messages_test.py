@@ -29,19 +29,19 @@ def clear():
 def test_channel_messages_channel_id_invalid(clear, dummy_cases):
     # Channel id is incorrect (no such channel id exists)
     with pytest.raises(InputError):
-        channel_messages_v1(dummy_cases['dummy_user_2']['auth_user_id'], 23455, 39283)
+        channel_messages_v1(dummy_cases['dummy_user_2']['auth_user_id'], -1, 39283)
 
 def test_channel_messages_start_greater_than_total_messages_error(clear, dummy_cases):
     # Total messages is less than start (causes error)
     with pytest.raises(InputError):
         channel_messages_v1(dummy_cases['dummy_user_2']['auth_user_id'],
-        dummy_cases['dummy_user_2_channel']['channel_id'], 34)
+        dummy_cases['dummy_user_2_channel']['channel_id'], -1)
 
 def test_channel_messages_auth_not_in_channel_invalid(clear, dummy_cases):
     # Correct auth_user_id but they are not a member of the channel
     with pytest.raises(AccessError):
         channel_messages_v1(dummy_cases['dummy_user_1']['auth_user_id'],
-        dummy_cases['dummy_user_2_channel']['channel_id'], 234)
+        dummy_cases['dummy_user_2_channel']['channel_id'], 100)
 
 def test_channel_messages_functionality(clear, dummy_cases):
     assert channel_messages_v1(dummy_cases['dummy_user_2']['auth_user_id'],
