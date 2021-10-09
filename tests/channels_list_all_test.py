@@ -25,7 +25,7 @@ def test_user_is_valid2():
     with pytest.raises(AccessError): 
         channels_listall_v1("1345")
 
-def test_user_is_valid2(): 
+def test_user_is_valid3(): 
     clear_v1()
     with pytest.raises(AccessError): 
         channels_listall_v1("&&")

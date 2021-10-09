@@ -17,7 +17,7 @@ def test_user_is_valid2():
     with pytest.raises(AccessError): 
         channels_listall_v1("1345")
 
-def test_user_is_valid2(): 
+def test_user_is_valid3(): 
     clear_v1()
     with pytest.raises(AccessError): 
         channels_listall_v1("&&")
@@ -63,6 +63,7 @@ def test_channels_list_member():
 
     assert (result == 1)
 
+
 def test_channels_list_member_and_join_member():
     clear_v1()
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
@@ -72,7 +73,7 @@ def test_channels_list_member_and_join_member():
     dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
     dummy_user_3_channel = channels_create_v1(dummy_user_3['auth_user_id'], 'dummy_user_3_channel', True) 
     
-    empty_dict1 = channel_join_v1(dummy_user_4['auth_user_id'], dummy_user_2_channel['channel_id'])
+    channel_join_v1(dummy_user_4['auth_user_id'], dummy_user_2_channel['channel_id'])
 
     #Dummy user 4, who is not part of the channel, is calling channels list all. 
     dummy_user_4_channels_list = channels_list_v1(dummy_user_4['auth_user_id'])
@@ -95,8 +96,8 @@ def test_channels_list_member_and_join_member2():
     dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
     dummy_user_3_channel = channels_create_v1(dummy_user_3['auth_user_id'], 'dummy_user_3_channel', True) 
     
-    empty_dict1 = channel_join_v1(dummy_user_4['auth_user_id'], dummy_user_2_channel['channel_id'])
-    empty_dict2 = channel_join_v1(dummy_user_4['auth_user_id'], dummy_user_3_channel['channel_id'])
+    channel_join_v1(dummy_user_4['auth_user_id'], dummy_user_2_channel['channel_id'])
+    channel_join_v1(dummy_user_4['auth_user_id'], dummy_user_3_channel['channel_id'])
     
     #Dummy user 4, who is not part of the channel, is calling channels list all. 
     dummy_user_4_channels_list = channels_list_v1(dummy_user_4['auth_user_id'])

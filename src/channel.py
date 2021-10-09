@@ -154,8 +154,11 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     data = data_store.get()
     msg_list = data["channels"]["Messages"]
 
-    for msg_num in range(0, num_loop):
+    i = 0
+    while i < range(0, num_loop):
         messages_dictionary['messages'].append(msg_list[num_loop - 1])
+        i += 1
+
 
     if num_loop < 50:
         end = -1
@@ -167,7 +170,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     messages_dictionary["end"] = end
 
     return messages_dictionary
-    
+
 
 def channel_join_v1(auth_user_id, channel_id):
     '''
