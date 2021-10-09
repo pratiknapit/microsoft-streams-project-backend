@@ -24,6 +24,8 @@ Example usage:
     data_store.set(store)
 '''
 import re
+from json import dumps
+import jwt
 
 initial_object = {
     'users': [    
@@ -84,6 +86,13 @@ def make_user(email, password, name_first, name_last, u_id):
             'channel_id_members': [],
             'is_global_owner': is_global_owner
     }
+
+logged_in_users = {}
+def login_token(user):
+    ENCRYPT = 'abcde'
+    token = str(jwt.encode({'handle_str': user['handle_str']}, ENCRYPT, algorithm = 'HS256'))
+    logged_in_users[token] = user
+    return token
 
 # Function to create_handle
 def create_handle(first_name, last_name):
