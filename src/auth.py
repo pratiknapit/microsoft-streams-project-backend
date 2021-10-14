@@ -98,18 +98,19 @@ def auth_login_v1(email, password):
     }
 
 def auth_logout(token):
+    '''
+    <Logs out user based on token>
+
+    Arguments:
+        <token> (str)       - <A string which holds the token>
+
+    Exceptions:
+
+    Return Value:
+        Returns empty dictionary
+    '''
     store = data_store.get() 
     for user in store['users']:
         if user['token'] == token:
             user.pop('token')
-            return True
-    return False
-
-if __name__ == '__main__':
-
-    dummy_user_1 = add_user('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'Napit')
-    dummy_user_2 = add_user('dummyuser2@gmail.com', 'yessword', 'Alpha', 'Napit')
-    dummy_user_3 = add_user('dummyuser3@gmail.com', 'passsssword', 'Alpha', 'Napit')
-    print(dummy_user_1)
-    print(dummy_user_2)
-    print(dummy_user_3)
+            return {}
