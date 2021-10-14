@@ -84,14 +84,10 @@ def test_multiple_channels_create():
     clear_v1()
 
     dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
-    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
-    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
 
     dummy1_id = dummy_user_1['auth_user_id']
-    dummy2_id = dummy_user_2['auth_user_id']
 
     channel_1 = channels_create_v1(dummy1_id, "School", True) #this shud return
-    channel_2 = channels_create_v1(dummy2_id, "Play", True)
     channel_3 = channels_create_v1(dummy1_id, "Tutoring", True) #this shud return
     channel_4 = channels_create_v1(dummy1_id, "Yellow", False) #this shud return
 
