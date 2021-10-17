@@ -4,7 +4,7 @@ from src.auth import auth_register_v1
 from src.channels import channels_create_v1
 from src.channel import channel_messages_v1
 from src.other import clear_v1
-'''
+
 #creating clear and dummy cases fixtures to use in every test
 @pytest.fixture
 def dummy_cases():
@@ -21,6 +21,7 @@ def dummy_cases():
         "dummy_user_3": dummy_user_3,
         "dummy_user_2_channel": dummy_user_2_channel,
     }
+    return combined_data
 
 @pytest.fixture
 def clear():
@@ -46,12 +47,12 @@ def test_channel_messages_auth_not_in_channel_invalid(clear, dummy_cases):
 def test_channel_messages_functionality(clear, dummy_cases):
     assert channel_messages_v1(dummy_cases['dummy_user_2']['auth_user_id'],
     dummy_cases['dummy_user_2_channel']['channel_id'], 0) == {
-        'messages': [],
+        'message': [],
         'start': 0,
         'end':-1 
     }
 
-'''
+
     
 
 

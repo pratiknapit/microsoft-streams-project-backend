@@ -24,11 +24,15 @@ Example usage:
     data_store.set(store)
 '''
 import re
+from json import dumps
+import jwt
 
 initial_object = {
     'users': [    
     ],
     'channels': [
+    ],
+    'dms': [
     ],
 }
 # Channels Helper Check Functions 
@@ -82,8 +86,62 @@ def make_user(email, password, name_first, name_last, u_id):
             'handle_str': create_handle(name_first, name_last),
             'channel_id_owners': [],
             'channel_id_members': [],
-            'is_global_owner': is_global_owner
+            'is_global_owner': is_global_owner,
+            'messages_created':[],
     }
+
+def make_message(message, channel_id, u_id): 
+    store = data_store.get()
+
+    user = user_id_check(u_id)
+    user['messages_created'].append(message)
+    
+    message_id = len(message) + 1
+    store['Messages'].append({
+                            'channel_id': channel_id, 
+                            'message_id': message_id, 
+                            'u_id': u_id, 
+                            'message': message, 
+                            })
+    return message_id
+
+
+
+logged_in_users = {}
+def login_token(user):
+    ENCRYPT = 'abcde'
+    token = str(jwt.encode({'handle_str': user['handle_str']}, ENCRYPT, algorithm = 'HS256'))
+    logged_in_users[token] = user
+    return token
+
+def is_valid_token(token):
+    data = data_store.get()
+    ENCRYPT = 'abcde'
+    try:
+        payload = jwt.decode(token, ENCRYPT, algorithms=['HS256'])
+    except:
+        jwt.exceptions.InvalidSignatureError()
+        return False
+    else:
+        user = next(
+            (user for user in data['users'] if user['u_id'] == payload['u_id']), False)
+        if user:
+            if user['session_list'].count(payload['session_id']) != 0:
+                return payload
+        return False
+
+def is_valid_user_id(auth_user_id):
+    data = data_store.get()
+    for user in data['users']:
+        if user['user_id'] == auth_user_id:
+            return True
+    return False
+
+def token_check(token):
+    store = logged_in_users
+    if token in store: 
+        return store[token]
+    return False
 
 # Function to create_handle
 def create_handle(first_name, last_name):
@@ -100,7 +158,7 @@ def create_handle(first_name, last_name):
         prototype_handle = first_proto + str(count)
         count += 1   
     return prototype_handle
-        
+
 
 def user_channels(u_id):
     store = data_store.get()
@@ -193,20 +251,22 @@ def password_check(password):
             return user
     return False
 
-def message_check(message_id):
+def message_id_check(message_id):
     data = data_store.get()
     for message in data['Messages']:
         if int(message['message_id']) == int(message_id):
             return message
     return None
 
+
 def channel_id_check(channel_id):
 	store = data_store.get()
 	for channel in store['channels']:
 		if int(channel['channel_id']) == int(channel_id):
-			return channel
-	
+			return channel	
 	return False
+
+    
 
 def check_if_user_is_channel_member(auth_user_id, channel_id):
     store = data_store.get()
