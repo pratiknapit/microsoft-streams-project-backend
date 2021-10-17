@@ -32,6 +32,8 @@ initial_object = {
     ],
     'channels': [
     ],
+    'dms': [
+    ],
 }
 # Channels Helper Check Functions 
 
@@ -111,6 +113,29 @@ def login_token(user):
     token = str(jwt.encode({'handle_str': user['handle_str']}, ENCRYPT, algorithm = 'HS256'))
     logged_in_users[token] = user
     return token
+
+def is_valid_token(token):
+    data = data_store.get()
+    ENCRYPT = 'abcde'
+    try:
+        payload = jwt.decode(token, ENCRYPT, algorithms=['HS256'])
+    except:
+        jwt.exceptions.InvalidSignatureError()
+        return False
+    else:
+        user = next(
+            (user for user in data['users'] if user['u_id'] == payload['u_id']), False)
+        if user:
+            if user['session_list'].count(payload['session_id']) != 0:
+                return payload
+        return False
+
+def is_valid_user_id(auth_user_id):
+    data = data_store.get()
+    for user in data['users']:
+        if user['user_id'] == auth_user_id:
+            return True
+    return False
 
 def token_check(token):
     store = logged_in_users

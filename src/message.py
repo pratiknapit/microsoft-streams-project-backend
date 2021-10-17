@@ -1,7 +1,7 @@
 
 from src.data_store import data_store, make_message
-from src.data_store import token_check, channel_id_check, u_id_check, message_id_check
-from error import InputError, AccessError
+from src.data_store import token_check, channel_id_check, message_id_check
+from src.error import InputError, AccessError
 
 
 def message_send(token, channel_id, message):
@@ -35,7 +35,7 @@ def message_send(token, channel_id, message):
         'message_id': message_id,
     }
 
-def message_edit(token, message_id, message):
+def message_edit(token, message_id, edit_message):
     """Edits a current message  
     Parameters:
         token (string)
@@ -43,26 +43,27 @@ def message_edit(token, message_id, message):
         edited_message(string)
     
     """
+    if len(edit_message) > 1000:
+        raise InputError
     if message_id_check(message_id) is None:
         raise InputError
-
-    if token_check(token) is False:
+    
+    user = token_check(token)
+    if user is False:
         raise AccessError
 
-    is_owner = owner_channel_check(token, message['channel_id'])
+    is_owner = owner_channel_check(token, edit_message['channel_id'])
 
     is_sender = False
 
-    if user['u_id'] == message['u_id']:
+    if user['u_id'] == edit_message['u_id']:
         is_sender = True
 
     if (is_owner or is_sender) == False:
         raise AccessError
 
-    message['message'] = edited_message
-
-    return {
-    }
+    edit_message['message'] = edit_message
+    return {}
 
 
 def message_remove(token, message_id):
@@ -72,13 +73,13 @@ def message_remove(token, message_id):
         message_id(int)
     
     """
-    if message_id_check(message_id) is None:
+    message = message_id_check(message_id)
+    if message is None:
         raise InputError
-
     is_owner = owner_channel_check(token, message['channel_id'])
 
-
-    if token_check(token) is False:
+    user = token_check(token)
+    if user is False:
         raise AccessError
 
     is_sender = False
@@ -91,8 +92,7 @@ def message_remove(token, message_id):
 
     store = data_store.get()['channels']
     store['Messages'].remove(message)
-    return {
-    }
+    return {}
 
 
 def member_channel_check(token, channel_id): 

@@ -2,7 +2,7 @@ import pytest
 from src.error import InputError, AccessError
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
-from src.channel import channel_messages_v1
+#from src.channel import channel_messages_v1
 from src.message import message_send
 from src.other import clear_v1
 
@@ -34,9 +34,7 @@ def clear():
 
 #def test_message_send_invalid_InputError(clear, dummy_cases):
     with pytest.raises(InputError):
-        message_send(dummy_cases['dummy_user_2']['token'],
-                    dummy_cases['dummy_user_2_channel']['channel_id'], "")
-        message_send(hayden_dict['token'], chan_id['channel_id'], "H"*1001)
+        message_send(dummy_cases['dummy_user_2']['token'], dummy_cases['dummy_user_2_channel']['channel_id'], "H"*1001)
 
 
 
