@@ -19,6 +19,7 @@ def dm_create_v1(token, u_ids):
          a dm with the same creator and dm members
         - a user who is removed from Dreams can not be added to a dm
     '''
+    '''
     data = data_store.get()
     dms = data['dms']
     dm_id = len(dms) + 1
@@ -70,6 +71,7 @@ def dm_create_v1(token, u_ids):
     #save_data(data)
 
     return {'dm_id': dm_id}
+    '''
 
 
 def dm_list_v1(token):
@@ -81,6 +83,7 @@ def dm_list_v1(token):
     Returns:
         {dms}: a list of dms the user is a member of
     """
+    '''
     decoded_token = is_valid_token(token)
     if decoded_token is False:
         raise AccessError("Invalid Token.")
@@ -96,6 +99,7 @@ def dm_list_v1(token):
                 break
 
     return {'dms': dm_list}
+    '''
 
 
 def dm_remove_v1(token, dm_id):
@@ -109,6 +113,7 @@ def dm_remove_v1(token, dm_id):
         InputError   - Occurs when dm_id does not refer to a valid dm
     Return Value:
         {} on successful removal of a dm
+    '''
     '''
     data = data_store.get()
     token_data = is_valid_token(token)
@@ -139,6 +144,7 @@ def dm_remove_v1(token, dm_id):
     
     #save_data(data)
     return {}
+    '''
 
 
 def dm_details_v1(token, dm_id):
@@ -154,6 +160,7 @@ def dm_details_v1(token, dm_id):
     Returns:
         {name, members}: name is str of the name of the dm, 
         members is a list of dicts with values, u_id, email, name_first, name_last and handle_str
+    '''
     '''
     if not is_valid_token(token):
         raise AccessError("Invalid token")
@@ -186,6 +193,7 @@ def dm_details_v1(token, dm_id):
                                        'handle_str': user['account_handle'],
                                        })
     return return_dict
+    '''
 
 
 def dm_leave_v1(token, dm_id):
@@ -199,6 +207,7 @@ def dm_leave_v1(token, dm_id):
         InputError  - Occurs when dm_id is invalid
     Return Value:
         Returns {}
+    '''
     '''
     decoded_token = is_valid_token(token)
     if decoded_token is False:
@@ -230,6 +239,7 @@ def dm_leave_v1(token, dm_id):
     #save_data(data)
 
     return {}
+    '''
 
 
 def dm_messages_v1(token, dm_id, start):
@@ -246,7 +256,7 @@ def dm_messages_v1(token, dm_id, start):
     Return Value:
         Returns {messages, start, end} where messages is a dictionary
     '''
-
+    '''
     data = data_store.get()
     try:
         dm_id = int(dm_id)
@@ -294,3 +304,4 @@ def dm_messages_v1(token, dm_id, start):
 
     save_data(data)
     return messages_dict
+    '''

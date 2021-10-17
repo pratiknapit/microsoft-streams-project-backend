@@ -29,7 +29,8 @@ def message_send(token, channel_id, message):
     for member in store['all_members']: 
  #       if message_id_check(message) is False:
  #           raise AccessError
-        message_id = make_message(message, channel_id, store['u_id'])
+        if store['u_id'] == member['u_id']: 
+            message_id = make_message(message, channel_id, store['u_id'])
         
     return {
         'message_id': message_id,

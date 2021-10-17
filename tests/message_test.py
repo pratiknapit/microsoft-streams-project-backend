@@ -33,8 +33,8 @@ def clear():
 
 
 #def test_message_send_invalid_InputError(clear, dummy_cases):
-    with pytest.raises(InputError):
-        message_send(dummy_cases['dummy_user_2']['token'], dummy_cases['dummy_user_2_channel']['channel_id'], "H"*1001)
+#    with pytest.raises(InputError):
+#        message_send(dummy_cases['dummy_user_2']['token'], dummy_cases['dummy_user_2_channel']['channel_id'], "H"*1001)
 
 
 
