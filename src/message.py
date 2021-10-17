@@ -108,4 +108,9 @@ def member_channel_check(token, channel_id):
             return True
     return False
 
+def owner_channel_check(token, channel_id):
+    user = token_check(token)   #checks if it's a valid user
+    if user == False:
+        raise InputError
+
 
