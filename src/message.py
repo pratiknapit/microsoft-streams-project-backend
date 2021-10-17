@@ -112,5 +112,13 @@ def owner_channel_check(token, channel_id):
     user = token_check(token)   #checks if it's a valid user
     if user == False:
         raise InputError
+    channel = channel_id_check(channel_id)
+    if channel == None:
+        raise InputError
+
+    for member in channel['owner_members']:     
+        if int(member['u_id']) == int(user['u_id']):
+            return True
+    return False
 
 
