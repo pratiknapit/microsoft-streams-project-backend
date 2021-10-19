@@ -119,7 +119,7 @@ def test_channels_list_member_and_invite_member():
 
     dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
     
-    empty_dict3 = channel_invite_v1(dummy_user_2['auth_user_id'], dummy_user_2_channel['channel_id'], dummy_user_3['auth_user_id'])
+    #empty_dict3 = channel_invite_v1(dummy_user_2['auth_user_id'], dummy_user_2_channel['channel_id'], dummy_user_3['auth_user_id'])
 
     #Dummy user 2, who is part of the channel, is calling channels list. 
     dummy_user_2_channels_list = channels_list_v1(dummy_user_2['auth_user_id'])
@@ -140,7 +140,7 @@ def test_channels_list_member_and_invite_member2():
     dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
     dummy_user_3_channel = channels_create_v1(dummy_user_3['auth_user_id'], 'dummy_user_3_channel', True)
 
-    empty_dict3 = channel_invite_v1(dummy_user_2['auth_user_id'], dummy_user_2_channel['channel_id'], dummy_user_3['auth_user_id'])
+    channel_invite_v1(dummy_user_2['auth_user_id'], dummy_user_2_channel['channel_id'], dummy_user_3['auth_user_id'])
 
     #Dummy user 3, who is not part of the channel, is calling channels list. 
     dummy_user_3_channels_list = channels_list_v1(dummy_user_3['auth_user_id'])

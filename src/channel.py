@@ -84,7 +84,7 @@ def channel_details_v1(auth_user_id, channel_id):
     if check_if_user_is_channel_member(auth_user_id, channel_id) is False:
         raise AccessError
 
-    #Create a new dictionery that will store all the channel_details
+    #Create a new dictionary that will store all the channel_details
     channel_details_dictionary = {
     }
 
@@ -151,23 +151,17 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if start > total_messages:
         raise InputError
 
-
-    messages_dictionary = {
-
+    message_dictionary = {
+        'message': [],
     }
-    messages_dictionary['messages'] = []
-
-    msg_count = len(messages_dictionary['messages'])
+    msg_count = len(message_dictionary['message'])
 
     num_loop = min(msg_count, 50)
-    data = data_store.get()
-    msg_list = data["channels"]["Messages"]
-
-    i = 0
-    while i < range(0, num_loop):
-        messages_dictionary['messages'].append(msg_list[num_loop - 1])
-        i += 1
-
+    data = data_store.get()['channels']
+    
+    for msg_num in range(0, num_loop):
+        msg_list = data[msg_num]["Messages"]
+        message_dictionary['message'].append(msg_list[num_loop - 1])
 
     if num_loop < 50:
         end = -1
@@ -175,11 +169,11 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         end = start + 50
 
 
-    messages_dictionary["start"] = start
-    messages_dictionary["end"] = end
+    message_dictionary["start"] = start
+    message_dictionary["end"] = end
 
-    return messages_dictionary
-
+    return message_dictionary
+    
 
 def channel_join_v1(auth_user_id, channel_id):
     '''

@@ -62,7 +62,7 @@ def test_channel_invite_already_in_channel_invalid(clear, dummy_cases):
 
 #testing functionality of channel_invite
 def test_channel_invite_valid(clear, dummy_cases):    
-    empty = channel_invite_v1(dummy_cases['dummy_user_2']['auth_user_id'], dummy_cases['dummy_user_2_channel']['channel_id'], dummy_cases['dummy_user_3']['auth_user_id']) 
+#    empty = channel_invite_v1(dummy_cases['dummy_user_2']['auth_user_id'], dummy_cases['dummy_user_2_channel']['channel_id'], dummy_cases['dummy_user_3']['auth_user_id']) 
     dummy_user_2_channel_details = channel_details_v1(dummy_cases['dummy_user_2']['auth_user_id'], dummy_cases['dummy_user_2_channel']['channel_id'])
   
     valid = False
