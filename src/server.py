@@ -180,7 +180,7 @@ def channel_join_v2():
     return dumps({})
 
 
-
+"""
 
 @APP.route("message/send/v1", methods=["POST"])
 def send_message():
@@ -213,7 +213,7 @@ def remove_message():
     
     message_remove(token, message_id)   
     return dumps({})
-
+"""
 
 
 #### NO NEED TO MODIFY BELOW THIS POINT

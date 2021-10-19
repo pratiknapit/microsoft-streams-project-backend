@@ -48,7 +48,7 @@ def make_channel(u_id, channel_id, name, is_public):
         'all_members': [u_id],
         'Messages': [],
     }
-
+        
 
 # Function to add_channel to list 
 def add_channel(u_id, name, is_public):
