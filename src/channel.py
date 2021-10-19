@@ -5,6 +5,8 @@ from src.error import InputError, AccessError
 from src.data_store import check_if_channel_is_public_or_private, check_if_user_is_channel_member
 from src.data_store import channel_id_check, auth_user_id_check, user_id_check
 from src.data_store import data_store
+from src.auth import auth_register_v1
+from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
@@ -68,10 +70,17 @@ def channel_details_v1(auth_user_id, channel_id):
 
     if not auth_user_id_check(auth_user_id):
         raise AccessError
+    
+    #channel id must first be an integer
+    if not isinstance(channel_id, int):
+        raise InputError
+       
     #Check if channel_id is valid
     if channel_id_check(channel_id) is False:
         raise InputError("channel id not valid")
-        #Check if user is in the channel
+
+
+    #Check if user is in the channel
     if check_if_user_is_channel_member(auth_user_id, channel_id) is False:
         raise AccessError
 
@@ -207,3 +216,25 @@ def channel_join_v1(auth_user_id, channel_id):
             channel['all_members'].append(auth_user_id)
 
     return {}
+
+
+
+if __name__ == '__main__':
+
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
+    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
+
+    print(channels_create_v1(dummy_user_1['auth_user_id'], 'dummy_user_1_channel', True))
+    print("")
+    print(channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True))
+    print("")
+    print(channels_create_v1(dummy_user_3['auth_user_id'], 'dummy_user_3_channel', True))
+    print("")
+    print(channels_create_v1(dummy_user_1['auth_user_id'], 'dummy_user_4_channel', True))
+    print("")
+    channel_join_v1(3, 2)
+    print(channel_details_v1(3, 2))
+    print(channels_list_v1(dummy_user_3['auth_user_id']))
+    print("")
+    print(channels_listall_v1(dummy_user_3['auth_user_id']))

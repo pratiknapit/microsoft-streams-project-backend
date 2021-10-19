@@ -38,7 +38,6 @@ def test_valid_channel_details(clear):
     dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
     dummy_user_2_list_channel = channels_list_v1(dummy_user_2['auth_user_id'])
 
-    dummy_user_2_list = dummy_user_2_list_channel['channels'][0]
     
     channel = channel_details_v1(dummy_user_2['auth_user_id'], dummy_user_2_channel['channel_id'])
 

@@ -26,7 +26,8 @@ def channels_list_v1(auth_user_id):
         raise AccessError
 
     #This will return a dictionary that looks like the stub comment below.
-    return user_channels(auth_user_id)
+    list_of_channels = user_channels(auth_user_id)
+    return list_of_channels['channels']
 
 def channels_listall_v1(auth_user_id):
     """
@@ -39,7 +40,6 @@ def channels_listall_v1(auth_user_id):
         AccessError       - Occurs when auth_user_id passed in is not a valid id.
 
     Return Value:
-        Returns AccessError on if the auth_user_id does not belong to a valid user id.
         Returns dictionary with key 'channels' and required details on
         every channel in the data store.
         Returns an empty dictionary on condition that there are no channels in the data store.
@@ -47,7 +47,9 @@ def channels_listall_v1(auth_user_id):
     if auth_user_id_check(auth_user_id) is False:
         raise AccessError
 
-    return user_all_channels(auth_user_id)
+    list_of_all_channels = user_all_channels(auth_user_id)
+
+    return list_of_all_channels['channels']
 
 
 def channels_create_v1(auth_user_id, name, is_public):
@@ -68,8 +70,10 @@ def channels_create_v1(auth_user_id, name, is_public):
         Returns Dictionary with 'channel_id' and 'name'  on valid user id and name.
         Returns an empty dictionary on condition that there are no channels in the data store.
     """
+    """
     if auth_user_id_check(auth_user_id) is False:
         raise AccessError
+    """
 
     if len(name) < 1 or len(name) > 20:
         raise InputError
