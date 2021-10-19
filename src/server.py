@@ -6,6 +6,7 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config
 from src.data_store import password_check, email_check, email_repeat_check
+from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1, auth_logout
 from src.message import message_send, message_edit, message_remove
 
@@ -41,6 +42,11 @@ def echo():
     return dumps({
         'data': data
     })
+
+@APP.route("/clear/v1", methods=["DELETE"])
+def clear():
+    clear_v1()
+    return dumps({})
 
 @APP.route("/auth/register/v2", methods=["POST"])
 def register_auth():
@@ -99,10 +105,13 @@ def login_auth():
 def logout_auth():
     data = request.get_json()
     token = data["token"]
+    result = auth_logout(token)
 
-    return dumps(auth_logout(token))
+    return dumps({
+        'is_success': result
+    })
 
-@APP.route("message/send/v1", methods=["POST"])
+@APP.route("/message/send/v1", methods=["POST"])
 def send_message():
     data = request.get_json()
 
@@ -113,7 +122,7 @@ def send_message():
     message_id = message_send(token, channel_id, message)
     return dumps(message_id)
 
-@APP.route("message/edit/v1", methods=["PUT"])
+@APP.route("/message/edit/v1", methods=["PUT"])
 def edit_message():
     data = request.get_json()
 
@@ -124,7 +133,7 @@ def edit_message():
     message_edit(token, message_id, message)
     return dumps({})
 
-@APP.route("message/remove/v1", methods=["DELETE"])
+@APP.route("/message/remove/v1", methods=["DELETE"])
 def remove_message():
     data = request.get_json()
 

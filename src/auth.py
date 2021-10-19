@@ -10,12 +10,12 @@ from src.data_store import data_store, add_user, login_email, login_token
 ##########################
 # Helper Check Functions #
 ##########################
-from src.data_store import email_check, email_repeat_check, password_check
+from src.data_store import email_check, email_repeat_check, password_check, is_valid_token
 
 ###################
 # Error Functions #
 ###################
-from src.error import InputError
+from src.error import InputError, AccessError
 
 def auth_register_v1(email, password, name_first, name_last):                     # Add_user
     '''
@@ -113,4 +113,5 @@ def auth_logout(token):
     for user in store['users']:
         if user['token'] == token:
             user.pop('token')
-            return {}
+            return True
+    return False
