@@ -11,7 +11,7 @@ def test_channel_leave_v2():
         "name_first": "Pratik",
         "name_last": "Napit"
         })
-    user1_payload = response.json()
+    
     assert response.status_code == 200
 
     response2 = requests.post(config.url + "auth/register/v2", json={
@@ -20,5 +20,5 @@ def test_channel_leave_v2():
         "name_first": "Liam",
         "name_last": "Maverick"
         })
-    user2_payload = response2.json()
+    
     assert response2.status_code == 200

@@ -36,6 +36,4 @@ def test_channel_details_v2():
         "token": user2_payload['token'],
         "channel_id": channel_payload['channel_id']
     })
-
-    join_payload = response_j.json()
     assert response_j.status_code == 200
