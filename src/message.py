@@ -1,6 +1,6 @@
 
 from src.data_store import data_store, make_message
-from src.data_store import token_check, channel_id_check, message_id_check
+from src.data_store import token_check, channel_id_check, message_id_check, dm_id_check, is_valid_token
 from src.error import InputError, AccessError
 
 
@@ -41,7 +41,7 @@ def message_edit(token, message_id, edit_message):
     Parameters:
         token (string)
         message_id(int)
-        edited_message(string)
+        edit_message(string)
     
     """
     if len(edit_message) > 1000:
@@ -85,7 +85,7 @@ def message_remove(token, message_id):
 
     is_sender = False
 
-    if user['u_id'] == message['user_id']:
+    if user['u_id'] == message['u_id']:
         is_sender = True
 
     if (is_owner or is_sender) == False:
@@ -95,6 +95,8 @@ def message_remove(token, message_id):
     store['Messages'].remove(message)
     return {}
 
+
+#def message_senddm(token, dm_id, message):
 
 def member_channel_check(token, channel_id): 
     if token_check(token) is False:
@@ -120,5 +122,3 @@ def owner_channel_check(token, channel_id):
         if int(member['u_id']) == int(user['u_id']):
             return True
     return False
-
-

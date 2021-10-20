@@ -105,8 +105,6 @@ def make_message(message, channel_id, u_id):
                             })
     return message_id
 
-
-
 logged_in_users = {}
 def login_token(user):
     ENCRYPT = 'abcde'
@@ -141,6 +139,14 @@ def token_check(token):
     store = logged_in_users
     if token in store: 
         return store[token]
+    return False
+
+
+def dm_id_check(dm_id):
+    store = data_store.get()
+    for dm in store['dms']:
+        if dm['dm_id'] == dm_id:
+            return True
     return False
 
 # Function to create_handle

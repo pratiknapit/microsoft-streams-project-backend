@@ -53,7 +53,7 @@ def auth_register_v1(email, password, name_first, name_last):                   
 
     store = data_store.get()
     for user in store['users']:
-        if user['u_id'] == user['u_id']:
+        if user['u_id'] == added_user['u_id']:
             user['token'] = token
             
     return {
