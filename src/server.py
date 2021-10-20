@@ -2,9 +2,12 @@ import sys
 import signal
 from json import dumps
 from flask import Flask, request
+from src.channel import channel_add_owner_v2, channel_join_v1, channel_details_v1, channel_leave_v2
+from src.channel import channel_remove_owner_v2
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.data_store import password_check, email_check, email_repeat_check
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1, auth_logout
@@ -100,7 +103,6 @@ def login_auth():
         "token": new_token,
     })
 
-
 @APP.route("/auth/logout/v1", methods=["POST"])
 def logout_auth():
     data = request.get_json()
@@ -110,6 +112,111 @@ def logout_auth():
     return dumps({
         'is_success': result
     })
+
+
+#Channels HTTP Server Wrappers
+
+@APP.route("/channels/create", methods=['POST'])
+def channels_create_v2():
+    """
+    This is a flask wrapper for the channels_create function.  
+    """
+    data = request.get_json()
+    token = data['token']
+    name = data['name']
+    is_public = data['is_public']
+    channel_id = channels_create_v1(token, name, is_public)
+
+    return dumps(channel_id)
+
+@APP.route("/channels/list", methods=['GET'])
+def channels_list_v2():
+    """
+    This is a flask wrapper for the channels_list function.  
+    """
+    
+    #no input for channels_list 
+    token = request.args.get('token')
+    #token = int(token)
+    #need to add a token check
+    
+    return_channel_list = channels_list_v1(token)
+    return dumps(return_channel_list)
+
+@APP.route("/channels/listall", methods=['GET'])
+def channels_list_all_v2():
+    """
+    This is a flask wrapper for the channels_list function.  
+    """
+    
+    #no input for channels_list 
+    token = request.args.get('token')
+    #token = int(token)
+    #need to add a token check
+    
+    return_channel_list_all = channels_listall_v1(token)
+    return dumps(return_channel_list_all)
+
+@APP.route("/channels/details", methods=['GET'])
+def c_details_v2():
+    """
+    This is a flask wrapper for the channels_details function.  
+    """
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id') 
+    
+    #need to add a token check and channel id check, assume for now they are valid.
+
+    return_dict = channel_details_v1(token, channel_id)
+    return dumps(return_dict)
+
+@APP.route("/channels/join", methods=['POST'])
+def channel_join_v2():
+    """
+    This is a flask wrapper for the channels_create function.  
+    """
+    data = request.get_json()
+    token = data['token']
+    channel_id = data['channel_id']
+    #do token and channel_id checks 
+    return dumps(channel_join_v1(token, channel_id))
+
+@APP.route("/channel/leave", methods=['POST'])
+def c_leave_v2():
+    """
+    This is a flask wrapper for the channels_create function.  
+    """
+    data = request.get_json()
+    token = data['token']
+    channel_id = data['channel_id']
+    #do token and channel_id checks 
+    return dumps(channel_leave_v2(token, channel_id))
+
+@APP.route("/channel/addowner", methods=['POST'])
+def c_addowner_v2():
+    """
+    This is a flask wrapper for the channels_create function.  
+    """
+    data = request.get_json()
+    token = data['token']
+    channel_id = data['channel_id']
+    u_id = data['u_id']
+    #do token and channel_id checks 
+    channel_add_owner_v2(token, channel_id, u_id)
+    return dumps({})
+
+@APP.route("/channel/removeowner", methods=['POST'])
+def c_removeowner_v2():
+    """
+    This is a flask wrapper for the channels_create function.  
+    """
+    data = request.get_json()
+    token = data['token']
+    channel_id = data['channel_id']
+    u_id = data['u_id']
+    #do token and channel_id checks 
+    channel_remove_owner_v2(token, channel_id, u_id)
+    return dumps({})
 
 @APP.route("/message/send/v1", methods=["POST"])
 def send_message():
