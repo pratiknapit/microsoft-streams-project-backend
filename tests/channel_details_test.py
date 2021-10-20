@@ -12,7 +12,7 @@ def dummy_cases():
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
     # Creating a new channel with the first member as an owner and member
-    dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True) # true means public channel
+    dummy_user_2_channel = channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True) # true means public channel
     combined_data = {
         "dummy_user_1": dummy_user_1,
         "dummy_user_2": dummy_user_2,
@@ -29,17 +29,16 @@ def test_invalid_channel_details(clear):
     clear_v1()
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
-    dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
+    dummy_user_2_channel = channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True)
 
 def test_valid_channel_details(clear):
     clear_v1()
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
-    dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
-    dummy_user_2_list_channel = channels_list_v1(dummy_user_2['auth_user_id'])
+    dummy_user_2_channel = channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True)
+    dummy_user_2_list_channel = channels_list_v1(dummy_user_2['token'])
 
-    
-    channel = channel_details_v1(dummy_user_2['auth_user_id'], dummy_user_2_channel['channel_id'])
+    channel = channel_details_v1(dummy_user_2['token'], dummy_user_2_channel['channel_id'])
 
     value = False
     if channel['name'] == 'dummy_user_2_channel':
@@ -49,7 +48,7 @@ def test_valid_channel_details(clear):
                     for mem in channel['all_members']:
                         if mem['u_id'] == dummy_user_2['auth_user_id']:
                             value = True 
-    else: 
+    else:
         value = False
     
     assert (value == True)

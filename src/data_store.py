@@ -37,24 +37,37 @@ initial_object = {
 }
 # Channels Helper Check Functions 
 
-# Function to make_channel dictionary
-def make_channel(u_id, channel_id, name, is_public):
+# Function to give user id given token 
+def token_to_user_id(token):
+    store = data_store.get()
+    for user in store['users']:
+        if user['token'] == token:
+            return user['u_id']
+    return False
+
+#Need to ask about if we add u_id or token to the members/owners list 
+def make_channel(channel_id, name, is_public):
+
+    #u_id = token_to_user_id(token)
 
     return {
         'channel_id': channel_id, 
         'name': name,
         'is_public': is_public,
-        'owner_members': [u_id],
-        'all_members': [u_id],
+        'owner_members': [],
+        'all_members': [],
         'Messages': [],
     }
         
-
 # Function to add_channel to list 
-def add_channel(u_id, name, is_public):
+def add_channel(token, name, is_public):
     store = data_store.get()                                                    # retrieve data from initial_object data base
     channel_id = len(store['channels']) + 1                                   
-    channel = make_channel(u_id, channel_id, name, is_public)
+    channel = make_channel(channel_id, name, is_public)
+    u_id = token_to_user_id(token)
+    channel['owner_members'].append(u_id)
+    channel['all_members'].append(u_id)
+
     store['channels'].append(channel)
 
     data_store.set(store) 
@@ -107,18 +120,19 @@ def make_message(message, channel_id, u_id):
 
 
 
-logged_in_users = {}
+logged_in_users = []
 def login_token(user):
-    ENCRYPT = 'abcde'
-    token = str(jwt.encode({'handle_str': user['handle_str']}, ENCRYPT, algorithm = 'HS256'))
-    logged_in_users[token] = user
+    SECRET = 'abcde'
+    #token = str(jwt.encode({'handle_str': user['handle_str']}, ENCRYPT, algorithm = 'HS256'))
+    token = jwt.encode({'auth_user_id': user['u_id']}, SECRET, algorithm='HS256')
+    logged_in_users.append(token)
     return token
 
 def is_valid_token(token):
     data = data_store.get()
-    ENCRYPT = 'abcde'
+    SECRET = 'abcde'
     try:
-        payload = jwt.decode(token, ENCRYPT, algorithms=['HS256'])
+        payload = jwt.decode(token, SECRET, algorithms=['HS256'])
     except:
         jwt.exceptions.InvalidSignatureError()
         return False
@@ -140,7 +154,7 @@ def is_valid_user_id(auth_user_id):
 def token_check(token):
     store = logged_in_users
     if token in store: 
-        return store[token]
+        return token
     return False
 
 # Function to create_handle
@@ -160,7 +174,8 @@ def create_handle(first_name, last_name):
     return prototype_handle
 
 
-def user_channels(u_id):
+def user_channels(token):
+    u_id = token_to_user_id(token)
     store = data_store.get()
     user_list_channel = {
         'channels': [
@@ -177,13 +192,12 @@ def user_channels(u_id):
 
 # def function to return list of channels that user is part of including private channels
 
-def user_all_channels(u_id):
+def user_all_channels(token):
     store = data_store.get()    
-
     all_channels_list = {
         'channels': [
 
-        ],
+        ]
     }
     for channel in store['channels']:
         all_channels_list['channels'].append(
@@ -195,7 +209,7 @@ def user_all_channels(u_id):
 # def functions to help with Channel create, channels_list and channels_listall 
 
 #check if channel is in our database and returns it. 
-def channel_check(channel_id):
+def from_channel_id_return_channel(channel_id):
     store = data_store.get()
 
     for channel in store['channels']:
@@ -209,7 +223,7 @@ def is_public_check(is_public):
         return True
     return False 
 
-def handle_check(handle_str):                                                   # Function to check handle uniqueness
+def handle_check(handle_str):   # Function to check handle uniqueness
     data = data_store.get()
     for user in data['users']:
         if user['handle_str'] == handle_str:
@@ -222,6 +236,7 @@ def auth_user_id_check(auth_user_id):
         if int(user['u_id']) == int(auth_user_id):
             return user
     return False
+
 
 def email_check(email):
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
@@ -266,9 +281,29 @@ def channel_id_check(channel_id):
 			return channel	
 	return False
 
-    
+def check_existing_owner(u_id, channel_id):
+    data = data_store.get()
+    current_owner = False
+    for channel in data['channels']:
+        if channel["channel_id"] == channel_id:
+            for owner in channel['owner_members']:
+	            if u_id == owner:
+		            current_owner = True 
+    return current_owner
 
-def check_if_user_is_channel_member(auth_user_id, channel_id):
+def check_existing_member(u_id, channel_id):
+    data = data_store.get()
+    result = False
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            for mem in channel['all_members']:
+	            if u_id == mem:
+		            result = True 
+    return result
+
+
+def check_if_user_is_channel_member(token, channel_id):
+    auth_user_id = token_to_user_id(token)
     store = data_store.get()
     user = auth_user_id_check(auth_user_id) 
     if user == False:
