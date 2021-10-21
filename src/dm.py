@@ -242,9 +242,9 @@ def dm_messages(token, dm_id, start):
     dm_info = find_dm(dm_id, data)
     dm_messages = dm_info['messages']
 
-    if not is_user_in_dm(dm_id, user_id, data):
-        raise AccessError(
-            description=f"User is not a member of the dm with dm id {dm_id}")
+ #   if not is_user_in_dm(dm_id, user_id, data):
+ #       raise AccessError(
+ #           description=f"User is not a member of the dm with dm id {dm_id}")
 
     # Check valid start number
     if start >= len(dm_messages) and start != 0:
