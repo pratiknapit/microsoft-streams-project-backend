@@ -3,7 +3,7 @@ import signal
 from json import dumps
 from flask import Flask, request
 from src.channel import channel_add_owner_v2, channel_join_v1, channel_details_v1, channel_leave_v2
-from src.channel import channel_remove_owner_v2
+from src.channel import channel_remove_owner_v2, channel_invite_v1, channel_messages_v1
 from flask_cors import CORS
 from src.error import InputError
 from src import config
@@ -217,6 +217,29 @@ def c_removeowner_v2():
     #do token and channel_id checks 
     channel_remove_owner_v2(token, channel_id, u_id)
     return dumps({})
+
+@APP.route("/channel/invite/v2", methods=['POST'])
+def c_invite():
+    data = request.get_json()
+    token = data['token']
+    channel_id = int(data['channel_id'])
+    u_id = int(data['u_id'])
+
+    out = channel_invite_v1(token, channel_id, u_id)
+    return dumps(out)
+
+@APP.route("/channel/messages/v2", methods=['GET'])
+def c_messages():
+    
+    token = request.args.get('token')
+    ch_id = int(request.args.get('channel_id'))
+    start = int(request.args.get('start'))
+    #token = input_dict['token']
+    #ch_id = channel_id['channel_id']
+    #start = 1
+    return_dict = channel_messages_v1(token, ch_id, start)
+    print(return_dict)
+    return dumps(return_dict)
 
 @APP.route("/message/send/v1", methods=["POST"])
 def send_message():

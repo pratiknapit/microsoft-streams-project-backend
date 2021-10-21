@@ -118,19 +118,17 @@ def make_message(message, channel_id, u_id):
                             })
     return message_id
 
-
-
 logged_in_users = []
 def login_token(user):
-    SECRET = 'abcde'
-    #token = str(jwt.encode({'handle_str': user['handle_str']}, ENCRYPT, algorithm = 'HS256'))
+    SECRET = 'abcdedweidjwijdokfwkfwoqkqfw'
+    #token = str(jwt.encode({'handle_str': user['handle_str']}, SECRET, algorithm = 'HS256'))
     token = jwt.encode({'auth_user_id': user['u_id']}, SECRET, algorithm='HS256')
     logged_in_users.append(token)
     return token
 
 def is_valid_token(token):
     data = data_store.get()
-    SECRET = 'abcde'
+    SECRET = 'abcdedweidjwijdokfwkfwoqkqfw'
     try:
         payload = jwt.decode(token, SECRET, algorithms=['HS256'])
     except:
@@ -138,23 +136,42 @@ def is_valid_token(token):
         return False
     else:
         user = next(
-            (user for user in data['users'] if user['u_id'] == payload['u_id']), False)
+            (user for user in data['users'] if user['u_id'] == payload), False)
         if user:
-            if user['session_list'].count(payload['session_id']) != 0:
-                return payload
+            return payload
         return False
-
-def is_valid_user_id(auth_user_id):
+'''
+def is_valid_token(token):
     data = data_store.get()
-    for user in data['users']:
-        if user['user_id'] == auth_user_id:
-            return True
-    return False
+    SECRET = 'abcdedweidjwijdokfwkfwoqkqfw'
+
+    payload = jwt.decode(token, SECRET, algorithms=['HS256'])
+
+    for user in data['users']: 
+        if user['u_id'] == payload:
+            return False
+        else:
+            return payload
+'''
 
 def token_check(token):
     store = logged_in_users
     if token in store: 
         return token
+    return False
+
+def is_valid_user_id(auth_user_id):
+    store = data_store.get()
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            return True
+    return False
+
+def dm_id_check(dm_id):
+    store = data_store.get()
+    for dm in store['dms']:
+        if dm['dm_id'] == dm_id:
+            return True
     return False
 
 # Function to create_handle
