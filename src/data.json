@@ -1,0 +1,33 @@
+{
+    "users": [
+        {
+            "u_id": 1,
+            "email": "dummyuser2@gmail.com",
+            "password": "yessword",
+            "name_first": "Beta",
+            "name_last": "BB",
+            "handle_str": "betabb",
+            "channel_id_owners": [],
+            "channel_id_members": [],
+            "is_global_owner": 1,
+            "messages_created": [],
+            "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoYW5kbGVfc3RyIjoiYmV0YWJiIn0.vedJ5AAEnQmDFFpsc8Ftsm87pXpL26kKVIUwP4rsSXg"
+        }
+    ],
+    "channels": [
+        {
+            "channel_id": 1,
+            "name": "dummy_user_2_channel",
+            "is_public": true,
+            "owner_members": [
+                1
+            ],
+            "all_members": [
+                1
+            ],
+            "Messages": []
+        }
+    ],
+    "dms": [],
+    "Messages": []
+}

@@ -10,12 +10,9 @@ from src.data_store import login_token
 @pytest.fixture
 def dummy_cases():
     # Dummy case created for testing of different parts of channel_invite_v1
-    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
-
-    
-    # Creating a new channel with the first member as an owner and member
-    dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True) # true means public channel
-    token = dummy_user_2['token']
+    auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
+    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'pspassword', 'Tree', 'Three')
+    token = dummy_user_3['token']
     return token
 
 @pytest.fixture
@@ -24,7 +21,7 @@ def clear():
 
 def test_setemail_valid(clear, dummy_cases):
     token = dummy_cases
-    valid_case = user_profile_setemail_v1(token, "newdummyuser2@gmail.com")
+    valid_case = user_profile_setemail_v1(token, "newdummy2@gmail.com")
     assert valid_case == {}
 
 def test_email_invalid(clear, dummy_cases):

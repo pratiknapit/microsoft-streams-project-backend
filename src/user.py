@@ -1,14 +1,14 @@
 from src.data_store import data_store, user_id_check, token_check
 from src.error import InputError, AccessError
-from src.data_store import handle_search, email_check, is_valid_token
+from src.data_store import handle_check, email_check, email_repeat_check, is_valid_token
 import json
 from src.data_store import save_data
 
 
 
 def users_all_v1(token):
-    if not is_valid_token(token):
-            raise AccessError("Token not valid")
+    if is_valid_token(token) == False:
+        raise AccessError("Token not valid")
     
     user_list = []
     data = data_store.get()
@@ -26,7 +26,6 @@ def users_all_v1(token):
 
 def user_profile_v1(token, u_id):
 
-    u_id = int(u_id)
     if not token_check(token):
             raise AccessError ("Token provided is not valid")
 
@@ -63,7 +62,7 @@ def user_profile_setname_v1(token, name_first, name_last):
 
     data = data_store.get()
     for user in data['users']:
-        if user['auth_user_id'] == id:
+        if user['u_id'] == id:
             user['name_first'] = name_first
             user['name_last'] = name_last
             break
@@ -72,15 +71,18 @@ def user_profile_setname_v1(token, name_first, name_last):
     return {}
 
 def user_profile_setemail_v1(token, email):
-    if not token_check(token):
-            raise AccessError("Token provided is not valid")
+    if token_check(token) == False:
+        raise AccessError("Token provided is not valid")
 
     if not email_check(email):
             raise InputError("Email is incorrect")
 
-    
-    id = is_valid_token(token) # Also validates the token, raises AccessError when token is invalid
+    if email_repeat_check(email) == True:
+            raise InputError("Email is already taken")
+
+    # Also validates the token, raises AccessError when token is invalid
     # Change the name associated with the user
+    id = is_valid_token(token) 
     data = data_store.get()
     for user in data['users']:
         if user['auth_user_id'] == id:
@@ -95,14 +97,14 @@ def user_profile_sethandle_v1(token, handle_str):
     if (len(handle_str) < 3 or len(handle_str) > 20):
         raise InputError("Invalid handle_str")
 
-    if handle_search(handle_str) is not None:
-        raise InputError("Handle_str is taken")
+    if handle_check(handle_str) == True:
+        raise InputError("Handle_str is already taken")
     
     data = data_store.get()
     for user in data['users']:
-        if user['auth_user_id'] == id:
+        if user['u_id'] == id:
             user['handle_str'] = handle_str
-            break
+
     save_data(data)        
     return {}
 

@@ -26,6 +26,7 @@ Example usage:
 import re
 from json import dumps
 import jwt
+import json
 
 initial_object = {
     'users': [    
@@ -124,7 +125,7 @@ def is_valid_token(token):
         return False
     else:
         user = next(
-            (user for user in data['users'] if user['u_id'] == payload), False)
+            (user for user in data['users'] if user['u_id'] == payload['u_id']), False)
         if user:
             if user['session_list'].count(payload['session_id']) != 0:
                 return payload

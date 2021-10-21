@@ -27,7 +27,7 @@ def test_invalid_token(clear, dummy_cases):
 
 def test_valid_output(clear, dummy_cases):
     token, dummy_id = dummy_cases
-    result = user_profile_v1(dummy_cases['token'], dummy_cases['auth_user_id'])
+    result = user_profile_v1(token, dummy_id)
 
     assert result['user']['u_id'] ==  dummy_id
     assert result['user']['email'] == 'dummydum@gmail.com'
