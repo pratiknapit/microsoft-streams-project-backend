@@ -21,7 +21,6 @@ def test_channel_leave_v2_functionality():
         "name_first": "Liam",
         "name_last": "Maverick"
         })
-    user2_payload = response.json()
     assert response2.status_code == 200
 
     response3 = requests.post(config.url + 'channels/create', json={
@@ -44,7 +43,6 @@ def test_channel_leave_v2_functionality():
         'token': user1_payload['token'],
         'channel_id': channel_payload["channel_id"]
     })
-    detail_payload = response_det.json()
     assert response_det.status_code == 403
 
 
