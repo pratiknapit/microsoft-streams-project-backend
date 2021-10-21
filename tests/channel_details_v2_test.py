@@ -29,7 +29,8 @@ def test_channel_details_v2():
     })
 
     detail_payload = response_det.json()
-    
+    assert response_det.status_code == 200
+
     assert detail_payload == {
         'name': "FirstChannel",
         'is_public': 'True',
@@ -49,6 +50,3 @@ def test_channel_details_v2():
         }]               
         
     }
-
-
-    
