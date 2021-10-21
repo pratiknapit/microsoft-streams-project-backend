@@ -3,7 +3,7 @@ import requests
 import json
 from src import config
 
-def test_channel_leave_v2_functionality():
+def test_channel_addowner_removeowner_v2_functionality():
     requests.delete(config.url + 'clear/v1')
 
     response = requests.post(config.url + "auth/register/v2", json={
@@ -11,7 +11,7 @@ def test_channel_leave_v2_functionality():
         "password": "ronaldo",
         "name_first": "Pratik",
         "name_last": "Napit"
-        })
+    })
     user1_payload = response.json()
     assert response.status_code == 200
 
@@ -20,7 +20,7 @@ def test_channel_leave_v2_functionality():
         "password": "yessir",
         "name_first": "Liam",
         "name_last": "Maverick"
-        })
+    })
     user2_payload = response.json()
     assert response2.status_code == 200
 
@@ -28,23 +28,24 @@ def test_channel_leave_v2_functionality():
         "token": user1_payload['token'],
         "name": "FirstChannel",
         "is_public": "True"
-        })
+    })
     channel_payload = response3.json()
     assert response3.status_code == 200
 
-    response5 = requests.post(config.url + 'channel/leave', json={
+    response4 = requests.post(config.url + 'channel/addowner', json={
         "token": user1_payload['token'],
-        "channel_id": channel_payload['channel_id']
-        })
-    leave_payload = response5.json()
-    assert response5.status_code == 200
-    assert leave_payload == {}
-    
-    response_det = requests.get(config.url + 'channels/details', params = {
-        'token': user1_payload['token'],
-        'channel_id': channel_payload["channel_id"]
+        "channel_id": channel_payload['channel_id'],
+        "u_id": user2_payload['auth_user_id']
     })
-    detail_payload = response_det.json()
-    assert response_det.status_code == 403
+    assert response4.status_code == 200
+
+    response4 = requests.post(config.url + 'channel/removeowner', json={
+        "token": user1_payload['token'],
+        "channel_id": channel_payload['channel_id'],
+        "u_id": user2_payload['auth_user_id']
+    })
+    assert response4.status_code == 200
 
 
+    
+    
