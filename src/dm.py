@@ -234,7 +234,7 @@ def dm_messages(token, dm_id, start):
     if not is_valid_token(token):
         raise AccessError(description="Token is invalid")
 
-    user_id = is_valid_token(token)['user_id']
+    #user_id = is_valid_token(token)['user_id']
 
     if not is_valid_dm_id(dm_id):
         raise InputError(description="DM ID is invalid.")
