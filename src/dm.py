@@ -1,6 +1,5 @@
 from src.error import AccessError, InputError
-from src.data_store import (is_valid_token, is_valid_user_id) 
-#find_dm, find_user, is_user_in_dm, is_valid_dm_id)
+from src.data_store import is_valid_token, is_valid_user_id
 from src.data_store import data_store
 from datetime import datetime
 
@@ -28,7 +27,7 @@ def dm_create(token, u_ids):
     if not is_valid_token(token):
         raise AccessError("Token is invalid.")
 
-    user_id = is_valid_token(token)['user_id']
+    user_id = is_valid_token(token)['u_id']
     handles = []
 
     for u_id in u_ids:
