@@ -48,13 +48,6 @@ def test_channels_create_max_invalid_name():
     with pytest.raises(InputError): #length of name is more than 20
         channels_create_v1(dummy1_id, "channel24istheworstchannelEver", False)
 
-def test_channels_create_wrong_public_input():
-    clear_v1()
-    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
-    dummy1_id = dummy_user_1['auth_user_id']
-    with pytest.raises(InputError):
-        channels_create_v1(dummy1_id, "Sports", "Not private")
-
 #The tests below actually check if the function works and does what we want it to do.
 #That is creating the channel and adding to the data base.
 
@@ -72,20 +65,29 @@ def test_channels_create():
             result = True
 
     assert (result == True)
-            
+
+def test_channels_create_return_type():
+    clear_v1()
+
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+
+    dummy1_id = dummy_user_1['auth_user_id']
+
+    channel_id = channels_create_v1(dummy1_id, "School", True)
+
+    assert channel_id == { 
+        'channel_id': channel_id['channel_id'],
+        'name': channel_id['name']
+    }
 
 def test_multiple_channels_create():
     clear_v1()
 
     dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
-    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
-    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
 
     dummy1_id = dummy_user_1['auth_user_id']
-    dummy2_id = dummy_user_2['auth_user_id']
 
     channel_1 = channels_create_v1(dummy1_id, "School", True) #this shud return
-    channel_2 = channels_create_v1(dummy2_id, "Play", True)
     channel_3 = channels_create_v1(dummy1_id, "Tutoring", True) #this shud return
     channel_4 = channels_create_v1(dummy1_id, "Yellow", False) #this shud return
 
@@ -104,15 +106,6 @@ def test_multiple_channels_create():
     #result should return 3 
     assert (result == 3)
         
-#testing if channels create works using channel_list_all
-
-
-#testing if channels create works using channel_join
-
-
-#testing if channels create works using channels_invite 
-
-#testing if channels create works using channel details 
 
 
 

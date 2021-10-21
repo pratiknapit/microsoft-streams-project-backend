@@ -21,19 +21,19 @@ def clear():
     clear_v1()
     
 
-def test_handle_already_taken(dummy_cases):
+def test_handle_already_taken(clear, dummy_cases):
     token = dummy_cases
     with pytest.raises(InputError):
         user_profile_sethandle_v1(token, "superman")
 
-def test_handle_invalid(dummy_cases):
+def test_handle_invalid(clear, dummy_cases):
     token = dummy_cases
     with pytest.raises(InputError):
         user_profile_sethandle_v1(token, "a")
     with pytest.raises(InputError):
         user_profile_sethandle_v1(token, "a"*99)
 
-def test_valid_sethandle(dummy_cases):
+def test_valid_sethandle(clear, dummy_cases):
     token = dummy_cases
     res = user_profile_sethandle_v1(token, "new_dummy")
     assert res == {}

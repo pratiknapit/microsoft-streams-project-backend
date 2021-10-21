@@ -1,6 +1,8 @@
 from src.data_store import data_store, user_id_check, token_check
 from src.error import InputError, AccessError
 from src.data_store import handle_search, email_check, is_valid_token
+import json
+from src.data_store import save_data
 
 
 
@@ -10,21 +12,21 @@ def users_all_v1(token):
     
     user_list = []
     data = data_store.get()
-    for user in data['users']:
-        #users.append(user)
-        # return custom user data
-        myuser = {
-            'auth_user_id': user['auth_user_id'],
-            'email': user['email'],
-            'name_first': user['name_first'],
-            'name_last': user['name_last'],
-            'handle_str': user['handle_str']
+    for user in range(len(data['users'])):
+        user = {
+            'u_id': data['user_list'][user]['u_id'],
+            'email': data['user_list'][user]['email'],
+            'name_first': data['user_list'][user]['name_first'],
+            'name_last': data['user_list'][user]['name_last'],
+            'handle_str': data['user_list'][user]['handle'],
         }
+        user_list.append(user)
 
-    pass
+    return{"user_list": user_list}
 
-def users_profile_v1(token, u_id):
+def user_profile_v1(token, u_id):
 
+    u_id = int(u_id)
     if not token_check(token):
             raise AccessError ("Token provided is not valid")
 
@@ -65,6 +67,8 @@ def user_profile_setname_v1(token, name_first, name_last):
             user['name_first'] = name_first
             user['name_last'] = name_last
             break
+
+    save_data(data)
     return {}
 
 def user_profile_setemail_v1(token, email):
@@ -81,10 +85,8 @@ def user_profile_setemail_v1(token, email):
     for user in data['users']:
         if user['auth_user_id'] == id:
             user['email'] = email
-            break
     
-    # Save the data persistently (the jason stuff)
-    # save_data(data)
+    save_data(data)
     return {}
 
 
@@ -101,9 +103,7 @@ def user_profile_sethandle_v1(token, handle_str):
         if user['auth_user_id'] == id:
             user['handle_str'] = handle_str
             break
-    # Save the data persistently (the jason stuff)
-    # save_data(data)
-
+    save_data(data)        
     return {}
 
 

@@ -1,6 +1,6 @@
 import pytest
 from src.error import InputError
-from src.auth import auth_register_v1, auth_login_v1
+from src.auth import auth_register_v1, auth_login_v1, auth_logout
 from src.other import clear_v1
 
 @pytest.fixture
@@ -49,7 +49,7 @@ def test_auth_login_email_invalid():
 def test_auth_register_user_valid():
     clear_v1()
     valid_user = auth_register_v1("validummy@gmail.com", "password", "smart", "dummy")
-    assert(valid_user == {"auth_user_id": valid_user["auth_user_id"]})
+    assert(valid_user == {"auth_user_id": valid_user["auth_user_id"], "token": valid_user["token"]})
 
 
 def test_auth_register_test_dummy(clear):
@@ -57,4 +57,8 @@ def test_auth_register_test_dummy(clear):
     dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
     dummy_id = auth_login_v1("dummyuser1@gmail.com", "passworddd")
     assert(dummy_user_1['auth_user_id'] == dummy_id['auth_user_id'])
+
+
+def test_auth_logout_invalid():
+	assert not(auth_logout('This_is_a_wrong_token'))
 
