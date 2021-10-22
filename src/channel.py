@@ -76,12 +76,6 @@ def channel_details_v1(token, channel_id):
 
     if token_check(token) == False:
         raise AccessError(description="token not found")
-    
-    #channel id must first be an integer
-    """
-    if not isinstance(channel_id, int):
-        raise InputError
-    """
        
     #Check if channel_id is valid
     if channel_id_check(channel_id) is False:
@@ -283,8 +277,8 @@ def channel_add_owner_v2(token, channel_id, u_id):
     if not auth_user_id_check(u_id):
         raise AccessError  
 
-    if check_existing_owner(u_id, channel_id):
-        raise InputError("User is already an owner of the channel.")
+    if check_existing_owner(u_id, channel_id) is False:
+        raise InputError("User is not an owner of the channel.")
 
     if channel_id_check(channel_id) is False:
         raise InputError
@@ -322,8 +316,8 @@ def channel_remove_owner_v2(token, channel_id, u_id):
     if not auth_user_id_check(u_id):
         raise AccessError  
 
-    if check_existing_owner(u_id, channel_id):
-        raise InputError("User is already an owner of the channel.")
+    if check_existing_owner(u_id, channel_id) is False:
+        raise InputError("User is not an owner of the channel.")
 
     if channel_id_check(channel_id) is False:
         raise InputError
@@ -363,26 +357,41 @@ if __name__ == '__main__':
 
     data = data_store.get()
 
-    print(channels_create_v1(dummy_user_1['token'], 'dummy_user_1_channel', True))
-    print("")
-    print(channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True))
-    print("")
-    print(channels_create_v1(dummy_user_3['token'], 'dummy_user_3_channel', True))
-    print("")
-    print(channels_create_v1(dummy_user_1['token'], 'dummy_user_4_channel', True))
-    print("")
-
+    channels_create_v1(dummy_user_1['token'], 'dummy_user_1_channel', True)
+    channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True)
+    channels_create_v1(dummy_user_3['token'], 'dummy_user_3_channel', True)
+    channels_create_v1(dummy_user_1['token'], 'dummy_user_4_channel', True)
+    
+    """
     channel_invite_v1(dummy_user_1['token'], 1, 2)
-    channel_invite_v1(dummy_user_1['token'], 1, 3)
     channel_invite_v1(dummy_user_3['token'], 3, 2)
     channel_invite_v1(dummy_user_2['token'], 2, 3)
     channel_invite_v1(dummy_user_3['token'], 2, 1)
     channel_invite_v1(dummy_user_1['token'], 4, 3)
 
+    
+    channel_leave_v2(dummy_user_3['token'], 1)
+    channel_leave_v2(dummy_user_3['token'], 2)
+    channel_leave_v2(dummy_user_3['token'], 3)
+    
+    channel_add_owner_v2(dummy_user_1['token'], 1, dummy_user_2['auth_user_id'])
+    channel_add_owner_v2(dummy_user_2['token'], 2, dummy_user_3['auth_user_id'])
+    channel_add_owner_v2(dummy_user_3['token'], 2, dummy_user_1['auth_user_id'])
+    """
+    #channel_remove_owner_v2(dummy_user_1['token'], 1, dummy_user_2['auth_user_id'])
+    #channel_remove_owner_v2(dummy_user_2['token'], 2, dummy_user_3['auth_user_id'])
+
+    print("")
     for channel in data['channels']:
         print(channel['all_members'])
+    print("")
+    for channel in data['channels']:
+        print(channel['owner_members'])
+    print("")
+    print(channel_details_v1(dummy_user_1['token'], 1))
+    print(channel_details_v1(dummy_user_2['token'], 2))
     #channel_join_v1(dummy_user_1['token'], 2)
     #print(channels_list_v1(dummy_user_1['token']))
     #print(token_to_user_id(dummy_user_1['token']))
     
-    #print(channel_details_v1(dummy_user_1['token'], 1))
+    

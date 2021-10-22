@@ -297,12 +297,11 @@ def check_existing_member(u_id, channel_id):
     data = data_store.get()
     result = False
     for channel in data['channels']:
-        if channel['channel_id'] == channel_id:
+        if int(channel['channel_id']) == int(channel_id):
             for mem in channel['all_members']:
-	            if u_id == mem:
+	            if mem == u_id:
 		            result = True 
     return result
-
 
 def check_if_user_is_channel_member(token, channel_id):
     auth_user_id = token_to_user_id(token)
@@ -317,6 +316,7 @@ def check_if_user_is_channel_member(token, channel_id):
                 if member == user['u_id']:
                     value = True 
     return value
+
 
 def check_if_channel_is_public_or_private(channel_id):
     store = data_store.get()
