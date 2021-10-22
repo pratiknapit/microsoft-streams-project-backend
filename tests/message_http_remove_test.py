@@ -53,6 +53,8 @@ def dm_id(auth_user, member):
                                                              'u_ids': [member['auth_user_id']]
                                                              }).json()['dm_id']
     return dm_id
+'''
+######
 
 def test_remove_channel_message(clear, auth_user, channel_id):
     message_id = requests.post(config.url + '/message/send/v1',
@@ -64,6 +66,8 @@ def test_remove_channel_message(clear, auth_user, channel_id):
                                json={'token': auth_user,
                                      'message_id': message_id})
     assert json.loads(response.text) == {}
+#####
+'''
 '''
 def test_remove_dm_message(clear, auth_user, dm_id):
     message_id = requests.post(config.url + '/message/senddm/v1',
@@ -76,10 +80,13 @@ def test_remove_dm_message(clear, auth_user, dm_id):
                                      'message_id': message_id})
     assert json.loads(response.text) == {}
 '''
-
+'''
+#####
 def test_invalid_token(clear):
     response = requests.delete(config.url + 'message/remove/v1', json={'token': "invalid_token", 'message_id': 1})
     assert response.status_code == 403
+########
+'''
 '''
 def test_unauthorised_auth_user(clear, auth_user, member, channel_id, dm_id):
     channel_message_id = requests.post(config.url + '/message/send/v1',

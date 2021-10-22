@@ -30,7 +30,7 @@ def message_send(token, channel_id, message):
     user = auth_user_id_check(auth_user_id) 
     if check_if_user_is_channel_member(token, channel_id) == True:
         message_id = make_message(message, channel_id, user['u_id'])
-
+        
     for i in store:
         if i['message_id'] == message_id:
             user['messages_created'].remove(message)
@@ -60,7 +60,7 @@ def message_edit(token, message_id, new_message):
     if decoded_token is False:
         raise AccessError(description='Invalid Token.')
 
-    
+
     message = message_id_check(message_id)
     if message == False:
         raise InputError
