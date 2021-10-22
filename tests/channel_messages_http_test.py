@@ -48,7 +48,7 @@ def test_invalid_input(token, channel_id):
     status_code2 = resp2.status_code
     assert status_code1 == 400
     assert status_code2 == 400
-'''
+
 def test_invalid_token(clear, channel_id):
     resp = requests.get(config.url + '/channel/messages/v2', params={
         'token': "invalid_token",
@@ -111,3 +111,4 @@ def test_messages(clear, token, channel_id):
     resp_dict = messages_dict.json()
     assert messages_dict.status_code == 200
     assert 'messages' and 'start' and 'end' in resp_dict
+'''
