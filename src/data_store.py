@@ -127,6 +127,7 @@ def login_token(user):
     logged_in_users.append(token)
     return token
 
+
 def is_valid_token(token):
     data = data_store.get()
     SECRET = 'abcdedweidjwijdokfwkfwoqkqfw'
@@ -212,15 +213,6 @@ def user_all_channels(token):
     return all_channels_list
 
 # def functions to help with Channel create, channels_list and channels_listall 
-
-#check if channel is in our database and returns it. 
-def from_channel_id_return_channel(channel_id):
-    store = data_store.get()
-
-    for channel in store['channels']:
-        if int(channel['channel_id']) == int(channel_id):
-            return channel    
-    return False
 
 def is_public_check(is_public):
     if is_public == True or is_public == False:
@@ -340,22 +332,6 @@ def handle_search(handle):
         if user['handle_str'] == handle:
             return user
     return
-
-
-logged_in_users = {}
-def login_token(user):
-    ENCRYPT = 'abcde'
-    token = str(jwt.encode({'handle_str': user['handle_str']}, ENCRYPT, algorithm = 'HS256'))
-    logged_in_users[token] = user
-    return token
-
-
-
-def token_check(token):
-    store = logged_in_users
-    if token in store: 
-        return store[token]
-    return False
 
 
 def save_data(data):

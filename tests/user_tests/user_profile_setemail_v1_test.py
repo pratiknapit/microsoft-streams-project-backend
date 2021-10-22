@@ -35,6 +35,5 @@ def test_email_taken_already(clear, dummy_cases):
         user_profile_setemail_v1(token, "dummyuser2@gmail.com")
 
 def test_invalid_token():
-    token = "invalidtoken"
     with pytest.raises(AccessError):
         assert user_profile_setemail_v1("invalidtoken", "dummyuser2@gmail.com")
