@@ -25,34 +25,35 @@ def token():
 def channel_id(token):
     return channels_create_v1(token, 'testChannel01', False)['channel_id']
 
-@pytest.fixture
-def clear():
-    clear_v1()
-
 # Message_send #
 def test_message_too_long(clear, token, channel_id):
     message = ''.join(random.choices(string.ascii_letters, k = 1001))
     with pytest.raises(InputError):
         message_send(token, channel_id, message)
+    clear_v1()
 
 def test_invalid_token(clear, token, channel_id):
     invalid_token = jwt.encode({'test' : 'value'}, 'TestSecret', algorithm='HS256')
     with pytest.raises(AccessError):
         message_send(invalid_token, channel_id, 'testMessage')
+    clear_v1()
 
 def test_user_not_in_channel(clear, token, channel_id):
     second_token = auth_register_v1('test2@unsw.au', 'testPassword', 'secondFirst', 'secondLast')
     with pytest.raises(AccessError):
         message_send(second_token['token'], channel_id, 'testMessage')
+    clear_v1()
 
 def test_message_ids_are_unique(clear, token, channel_id):
     first_id = message_send(token, channel_id, 'testMessaage')['message_id']
     second_id = message_send(token, channel_id, 'secondTestMessage')['message_id']
     assert first_id != second_id
+    clear_v1()
 
 def test_invalid_channel_id(clear, token):
     with pytest.raises(InputError):
         message_send(token, 'channel_id', 'test message')
+    clear_v1()
 
 # Message_edit #
 @pytest.fixture(autouse=True)
