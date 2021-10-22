@@ -27,7 +27,7 @@ def dm_create(token, u_ids):
     if not is_valid_token(token):
         raise AccessError("Token is invalid.")
 
-    user_id = is_valid_token(token)['u_id']
+    user_id = is_valid_token(token)['auth_user_id']
     handles = []
 
     for u_id in u_ids:
@@ -51,8 +51,6 @@ def dm_create(token, u_ids):
     dms.append(dm_dict)
 
     return {'dm_id': dm_id}
-    
-
 
 def dm_list(token):
     """Returns the list of DMs that the user is a member of
@@ -63,7 +61,7 @@ def dm_list(token):
     Returns:
         {dms}: a list of dms the user is a member of
     """
-    
+
     decoded_token = is_valid_token(token)
     if decoded_token is False:
         raise AccessError("Invalid Token.")
@@ -117,7 +115,6 @@ def dm_remove(token, dm_id):
 
     return {}
     
-
 
 def dm_details(token, dm_id):
     '''
@@ -234,7 +231,7 @@ def dm_messages(token, dm_id, start):
     if not is_valid_token(token):
         raise AccessError(description="Token is invalid")
 
-    #user_id = is_valid_token(token)['user_id']
+    user_id = is_valid_token(token)['user_id']
 
     if not is_valid_dm_id(dm_id):
         raise InputError(description="DM ID is invalid.")
@@ -242,9 +239,9 @@ def dm_messages(token, dm_id, start):
     dm_info = find_dm(dm_id, data)
     dm_messages = dm_info['messages']
 
- #   if not is_user_in_dm(dm_id, user_id, data):
- #       raise AccessError(
- #           description=f"User is not a member of the dm with dm id {dm_id}")
+    if not is_user_in_dm(dm_id, user_id, data):
+        raise AccessError(
+            description=f"User is not a member of the dm with dm id {dm_id}")
 
     # Check valid start number
     if start >= len(dm_messages) and start != 0:
