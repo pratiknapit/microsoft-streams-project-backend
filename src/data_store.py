@@ -105,13 +105,16 @@ def make_user(email, password, name_first, name_last, u_id):
     }
 
 def make_message(message, channel_id, u_id): 
-    store = data_store.get()
-
+    m_id = 0
+    channels = data_store.get()['channels']
+    for channel in channels:
+        m_id += len(channel['Messages'])
+    message_id = m_id + 1
     user = user_id_check(u_id)
-    user['messages_created'].append(message)
-    
-    message_id = len(message) + 1
-    store['Messages'].append({
+    user['messages_created'].append(message_id)
+
+    channel = channel_id_check(channel_id)
+    channel['Messages'].append({
                             'channel_id': channel_id, 
                             'message_id': message_id, 
                             'u_id': u_id, 
@@ -263,10 +266,11 @@ def password_check(password):
     return False
 
 def message_id_check(message_id):
-    data = data_store.get()
-    for message in data['Messages']:
-        if message['message_id'] == message_id:
-            return message
+    channels = data_store.get()['channels']
+    for channel in channels:
+        for message in channel['Messages']:
+            if message['message_id'] == message_id:
+                return message
     return None
 
 def channel_id_check(channel_id):
