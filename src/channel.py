@@ -202,7 +202,7 @@ def channel_join_v1(token, channel_id):
     user_detail = auth_user_id_check(auth_user_id)
 
     if check_existing_member(auth_user_id, channel_id) is True:
-        raise InputError
+        raise InputError("Already a member.")
 
     if user_detail['is_global_owner'] == 2:
         if check_if_channel_is_public_or_private(channel_id) is False:
@@ -274,10 +274,10 @@ def channel_add_owner_v2(token, channel_id, u_id):
         raise AccessError(description="token not found")
     
     if not auth_user_id_check(u_id):
-        raise AccessError  
+        raise InputError  
 
-    if check_existing_owner(u_id, channel_id) is False:
-        raise InputError("User is not an owner of the channel.")
+    if check_existing_owner(u_id, channel_id) is True:
+        raise InputError("User is already an owner of the channel.")
 
     if channel_id_check(channel_id) is False:
         raise InputError
@@ -286,10 +286,6 @@ def channel_add_owner_v2(token, channel_id, u_id):
         raise InputError
     
     auth_user_id = token_to_user_id(token) 
-
-    if check_existing_owner(auth_user_id, channel_id) is False:
-        raise AccessError
-    
     user_detail = auth_user_id_check(auth_user_id)
 
     if user_detail['is_global_owner'] == 2:
@@ -313,10 +309,7 @@ def channel_remove_owner_v2(token, channel_id, u_id):
         raise AccessError(description="token not found")
     
     if not auth_user_id_check(u_id):
-        raise AccessError  
-
-    if check_existing_owner(u_id, channel_id) is False:
-        raise InputError("User is not an owner of the channel.")
+        raise InputError 
 
     if channel_id_check(channel_id) is False:
         raise InputError
@@ -324,13 +317,14 @@ def channel_remove_owner_v2(token, channel_id, u_id):
     if check_existing_member(u_id, channel_id) is False:
         raise InputError
     
-    auth_user_id = token_to_user_id(token) 
-
-    if check_existing_owner(auth_user_id, channel_id) is False:
-        raise AccessError
+    channel_info = channel_id_check(channel_id)
+    if len(channel_info['owner_members']) == 1:
+        if check_existing_owner(u_id, channel_id) is True:
+            raise InputError("User is only owner of the channel.")
     
+    #Little bit confused with this part: Can a global owner remove the last owner in the channel" 
+    auth_user_id = token_to_user_id(token) 
     user_detail = auth_user_id_check(auth_user_id)
-
     if user_detail['is_global_owner'] == 2:
         if check_existing_owner(auth_user_id, channel_id) is False:
             raise AccessError

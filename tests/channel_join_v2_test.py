@@ -25,7 +25,7 @@ def user2():
 
 @pytest.fixture
 def channel1(user1):
-    channel = requests.post(config.url + 'channels/create', json={
+    channel = requests.post(config.url + 'channels/create/v2', json={
         "token": user1['token'],
         "name": "FirstChannel",
         "is_public": True
@@ -34,7 +34,7 @@ def channel1(user1):
 
 @pytest.fixture
 def channel_priv(user1):
-    c_priv = requests.post(config.url + 'channels/create', json={
+    c_priv = requests.post(config.url + 'channels/create/v2', json={
         "token": user1['token'],
         "name": "PrivChannel",
         "is_public": False
@@ -46,21 +46,26 @@ def clear():
     requests.delete(config.url + 'clear/v1')
 
 def test_invalid_token(channel1):
-    response = requests.post(config.url + 'channels/join', json={
+    response = requests.post(config.url + 'channel/join/v2', json={
         "token": "randomtoken1",
         "channel_id": channel1['channel_id']
     })
     assert response.status_code == 403
 
 def test_invalid_channel(user1):
-    response = requests.post(config.url + 'channels/join', json={
+    response = requests.post(config.url + 'channel/join/v2', json={
         "token": user1['token'],
         "channel_id": "randomchannel"
     })
     assert response.status_code == 400
     
-def test_member_is_already_channel_members():
-    pass
+def test_member_is_already_channel_members(clear, user1, channel1):
+    response = requests.post(config.url + 'channel/join/v2', json={
+        "token": user1['token'],
+        "channel_id": channel1['channel_id']
+    })
+    assert response.status_code == 400
+    
 
 #This does not work for some reason, it is returning 400 error instead of 403.
 def test_priv_channel_and_not_global_owner(clear, user1, user2, channel1, channel_priv):
@@ -69,7 +74,7 @@ def test_priv_channel_and_not_global_owner(clear, user1, user2, channel1, channe
     print(channel1)
     print(channel_priv)
 
-    response = requests.post(config.url + 'channels/join', json={
+    response = requests.post(config.url + 'channel/join/v2', json={
         "token": user2['token'],
         "channel_id": channel_priv['channel_id']
     })
@@ -100,7 +105,7 @@ def test_priv_channel_and_not_global_owner2():
         })
     channel1_payload = channel1.json()
 
-    channel_priv = requests.post(config.url + 'channels/create', json={
+    channel_priv = requests.post(config.url + 'channels/create/v2', json={
         "token": user1_payload['token'],
         "name": "PrivChannel",
         "is_public": False
@@ -112,7 +117,7 @@ def test_priv_channel_and_not_global_owner2():
     print(channel1_payload)
     print(priv_payload)
 
-    response = requests.post(config.url + 'channels/join', json={
+    response = requests.post(config.url + 'channel/join/v2', json={
         "token": user2_payload['token'],
         "channel_id": priv_payload['channel_id']
     })
@@ -139,7 +144,7 @@ def test_basic_func_channel_details_v2():
     user2_payload = response2.json()
     assert response2.status_code == 200
 
-    response_c = requests.post(config.url + 'channels/create', json={
+    response_c = requests.post(config.url + 'channels/create/v2', json={
         "token": user1_payload['token'],
         "name": "FirstChannel",
         "is_public": "True"
@@ -148,7 +153,7 @@ def test_basic_func_channel_details_v2():
     channel_payload = response_c.json()
     assert response_c.status_code == 200
 
-    response_j = requests.post(config.url + 'channels/join', json={
+    response_j = requests.post(config.url + 'channel/join/v2', json={
         "token": user2_payload['token'],
         "channel_id": channel_payload['channel_id']
     })

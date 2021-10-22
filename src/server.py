@@ -116,7 +116,7 @@ def logout_auth():
 
 #Channels HTTP Server Wrappers
 
-@APP.route("/channels/create", methods=['POST'])
+@APP.route("/channels/create/v2", methods=['POST'])
 def channels_create_v2():
     """
     This is a flask wrapper for the channels_create function.  
@@ -129,7 +129,7 @@ def channels_create_v2():
 
     return dumps(channel_id)
 
-@APP.route("/channels/list", methods=['GET'])
+@APP.route("/channels/list/v2", methods=['GET'])
 def channels_list_v2():
     """
     This is a flask wrapper for the channels_list function.  
@@ -143,7 +143,7 @@ def channels_list_v2():
     return_channel_list = channels_list_v1(token)
     return dumps(return_channel_list)
 
-@APP.route("/channels/listall", methods=['GET'])
+@APP.route("/channels/listall/v2", methods=['GET'])
 def channels_list_all_v2():
     """
     This is a flask wrapper for the channels_list function.  
@@ -157,7 +157,7 @@ def channels_list_all_v2():
     return_channel_list_all = channels_listall_v1(token)
     return dumps(return_channel_list_all)
 
-@APP.route("/channels/details", methods=['GET'])
+@APP.route("/channel/details/v2", methods=['GET'])
 def c_details_v2():
     """
     This is a flask wrapper for the channels_details function.  
@@ -170,7 +170,7 @@ def c_details_v2():
     return_dict = channel_details_v1(token, channel_id)
     return dumps(return_dict)
 
-@APP.route("/channels/join", methods=['POST'])
+@APP.route("/channel/join/v2", methods=['POST'])
 def c_join_v2():
     """
     This is a flask wrapper for the channels_create function.  
@@ -182,7 +182,7 @@ def c_join_v2():
     return_join = channel_join_v1(token, channel_id)
     return dumps(return_join)
 
-@APP.route("/channel/leave", methods=['POST'])
+@APP.route("/channel/leave/v1", methods=['POST'])
 def c_leave_v2():
     """
     This is a flask wrapper for the channels_create function.  
@@ -193,7 +193,7 @@ def c_leave_v2():
     #do token and channel_id checks 
     return dumps(channel_leave_v2(token, channel_id))
 
-@APP.route("/channel/addowner", methods=['POST'])
+@APP.route("/channel/addowner/v1", methods=['POST'])
 def c_addowner_v2():
     """
     This is a flask wrapper for the channels_create function.  
@@ -206,7 +206,7 @@ def c_addowner_v2():
     channel_add_owner_v2(token, channel_id, u_id)
     return dumps({})
 
-@APP.route("/channel/removeowner", methods=['POST'])
+@APP.route("/channel/removeowner/v1", methods=['POST'])
 def c_removeowner_v2():
     """
     This is a flask wrapper for the channels_create function.  
