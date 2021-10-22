@@ -1,3 +1,3 @@
-port = 8081
+port = 10000
 
 url = f"http://localhost:{port}/"

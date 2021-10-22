@@ -171,7 +171,7 @@ def c_details_v2():
     return dumps(return_dict)
 
 @APP.route("/channels/join", methods=['POST'])
-def channel_join_v2():
+def c_join_v2():
     """
     This is a flask wrapper for the channels_create function.  
     """
@@ -179,7 +179,8 @@ def channel_join_v2():
     token = data['token']
     channel_id = data['channel_id']
     #do token and channel_id checks 
-    return dumps(channel_join_v1(token, channel_id))
+    return_join = channel_join_v1(token, channel_id)
+    return dumps(return_join)
 
 @APP.route("/channel/leave", methods=['POST'])
 def c_leave_v2():

@@ -307,20 +307,19 @@ def check_if_user_is_channel_member(token, channel_id):
     user = auth_user_id_check(auth_user_id) 
     if user == False:
         return False
-    value = False 
-    for Dict in store['channels']:
-        if int(Dict['channel_id']) == int(channel_id):
-            for member in Dict['all_members']:
-                if member == user['u_id']:
-                    value = True 
-    return value
+    result = False 
+    for channel in store['channels']:
+        if int(channel['channel_id']) == int(channel_id):
+            for member in channel['all_members']:
+                if member == auth_user_id:
+                    result = True 
+    return result
 
 
 def check_if_channel_is_public_or_private(channel_id):
     store = data_store.get()
-    channel_storage = channel_id_check(channel_id)
     for channel in store['channels']:
-        if channel['channel_id'] == channel_storage['channel_id']:
+        if int(channel['channel_id']) == int(channel_id):
             return channel['is_public']
             
 def user_id_check(u_id):
