@@ -2,7 +2,6 @@ import pytest
 from src.error import InputError, AccessError
 from src.auth import auth_register_v1
 from src.user import user_profile_sethandle_v1
-from src.channels import channels_create_v1
 from src.other import clear_v1
 
 
@@ -22,14 +21,16 @@ def clear():
 def test_handle_already_taken(clear, dummy_cases):
     token = dummy_cases
     with pytest.raises(InputError):
-        user_profile_sethandle_v1(token, "BettaBB")
+        user_profile_sethandle_v1(dummy_cases, "BettaBB")
 
 def test_handle_invalid(clear, dummy_cases):
     token = dummy_cases
     with pytest.raises(InputError):
-        user_profile_sethandle_v1(token, "a")
+        user_profile_sethandle_v1(token, "y"*0)
     with pytest.raises(InputError):
-        user_profile_sethandle_v1(token, "a"*99)
+        user_profile_sethandle_v1(token, "y")
+    with pytest.raises(InputError):
+        user_profile_sethandle_v1(token, "y"*99)
 
 def test_valid_sethandle(clear, dummy_cases):
     token = dummy_cases

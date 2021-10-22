@@ -34,10 +34,10 @@ def user_profile_v1(token, u_id):
 
     data = data_store.get()
     for user in data['users']:
-        if u_id == user['auth_user_id']:
+        if u_id == user['u_id']:
             return {
                 'user': {
-                    'u_id': user['auth_user_id'],
+                    'u_id': user['u_id'],
                     'email': user['email'],
                     'name_first' : user['name_first'], 
 	                'name_last' : user['name_last'], 
@@ -85,7 +85,7 @@ def user_profile_setemail_v1(token, email):
     id = is_valid_token(token) 
     data = data_store.get()
     for user in data['users']:
-        if user['auth_user_id'] == id:
+        if user['u_id'] == id:
             user['email'] = email
     
     save_data(data)

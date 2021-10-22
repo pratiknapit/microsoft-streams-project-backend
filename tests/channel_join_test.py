@@ -20,35 +20,35 @@ def test_channel_join_invalid_id():
     clear_v1()
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
     with pytest.raises(InputError):
-        assert channel_join_v1(dummy_user_2['auth_user_id'], 123123123)
+        assert channel_join_v1(dummy_user_2['token'], 123123123)
 
 def test_channel_join_private_channel():
     clear_v1()
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
-    dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', False)
+    dummy_user_2_channel = channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', False)
 
     with pytest.raises(AccessError):
-        assert channel_join_v1(dummy_user_3['auth_user_id'], dummy_user_2_channel['channel_id'])
+        assert channel_join_v1(dummy_user_3['token'], dummy_user_2_channel['channel_id'])
 
 def test_user_is_already_member():
     clear_v1()
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
-    dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', False)
+    dummy_user_2_channel = channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', False)
 
     with pytest.raises(InputError):
-        assert channel_join_v1(dummy_user_2['auth_user_id'], dummy_user_2_channel['channel_id'])
+        assert channel_join_v1(dummy_user_2['token'], dummy_user_2_channel['channel_id'])
 
 def test_if_joining_works():
     clear_v1()
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
-    dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
+    dummy_user_2_channel = channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True)
 
     
-    channel_join_v1(dummy_user_3['auth_user_id'],  dummy_user_2_channel['channel_id'])
-    channel_data = channel_details_v1(dummy_user_2['auth_user_id'], dummy_user_2_channel['channel_id'])
+    channel_join_v1(dummy_user_3['token'],  dummy_user_2_channel['channel_id'])
+    channel_data = channel_details_v1(dummy_user_2['token'], dummy_user_2_channel['channel_id'])
     value = False
 
     for member in channel_data['all_members']:

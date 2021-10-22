@@ -10,7 +10,7 @@ from src.data_store import data_store, add_user, login_email, login_token
 ##########################
 # Helper Check Functions #
 ##########################
-from src.data_store import email_check, email_repeat_check, password_check, is_valid_token
+from src.data_store import email_check, email_repeat_check, password_check, is_valid_token, token_to_user_id
 
 ###################
 # Error Functions #
@@ -53,9 +53,9 @@ def auth_register_v1(email, password, name_first, name_last):                   
 
     store = data_store.get()
     for user in store['users']:
-        if user['u_id'] == user['u_id']:
+        if user['u_id'] == added_user['u_id']:
             user['token'] = token
-            
+
     return {
         'auth_user_id': added_user['u_id'],
         'token': token,
@@ -89,7 +89,7 @@ def auth_login_v1(email, password):
 
     store = data_store.get()
     for user in store['users']:
-        if user['u_id'] == user['u_id']:
+        if user['u_id'] == cur_user['u_id']:
             user['token'] = token
             
     return {
@@ -115,3 +115,23 @@ def auth_logout(token):
             user.pop('token')
             return True
     return False
+
+
+if __name__ == '__main__':
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
+    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
+
+    #print(dummy_user_1)
+    #print(dummy_user_2)
+    #print(dummy_user_3)
+    store = data_store.get()
+    for user in store['users']:
+        print(user)
+        print(" ")
+    
+    
+    for user in store['users']:
+        u_id = token_to_user_id(user['token'])
+        print(u_id)
+    

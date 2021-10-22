@@ -9,7 +9,7 @@ from src.other import clear_v1
 @pytest.fixture
 def dummy_cases():
 
-    dummy = auth_register_v1("dummydum@gmail.com", "wordpass", "Dummy", "Dum")
+    dummy = auth_register_v1("dummydum@gmail.com", "wordpass", "dummy", "dum")
     token = dummy['token']
     dummy_id = dummy['auth_user_id']
 
@@ -22,7 +22,7 @@ def clear():
 def test_invalid_token(clear, dummy_cases):
     token, dummy_id = dummy_cases
     dummy_id = dummy_id + 1
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         user_profile_v1(token, dummy_id)
 
 def test_valid_output(clear, dummy_cases):
@@ -31,9 +31,9 @@ def test_valid_output(clear, dummy_cases):
 
     assert result['user']['u_id'] ==  dummy_id
     assert result['user']['email'] == 'dummydum@gmail.com'
-    assert result['user']['name_first'] == 'Dummy'
-    assert result['user']['name_last'] == 'Dum'
-    assert result['user']['handle_str'] == 'DummyDum'
+    assert result['user']['name_first'] == 'dummy'
+    assert result['user']['name_last'] == 'dum'
+    assert result['user']['handle_str'] == 'dummydum'
 
 
 

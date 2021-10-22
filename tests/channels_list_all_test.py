@@ -37,14 +37,14 @@ def test_channels_list_all_nonmember_user():
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
     dummy_user_4 = auth_register_v1('dummyuser4@gmail.com', 'passsssworddd', 'Deal', 'DD')
 
-    dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
-    dummy_user_3_channel = channels_create_v1(dummy_user_3['auth_user_id'], 'dummy_user_3_channel', True) 
+    dummy_user_2_channel = channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True)
+    dummy_user_3_channel = channels_create_v1(dummy_user_3['token'], 'dummy_user_3_channel', True) 
     
     #Dummy user 4, who is not part of the channel, is calling channels list all. 
-    dummy_user_4_channels_list_all = channels_listall_v1(dummy_user_4['auth_user_id'])
+    dummy_user_4_channels_list_all = channels_listall_v1(dummy_user_4['token'])
 
     result = 0
-    for channel in dummy_user_4_channels_list_all['channels']:
+    for channel in dummy_user_4_channels_list_all:
         if channel['channel_id'] == dummy_user_2_channel['channel_id'] and channel['name'] == "dummy_user_2_channel":
             result += 1
         if channel['channel_id'] == dummy_user_3_channel['channel_id'] and channel['name'] == "dummy_user_3_channel":
@@ -57,14 +57,13 @@ def test_channels_list_all_return_type():
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
 
-    dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
-    dummy_user_3_channel = channels_create_v1(dummy_user_3['auth_user_id'], 'dummy_user_3_channel', True) 
+    dummy_user_2_channel = channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True)
+    dummy_user_3_channel = channels_create_v1(dummy_user_3['token'], 'dummy_user_3_channel', True) 
     
     #Dummy user 4, who is not part of the channel, is calling channels list all. 
-    channels_list_all = channels_listall_v1(dummy_user_2['auth_user_id'])
+    channels_list_all = channels_listall_v1(dummy_user_2['token'])
 
-    assert (channels_list_all == {
-        'channels': [
+    assert (channels_list_all == [
         	{
         		'channel_id': 1,
         		'name': 'dummy_user_2_channel',
@@ -73,8 +72,8 @@ def test_channels_list_all_return_type():
         		'channel_id': 2,
         		'name': 'dummy_user_3_channel',
         	},
-        ],
-    })
+        ]
+    )
 
 
 def test_channels_list_all_multiple_by_user_2():
@@ -83,15 +82,15 @@ def test_channels_list_all_multiple_by_user_2():
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
     dummy_user_4 = auth_register_v1('dummyuser4@gmail.com', 'passsssworddd', 'Deal', 'DD')
 
-    dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
-    dummy_user_3_channel = channels_create_v1(dummy_user_3['auth_user_id'], 'dummy_user_3_channel', True) 
-    dummy_user_4_channel = channels_create_v1(dummy_user_4['auth_user_id'], 'dummy_user_4_channel', True)
+    dummy_user_2_channel = channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True)
+    dummy_user_3_channel = channels_create_v1(dummy_user_3['token'], 'dummy_user_3_channel', True) 
+    dummy_user_4_channel = channels_create_v1(dummy_user_4['token'], 'dummy_user_4_channel', True)
 
     #Dummy user 2 is calling channel list all.
-    dummy_user_2_channels_list_all = channels_listall_v1(dummy_user_2['auth_user_id'])
+    dummy_user_2_channels_list_all = channels_listall_v1(dummy_user_2['token'])
 
     result = 0
-    for channel in dummy_user_2_channels_list_all['channels']:
+    for channel in dummy_user_2_channels_list_all:
         if channel['channel_id'] == dummy_user_2_channel['channel_id'] and channel['name'] == "dummy_user_2_channel":
             result += 1
         if channel['channel_id'] == dummy_user_3_channel['channel_id'] and channel['name'] == "dummy_user_3_channel":
@@ -108,15 +107,15 @@ def test_channels_list_all_multiple_by_user_3():
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
     dummy_user_4 = auth_register_v1('dummyuser4@gmail.com', 'passsssworddd', 'Deal', 'DD')
 
-    dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
-    dummy_user_3_channel = channels_create_v1(dummy_user_3['auth_user_id'], 'dummy_user_3_channel', True) 
-    dummy_user_4_channel = channels_create_v1(dummy_user_4['auth_user_id'], 'dummy_user_4_channel', True)
+    dummy_user_2_channel = channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True)
+    dummy_user_3_channel = channels_create_v1(dummy_user_3['token'], 'dummy_user_3_channel', True) 
+    dummy_user_4_channel = channels_create_v1(dummy_user_4['token'], 'dummy_user_4_channel', True)
 
     #Dummy user 2 is calling channel list all.
-    dummy_user_3_channels_list_all = channels_listall_v1(dummy_user_3['auth_user_id'])
+    dummy_user_3_channels_list_all = channels_listall_v1(dummy_user_3['token'])
 
     result = 0
-    for channel in dummy_user_3_channels_list_all['channels']:
+    for channel in dummy_user_3_channels_list_all:
         if channel['channel_id'] == dummy_user_2_channel['channel_id'] and channel['name'] == "dummy_user_2_channel":
             result += 1
         if channel['channel_id'] == dummy_user_3_channel['channel_id'] and channel['name'] == "dummy_user_3_channel":
