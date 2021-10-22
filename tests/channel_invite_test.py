@@ -41,7 +41,7 @@ def test_channel_invite_incorrect_user_invalid(clear, dummy_cases):
     with pytest.raises(AccessError):
         channel_invite_v1(dummy_cases['dummy_user_2']['token'],
         dummy_cases['dummy_user_2_channel']['channel_id'], 
-        23453364)
+        0)
 
 def test_channel_invite_auth_not_in_channel_invalid(clear, dummy_cases):
     with pytest.raises(AccessError):

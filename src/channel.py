@@ -178,7 +178,7 @@ def channel_messages_v1(token, channel_id, start):
     message_dictionary["end"] = end
 
     return message_dictionary
-    
+   
 
 def channel_join_v1(token, channel_id):
     '''
