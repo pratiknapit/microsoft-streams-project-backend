@@ -273,7 +273,7 @@ def password_check(password):
 def message_id_check(message_id):
     data = data_store.get()
     for message in data['Messages']:
-        if int(message['message_id']) == int(message_id):
+        if message['message_id'] == message_id:
             return message
     return None
 

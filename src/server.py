@@ -238,7 +238,6 @@ def c_messages():
     channel_id = int(request.args.get('channel_id'))
     start = int(request.args.get('start'))
     return_dict = channel_messages_v1(token, channel_id, start)
-    print(return_dict)
     return dumps(return_dict)
 
 @APP.route("/message/send/v1", methods=["POST"])
@@ -257,7 +256,7 @@ def edit_message():
     data = request.get_json()
 
     token = data['token']
-    message_id = int(data['message_id'])
+    message_id = data['message_id']
     message = data['message']
     
     message_edit(token, message_id, message)
@@ -268,7 +267,7 @@ def remove_message():
     data = request.get_json()
 
     token = data['token']
-    message_id = int(data['message_id'])
+    message_id = data['message_id']
     
     message_remove(token, message_id)   
     return dumps({})
