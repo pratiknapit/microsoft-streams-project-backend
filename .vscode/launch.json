@@ -16,7 +16,9 @@
             "type": "python",
             "request": "launch",
             "module": "pytest",
-            "args": ["tests/user_http_tests/user_profile_setemail_v1_http_test.py"]
+            "args": [
+                "tests/message_http_send_test.py"
+            ]
         }
     ]
 }

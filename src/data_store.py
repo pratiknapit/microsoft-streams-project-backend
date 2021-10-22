@@ -26,7 +26,6 @@ Example usage:
 import re
 from json import dumps
 import jwt
-import json
 
 initial_object = {
     'users': [    
@@ -127,7 +126,6 @@ def login_token(user):
     logged_in_users.append(token)
     return token
 
-
 def is_valid_token(token):
     data = data_store.get()
     SECRET = 'abcdedweidjwijdokfwkfwoqkqfw'
@@ -213,6 +211,15 @@ def user_all_channels(token):
     return all_channels_list
 
 # def functions to help with Channel create, channels_list and channels_listall 
+
+#check if channel is in our database and returns it. 
+def from_channel_id_return_channel(channel_id):
+    store = data_store.get()
+
+    for channel in store['channels']:
+        if int(channel['channel_id']) == int(channel_id):
+            return channel    
+    return False
 
 def is_public_check(is_public):
     if is_public == True or is_public == False:
@@ -326,20 +333,7 @@ def user_id_check(u_id):
     return False
 
 
-def handle_search(handle):
-    data = data_store.get()
-    for user in data['users']:
-        if user['handle_str'] == handle:
-            return user
-    return
-
-
-def save_data(data):
-    with open('data.json', 'w') as FILE:
-        json.dump(data, FILE)
-
-## YOU SHOULD MODIFY THIS OBJECT ABOVE
-
+###################################################################
 class Datastore:
     def __init__(self):
         self.__store = initial_object

@@ -12,8 +12,6 @@ from src.data_store import password_check, email_check, email_repeat_check
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1, auth_logout
 from src.message import message_send, message_edit, message_remove
-from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
-from src.user import user_profile_sethandle_v1, users_all_v1
 from src.dm import dm_create, dm_list, dm_remove, dm_details, dm_leave, dm_messages
 
 def quit_gracefully(*args):
@@ -271,52 +269,6 @@ def remove_message():
     
     message_remove(token, message_id)   
     return dumps({})
-
-@APP.route("/users/all/v1", methods=["GET"])
-def users():
-    token = request.args.get('token')
-
-    all_users = users_all_v1(token)
-    return dumps(all_users)
-
-@APP.route("/user/profile/v1", methods=["GET"])
-def profile_users():
-    token = request.args.get('token')
-    u_id = request.args.get('u_id')
-
-    user_profile = user_profile_v1(token, u_id)
-    return dumps(user_profile)
-
-@APP.route("/user/profile/setname/v1", methods=["PUT"])
-def profile_setname():
-    data = request.get_json()
-
-    token = data["token"]
-    name_first = data["name_first"]
-    name_last = data["name_last"]
-
-    profile_set_name = user_profile_setname_v1(token, name_first, name_last)
-    return dumps(profile_set_name)
-
-@APP.route("/user/profile/setemail/v1", methods=["PUT"])
-def profile_setemail():
-    data = request.get_json()
-
-    token = data["token"]
-    email = data["email"]
-
-    profile_set_email = user_profile_setemail_v1(token, email)
-    return dumps(profile_set_email)
-
-@APP.route("/user/profile/sethandle/v1", methods=["PUT"])
-def sethandle():
-    data = request.get_json()
-
-    token = data["token"]
-    handle_str = data['handle']
-
-    profile_set_handle = user_profile_sethandle_v1(token, handle_str)
-    return dumps(profile_set_handle)
 
 @APP.route("/dm/create/v1", methods=['POST'])
 def create_dm():
