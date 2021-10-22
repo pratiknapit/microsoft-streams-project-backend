@@ -281,8 +281,6 @@ def users():
 
 @APP.route("/user/profile/v1", methods=["GET"])
 def profile_users():
-    data = request.get_json()
-
     token = request.args.get('token')
     u_id = request.args.get('u_id')
 
