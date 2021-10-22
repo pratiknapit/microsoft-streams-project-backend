@@ -137,7 +137,11 @@ def test_user_is_already_channel_owner_remove(clear, user1, channel1, user2, use
     assert response.status_code == 400
 
 def test_no_owner_permission_add(clear, user1, channel1, user2, user3):
-    requests.delete(config.url + 'clear/v1')
+    response = requests.post(config.url + 'channel/join/v2', json={
+        "token": user3['token'],
+        "channel_id": channel1['channel_id']
+    })
+
     response = requests.post(config.url + 'channel/addowner/v1', json={
         "token": user2['token'],
         "channel_id": channel1['channel_id'],
@@ -145,15 +149,19 @@ def test_no_owner_permission_add(clear, user1, channel1, user2, user3):
     })
     assert response.status_code == 403
 
-def test_no_owner_permission_add(clear, user1, channel1, user2, user3):
-    requests.delete(config.url + 'clear/v1')
+def test_no_owner_permission_remove(clear, user1, channel1, user2, user3):
+    response = requests.post(config.url + 'channel/join/v2', json={
+        "token": user3['token'],
+        "channel_id": channel1['channel_id']
+    })
+
     response = requests.post(config.url + 'channel/removeowner/v1', json={
         "token": user2['token'],
         "channel_id": channel1['channel_id'],
         "u_id": user3['auth_user_id']
     })
     
-    assert response.status_code == 400
+    assert response.status_code == 403
 
 def test_channel_add_remove_owner1(clear, user1, user2, channel1):
     r1 = requests.post(config.url + 'channel/join/v2', json={
