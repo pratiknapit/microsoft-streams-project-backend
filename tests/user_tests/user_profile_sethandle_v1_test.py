@@ -8,7 +8,7 @@ from src.other import clear_v1
 @pytest.fixture
 def dummy_cases():
     # Dummy case created for testing of different parts of channel_invite_v1
-    auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
+    auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Betta', 'BB')
     dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'pspassword', 'Tree', 'Three')
     token = dummy_user_3['token']
     return token
@@ -21,7 +21,7 @@ def clear():
 def test_handle_already_taken(clear, dummy_cases):
     token = dummy_cases
     with pytest.raises(InputError):
-        user_profile_sethandle_v1(dummy_cases, "BettaBB")
+        user_profile_sethandle_v1(dummy_cases, "bettabb")
 
 def test_handle_invalid(clear, dummy_cases):
     token = dummy_cases

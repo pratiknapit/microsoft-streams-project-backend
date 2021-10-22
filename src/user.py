@@ -9,7 +9,9 @@ from src.data_store import save_data
 def users_all_v1(token):
     if is_valid_token(token) == False:
         raise AccessError("Token not valid")
-    
+
+
+    token = is_valid_token(token)
     user_list = []
     data = data_store.get()
     for user in range(len(data['users'])):
@@ -21,7 +23,6 @@ def users_all_v1(token):
             'handle_str': data['user_list'][user]['handle'],
         }
         user_list.append(user)
-
     return{"user_list": user_list}
 
 def user_profile_v1(token, u_id):
@@ -75,7 +76,7 @@ def user_profile_setemail_v1(token, email):
         raise AccessError("Token provided is not valid")
 
     if not email_check(email):
-            raise InputError("Email is incorrect")
+            raise InputError("Email is invalid")
 
     if email_repeat_check(email) == True:
             raise InputError("Email is already taken")
@@ -107,5 +108,3 @@ def user_profile_sethandle_v1(token, handle_str):
 
     save_data(data)        
     return {}
-
-
