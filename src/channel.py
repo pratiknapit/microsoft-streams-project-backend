@@ -158,14 +158,15 @@ def channel_messages_v1(token, channel_id, start):
     message_dictionary = {
         'message': [],
     }
-    msg_count = len(message_dictionary['message'])
+    msg_count_char = len(message_dictionary['message'])
 
-    num_loop = min(msg_count, 50)
+    num_loop = min(msg_count_char, 50)
     data = data_store.get()['channels']
     
-    for msg_num in range(0, num_loop):
-        msg_list = data[msg_num]["Messages"]
-        message_dictionary['message'].append(msg_list[num_loop - 1])
+    for channel in range(0, num_loop):
+        message_list = data[channel]["Messages"]
+        message = message_list[num_loop - 1]
+        message_dictionary['message'].append(message)
 
     if num_loop < 50:
         end = -1
@@ -177,7 +178,7 @@ def channel_messages_v1(token, channel_id, start):
     message_dictionary["end"] = end
 
     return message_dictionary
-    
+   
 
 def channel_join_v1(token, channel_id):
     '''

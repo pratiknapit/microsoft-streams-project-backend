@@ -26,6 +26,7 @@ Example usage:
 import re
 from json import dumps
 import jwt
+import json
 
 initial_object = {
     'users': [    
@@ -104,13 +105,16 @@ def make_user(email, password, name_first, name_last, u_id):
     }
 
 def make_message(message, channel_id, u_id): 
-    store = data_store.get()
-
+    m_id = 0
+    channels = data_store.get()['channels']
+    for channel in channels:
+        m_id += len(channel['Messages'])
+    message_id = m_id + 1
     user = user_id_check(u_id)
-    user['messages_created'].append(message)
-    
-    message_id = len(message) + 1
-    store['Messages'].append({
+    user['messages_created'].append(message_id)
+
+    channel = channel_id_check(channel_id)
+    channel['Messages'].append({
                             'channel_id': channel_id, 
                             'message_id': message_id, 
                             'u_id': u_id, 
@@ -118,19 +122,18 @@ def make_message(message, channel_id, u_id):
                             })
     return message_id
 
-
-
 logged_in_users = []
 def login_token(user):
-    SECRET = 'abcde'
-    #token = str(jwt.encode({'handle_str': user['handle_str']}, ENCRYPT, algorithm = 'HS256'))
+    SECRET = 'abcdedweidjwijdokfwkfwoqkqfw'
+    #token = str(jwt.encode({'handle_str': user['handle_str']}, SECRET, algorithm = 'HS256'))
     token = jwt.encode({'auth_user_id': user['u_id']}, SECRET, algorithm='HS256')
     logged_in_users.append(token)
     return token
 
+
 def is_valid_token(token):
     data = data_store.get()
-    SECRET = 'abcde'
+    SECRET = 'abcdedweidjwijdokfwkfwoqkqfw'
     try:
         payload = jwt.decode(token, SECRET, algorithms=['HS256'])
     except:
@@ -138,23 +141,29 @@ def is_valid_token(token):
         return False
     else:
         user = next(
-            (user for user in data['users'] if user['u_id'] == payload['u_id']), False)
+            (user for user in data['users'] if user['u_id'] == payload['auth_user_id']), False)
         if user:
-            if user['session_list'].count(payload['session_id']) != 0:
-                return payload
+            return payload
         return False
-
-def is_valid_user_id(auth_user_id):
-    data = data_store.get()
-    for user in data['users']:
-        if user['user_id'] == auth_user_id:
-            return True
-    return False
 
 def token_check(token):
     store = logged_in_users
     if token in store: 
         return token
+    return False
+
+def is_valid_user_id(auth_user_id):
+    store = data_store.get()
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            return True
+    return False
+
+def dm_id_check(dm_id):
+    store = data_store.get()
+    for dm in store['dms']:
+        if dm['dm_id'] == dm_id:
+            return True
     return False
 
 # Function to create_handle
@@ -208,16 +217,6 @@ def user_all_channels(token):
 
 # def functions to help with Channel create, channels_list and channels_listall 
 
-#check if channel is in our database and returns it. 
-def from_channel_id_return_channel(channel_id):
-    store = data_store.get()
-
-    for channel in store['channels']:
-        if int(channel['channel_id']) == int(channel_id):
-            return channel 
-    
-    return False
-
 def is_public_check(is_public):
     if is_public == True or is_public == False:
         return True
@@ -267,12 +266,12 @@ def password_check(password):
     return False
 
 def message_id_check(message_id):
-    data = data_store.get()
-    for message in data['Messages']:
-        if int(message['message_id']) == int(message_id):
-            return message
+    channels = data_store.get()['channels']
+    for channel in channels:
+        for message in channel['Messages']:
+            if message['message_id'] == message_id:
+                return message
     return None
-
 
 def channel_id_check(channel_id):
 	store = data_store.get()
@@ -330,7 +329,20 @@ def user_id_check(u_id):
     return False
 
 
-###################################################################
+def handle_search(handle):
+    data = data_store.get()
+    for user in data['users']:
+        if user['handle_str'] == handle:
+            return user
+    return
+
+
+def save_data(data):
+    with open('data.json', 'w') as FILE:
+        json.dump(data, FILE)
+
+## YOU SHOULD MODIFY THIS OBJECT ABOVE
+
 class Datastore:
     def __init__(self):
         self.__store = initial_object
