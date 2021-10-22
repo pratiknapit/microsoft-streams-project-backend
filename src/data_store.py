@@ -136,23 +136,10 @@ def is_valid_token(token):
         return False
     else:
         user = next(
-            (user for user in data['users'] if user['u_id'] == payload), False)
+            (user for user in data['users'] if user['u_id'] == payload['auth_user_id']), False)
         if user:
             return payload
         return False
-'''
-def is_valid_token(token):
-    data = data_store.get()
-    SECRET = 'abcdedweidjwijdokfwkfwoqkqfw'
-
-    payload = jwt.decode(token, SECRET, algorithms=['HS256'])
-
-    for user in data['users']: 
-        if user['u_id'] == payload:
-            return False
-        else:
-            return payload
-'''
 
 def token_check(token):
     store = logged_in_users
@@ -231,8 +218,7 @@ def from_channel_id_return_channel(channel_id):
 
     for channel in store['channels']:
         if int(channel['channel_id']) == int(channel_id):
-            return channel 
-    
+            return channel    
     return False
 
 def is_public_check(is_public):
@@ -289,7 +275,6 @@ def message_id_check(message_id):
         if int(message['message_id']) == int(message_id):
             return message
     return None
-
 
 def channel_id_check(channel_id):
 	store = data_store.get()
