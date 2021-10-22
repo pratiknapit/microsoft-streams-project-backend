@@ -25,34 +25,35 @@ def token():
 def channel_id(token):
     return channels_create_v1(token, 'testChannel01', False)['channel_id']
 
-@pytest.fixture
-def clear():
-    clear_v1()
-
 # Message_send #
 def test_message_too_long(clear, token, channel_id):
     message = ''.join(random.choices(string.ascii_letters, k = 1001))
     with pytest.raises(InputError):
         message_send(token, channel_id, message)
+    clear_v1()
 
 def test_invalid_token(clear, token, channel_id):
     invalid_token = jwt.encode({'test' : 'value'}, 'TestSecret', algorithm='HS256')
     with pytest.raises(AccessError):
         message_send(invalid_token, channel_id, 'testMessage')
+    clear_v1()
 
 def test_user_not_in_channel(clear, token, channel_id):
     second_token = auth_register_v1('test2@unsw.au', 'testPassword', 'secondFirst', 'secondLast')
     with pytest.raises(AccessError):
         message_send(second_token['token'], channel_id, 'testMessage')
+    clear_v1()
 
 def test_message_ids_are_unique(clear, token, channel_id):
     first_id = message_send(token, channel_id, 'testMessaage')['message_id']
     second_id = message_send(token, channel_id, 'secondTestMessage')['message_id']
     assert first_id != second_id
+    clear_v1()
 
 def test_invalid_channel_id(clear, token):
     with pytest.raises(InputError):
         message_send(token, 'channel_id', 'test message')
+    clear_v1()
 
 # Message_edit #
 @pytest.fixture(autouse=True)
@@ -99,7 +100,7 @@ def test_invalid_token_channel(channel_message):
     invalid_token = 'invalidtoken123123'
     with pytest.raises(AccessError):
         message_edit(
-            invalid_token, channel_message, 'this is an updated message in the dm.')
+            invalid_token, channel_message['message_id'], 'this is an updated message in the dm.')
 
 '''
 def test_message_incorrect_length_dm(admin, dm_message):
@@ -119,14 +120,16 @@ def test_message_sent_by_unauthorised_user_and_not_channel_owner(admin, member, 
         message_edit(member['token'], channel_message['message_id'],
                         'this is an updated message in the dm.')
 
-
+'''
+#####
 def test_success_channel_message(admin, channel, channel_message):
     message_edit(admin['token'], channel_message['message_id'],
                     'this edit is valid in this channel.')
     channel_messages = channel_messages_v1(
         admin['token'], channel['channel_id'], 0)
     assert channel_messages['message'] == 'this edit is valid in this channel.'
-
+#####
+'''
 '''    
 def test_success_dm_message(admin, dm, dm_message):
     message_edit(admin['token'], dm_message['message_id'],
