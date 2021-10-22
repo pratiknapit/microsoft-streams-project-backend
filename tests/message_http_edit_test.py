@@ -48,11 +48,11 @@ def dm(admin, member):
 def channel_message(admin, channel):
     return requests.post(config.url + '/message/send/v1', json={'token': admin['token'], 'channel_id': channel['channel_id'], 'message': 'this is a message sent to the other user in the channel.'}).json()
 
-
+'''
 @ pytest.fixture
 def dm_message(admin, dm):
     return requests.post(config.url + '/message/senddm/v1', json={'token': admin['token'], 'dm_id': dm['dm_id'], 'message': 'this is a message sent to the other user.'}).json()
-
+'''
 '''
 def test_invalid_token_dm(dm_message):
     invalid_token = 'invalidtoken123123'
@@ -69,11 +69,12 @@ def test_invalid_token_channel(channel_message):
     assert message_call.status_code == 403
 ######
 '''
+'''
 def test_message_incorrect_length_dm(admin, dm_message):
     message_call = requests.put(config.url + '/message/edit/v1', json={
         'token': admin['token'], 'message_id': dm_message, 'message': 1500*'A'})
     assert message_call.status_code == 400
-
+'''
 
 def test_message_incorrect_length_channel(admin, channel_message):
     message_call = requests.put(config.url + '/message/edit/v1', json={
