@@ -34,11 +34,20 @@ def test_channel_join_private_channel():
 def test_user_is_already_member():
     clear_v1()
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
-    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
     dummy_user_2_channel = channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', False)
 
     with pytest.raises(InputError):
         assert channel_join_v1(dummy_user_2['token'], dummy_user_2_channel['channel_id'])
+
+def test_priv_chan_join():
+    clear_v1()
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'asfdasdf', 'Pratik', 'Napit')
+    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
+    dummy_user_1_channel = channels_create_v1(dummy_user_1['token'], 'dummy_user_1_channel', False)
+
+    with pytest.raises(AccessError):
+        assert channel_join_v1(dummy_user_2['token'], dummy_user_1_channel['channel_id'])
+
 
 def test_if_joining_works():
     clear_v1()

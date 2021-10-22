@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
     print(channels_create_v1(dummy_user_1['token'], 'dummy_user_1_channel', True))
     print("")
-    print(channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True))
+    print(channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', False))
     print("")
     print(channels_create_v1(dummy_user_3['token'], 'dummy_user_3_channel', True))
     print("")

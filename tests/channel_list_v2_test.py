@@ -2,9 +2,24 @@ import pytest
 import requests
 import json
 from src import config
-from src.channel import auth_register_v1
 
-def test_channel_list_v2_basic(): 
+
+def test_invalid_token():
+    requests.delete(config.url + 'clear/v1')
+    response = requests.get(config.url + 'channels/list/v2', params = {
+        'token': "random_token"
+    })
+    assert response.status_code == 403
+
+def test_invalid_token2():
+    requests.delete(config.url + 'clear/v1')
+    response = requests.get(config.url + 'channels/listall/v2', params = {
+        'token': "random_token"
+    })
+    assert response.status_code == 403
+
+
+def test_channel_list_listall_v2_basic(): 
     requests.delete(config.url + 'clear/v1')
     response_j = requests.post(config.url + "auth/register/v2", json={
     "email": "use4r@gmail.com",
@@ -25,13 +40,13 @@ def test_channel_list_v2_basic():
     assert response_j.status_code == 200
     assert response_p.status_code == 200
 
-    response1 = requests.post(config.url + 'channels/create', json={
+    response1 = requests.post(config.url + 'channels/create/v2', json={
         "token": user_j_payload['token'],
         "name": "FirstChannel",
         "is_public": "True"
         })
     
-    response_cp = requests.post(config.url + 'channels/create', json={
+    response_cp = requests.post(config.url + 'channels/create/v2', json={
         "token": user_p_payload['token'],
         "name": "IshaChannel",
         "is_public": "True"
@@ -43,7 +58,7 @@ def test_channel_list_v2_basic():
     assert channel_payload == {"channel_id": 1}
 
 
-    response2 = requests.get(config.url + 'channels/list', params = {
+    response2 = requests.get(config.url + 'channels/list/v2', params = {
         'token': user_j_payload['token']
     })
 
@@ -54,7 +69,7 @@ def test_channel_list_v2_basic():
     }]
 
     #testing list all route 
-    response3 = requests.get(config.url + 'channels/listall', params = {
+    response3 = requests.get(config.url + 'channels/listall/v2', params = {
         'token': user_j_payload['token']
     })
     listall_payload = response3.json()
