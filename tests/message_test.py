@@ -99,7 +99,7 @@ def test_invalid_token_channel(channel_message):
     invalid_token = 'invalidtoken123123'
     with pytest.raises(AccessError):
         message_edit(
-            invalid_token, channel_message, 'this is an updated message in the dm.')
+            invalid_token, channel_message['message_id'], 'this is an updated message in the dm.')
 
 '''
 def test_message_incorrect_length_dm(admin, dm_message):

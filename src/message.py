@@ -1,6 +1,6 @@
-
 from src.data_store import data_store, make_message
-from src.data_store import token_check, channel_id_check, message_id_check, dm_id_check, is_valid_token, check_if_user_is_channel_member, token_to_user_id, auth_user_id_check 
+from src.data_store import token_check, channel_id_check, message_id_check
+from src.data_store import dm_id_check, is_valid_token, check_if_user_is_channel_member, token_to_user_id, auth_user_id_check, user_id_check 
 from src.error import InputError, AccessError
 
 
@@ -62,16 +62,18 @@ def message_edit(token, message_id, new_message):
 
     
     message = message_id_check(message_id)
-    if message == None:
+    if message == False:
         raise InputError
 
     is_owner = owner_channel_check(token, message['channel_id'])
-    user = token_check(token)
+    u_id = token_to_user_id(token)
+    user = user_id_check(u_id)
+
     if user == False:
         raise AccessError
 
     is_sender = False
-    if user['u_id'] == message['user_id']:
+    if user['u_id'] == message['u_id']:
         is_sender = True
 
     if (is_owner or is_sender) == False:
@@ -168,14 +170,12 @@ def message_senddm(token, dm_id, message):
 '''
 
 def owner_channel_check(token, channel_id):
-    user = token_check(token)   #checks if it's a valid user
-    if user == False:
-        raise InputError
+    u_id = token_to_user_id(token)   #checks if it's a valid user
     channel = channel_id_check(channel_id)
     if channel == None:
         raise InputError
 
     for member in channel['owner_members']:     
-        if member['u_id'] == user['u_id']:
+        if member == u_id:
             return True
     return False
