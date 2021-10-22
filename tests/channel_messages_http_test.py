@@ -94,7 +94,7 @@ def test_invalid_start(clear, token, channel_id):
 
     status_code = resp.status_code
     assert status_code == 400
-'''
+
 def test_messages(clear, token, channel_id):
     for i in range(3):
         requests.post(config.url + '/message/send/v1', json={
@@ -107,7 +107,7 @@ def test_messages(clear, token, channel_id):
             'token': token,
             'channel_id': channel_id,
             'start': 0
-        }).json()
-
-    assert messages_dict['messages'][0]['message'] == '2'   
-'''
+        })
+    resp_dict = messages_dict.json()
+    assert messages_dict.status_code == 200
+    assert 'messages' and 'start' and 'end' in resp_dict

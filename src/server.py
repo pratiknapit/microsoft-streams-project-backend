@@ -14,6 +14,7 @@ from src.auth import auth_register_v1, auth_login_v1, auth_logout
 from src.message import message_send, message_edit, message_remove
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
 from src.user import user_profile_sethandle_v1, users_all_v1
+from src.dm import dm_create, dm_list, dm_remove, dm_details, dm_leave, dm_messages
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -234,12 +235,9 @@ def c_invite():
 def c_messages():
     
     token = request.args.get('token')
-    ch_id = int(request.args.get('channel_id'))
+    channel_id = int(request.args.get('channel_id'))
     start = int(request.args.get('start'))
-    #token = input_dict['token']
-    #ch_id = channel_id['channel_id']
-    #start = 1
-    return_dict = channel_messages_v1(token, ch_id, start)
+    return_dict = channel_messages_v1(token, channel_id, start)
     print(return_dict)
     return dumps(return_dict)
 
@@ -323,6 +321,44 @@ def sethandle():
     profile_set_handle = user_profile_sethandle_v1(token, handle_str)
     return dumps(profile_set_handle)
 
+@APP.route("/dm/create/v1", methods=['POST'])
+def create_dm():
+    data = request.get_json()
+    dm_dict = dm_create(data['token'], data['u_ids'])
+    return dumps(dm_dict)
+
+@APP.route("/dm/list/v1", methods=['GET'])
+def list_dm():
+    data = request.args.get('token')
+    dm_list_generated = dm_list(data)
+
+    return dumps(dm_list_generated)
+
+@APP.route('/dm/remove/v1', methods=['DELETE'])
+def remove_dm():
+    data = request.get_json()
+    return dumps(dm_remove(data['token'], data['dm_id']))
+
+@APP.route('/dm/details/v1', methods=['GET'])
+def details_dm():
+    token = request.args.get('token')
+    dm_id = request.args.get('dm_id')
+    details = dm_details(token, dm_id)
+    return dumps(details)        
+
+@APP.route("/dm/leave/v1", methods=['POST'])
+def leave_dm():
+    data = request.get_json()
+    dm_leave(data['token'], data['dm_id'])
+    return dumps({})
+
+@APP.route("/dm/messages/v1", methods=['GET'])
+def messages_dm():
+    token = request.args.get('token')
+    dm_id = request.args.get('dm_id')
+    start = request.args.get('start')
+    messages_dict = dm_messages(token, dm_id, start)
+    return dumps(messages_dict)
 
 
 
