@@ -122,7 +122,7 @@ def test_invalid_dm_id(clear, user0):
         dm_remove(user0['token'], 1) 
     clear_v1()
 
-def test_invalid_token(clear, user0):
+def test_invalid_token_v2(clear, user0):
     owner_token = auth_register_v1("dmcreator@gmail.com", "TestTest1", "first", "last")['token']
     dm = dm_create(owner_token, [user0['auth_user_id']])
     
@@ -169,7 +169,7 @@ def users(num_members):
     return {'tokens' : tokens, 'u_ids': u_ids}
 
 
-def test_invalid_token(clear):
+def test_invalid_token_v3(clear):
     with pytest.raises(AccessError):
         dm_details(jwt.encode({'test' : 'token'}, 'testSecret', algorithm='HS256'), 5)
 
@@ -178,7 +178,7 @@ def test_user_not_in_dm(clear, users):
     with pytest.raises(AccessError):
         dm_details(users['tokens'][0], dm['dm_id'])
 
-def test_invalid_dm_id(clear, users):
+def test_invalid_dm_id_v2(clear, users):
     with pytest.raises(InputError):
         dm_details(users['tokens'][0], 'test_dm_id')
 
@@ -238,7 +238,7 @@ def test_auth_user_not_dm_member():
     clear_v1()
 
 
-def test_success_case():
+def test_success_case_leave():
     clear_v1()
 
     admin = auth_register_v1('test1@unsw.au', 'password1', 'first1', 'last1')
@@ -290,11 +290,11 @@ def unauthorised_user():
     token = auth_register_v1(email, password, "firstthree", "lastthree")['token']
     return token
 
-def test_invalid_token(dm_id):
+def test_invalid_token_v4(dm_id):
     with pytest.raises(AccessError):
         dm_messages("invalid_token", dm_id, 0)
 
-def test_invalid_dm_id(token2, dm_id):
+def test_invalid_dm_id_v3(token2, dm_id):
     with pytest.raises(InputError):
         dm_messages(token2, dm_id + 1, 0)
 
