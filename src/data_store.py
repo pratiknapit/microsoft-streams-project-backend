@@ -105,13 +105,16 @@ def make_user(email, password, name_first, name_last, u_id):
     }
 
 def make_message(message, channel_id, u_id): 
-    store = data_store.get()
-
+    m_id = 0
+    channels = data_store.get()['channels']
+    for channel in channels:
+        m_id += len(channel['Messages'])
+    message_id = m_id + 1
     user = user_id_check(u_id)
-    user['messages_created'].append(message)
-    
-    message_id = len(message) + 1
-    store['Messages'].append({
+    user['messages_created'].append(message_id)
+
+    channel = channel_id_check(channel_id)
+    channel['Messages'].append({
                             'channel_id': channel_id, 
                             'message_id': message_id, 
                             'u_id': u_id, 
@@ -263,10 +266,11 @@ def password_check(password):
     return False
 
 def message_id_check(message_id):
-    data = data_store.get()
-    for message in data['Messages']:
-        if message['message_id'] == message_id:
-            return message
+    channels = data_store.get()['channels']
+    for channel in channels:
+        for message in channel['Messages']:
+            if message['message_id'] == message_id:
+                return message
     return None
 
 def channel_id_check(channel_id):
@@ -302,20 +306,19 @@ def check_if_user_is_channel_member(token, channel_id):
     user = auth_user_id_check(auth_user_id) 
     if user == False:
         return False
-    value = False 
-    for Dict in store['channels']:
-        if int(Dict['channel_id']) == int(channel_id):
-            for member in Dict['all_members']:
-                if member == user['u_id']:
-                    value = True 
-    return value
+    result = False 
+    for channel in store['channels']:
+        if int(channel['channel_id']) == int(channel_id):
+            for member in channel['all_members']:
+                if member == auth_user_id:
+                    result = True 
+    return result
 
 
 def check_if_channel_is_public_or_private(channel_id):
     store = data_store.get()
-    channel_storage = channel_id_check(channel_id)
     for channel in store['channels']:
-        if channel['channel_id'] == channel_storage['channel_id']:
+        if int(channel['channel_id']) == int(channel_id):
             return channel['is_public']
             
 def user_id_check(u_id):

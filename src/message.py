@@ -3,6 +3,9 @@ from src.data_store import token_check, channel_id_check, message_id_check
 from src.data_store import dm_id_check, is_valid_token, check_if_user_is_channel_member, token_to_user_id, auth_user_id_check, user_id_check 
 from src.error import InputError, AccessError
 
+from src.auth import auth_register_v1
+from src.channels import channels_create_v1
+
 
 def message_send(token, channel_id, message):
     """ Sends a message to the designated channel 
@@ -25,7 +28,8 @@ def message_send(token, channel_id, message):
     if not check_if_user_is_channel_member(token, channel_id):
         raise AccessError
 
-    store = data_store.get()['Messages']
+    channel = channel_id_check(channel_id)
+    store = channel['Messages']
     auth_user_id = token_to_user_id(token)
     user = auth_user_id_check(auth_user_id) 
     if check_if_user_is_channel_member(token, channel_id) == True:
@@ -33,7 +37,7 @@ def message_send(token, channel_id, message):
         
     for i in store:
         if i['message_id'] == message_id:
-            user['messages_created'].remove(message)
+            user['messages_created'].remove(message_id)
 
     '''
         if message_id_check(message_id) == message:
@@ -59,7 +63,6 @@ def message_edit(token, message_id, new_message):
     decoded_token = is_valid_token(token)
     if decoded_token is False:
         raise AccessError(description='Invalid Token.')
-
 
     message = message_id_check(message_id)
     if message == False:
@@ -179,3 +182,9 @@ def owner_channel_check(token, channel_id):
         if member == u_id:
             return True
     return False
+
+
+if __name__=='__main__':
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+    dummy_user_1_channel = channels_create_v1(dummy_user_1['token'], 'dummy_user_2_channel', True)
+    print(message_send(dummy_user_1['token'], dummy_user_1_channel['channel_id'], 'wqyhefqf'))

@@ -1,9 +1,7 @@
 '''
-This file contains channels_list, channels_listall, channels_create
+This file contains channels_list, channels_listall, channels_create.
 '''
 from src.data_store import token_check, user_channels, add_channel, user_all_channels
-from src.data_store import auth_user_id_check
-from src.auth import auth_register_v1
 from src.error import AccessError, InputError
 
 
@@ -25,9 +23,7 @@ def channels_list_v1(token):
     if token_check(token) == False:
         raise AccessError(description="token not found")
 
-    #This will return a dictionary that looks like the stub comment below.
-    list_of_channels = user_channels(token)
-    return list_of_channels['channels']
+    return user_channels(token)
 
 
 def channels_listall_v1(token):
@@ -48,8 +44,7 @@ def channels_listall_v1(token):
     if token_check(token) == False:
         raise AccessError(description="token not found")
 
-    list_of_all_channels = user_all_channels(token)
-    return list_of_all_channels['channels']
+    return user_all_channels(token)
 
 
 def channels_create_v1(token, name, is_public):
@@ -70,10 +65,6 @@ def channels_create_v1(token, name, is_public):
         Returns Dictionary with 'channel_id' and 'name'  on valid user id and name.
         Returns an empty dictionary on condition that there are no channels in the data store.
     """
-    """
-    if auth_user_id_check(auth_user_id) is False:
-        raise AccessError
-    """
 
     if len(name) < 1 or len(name) > 20:
         raise InputError
@@ -89,22 +80,3 @@ def channels_create_v1(token, name, is_public):
         'channel_id': added_channel['channel_id']
     }
 
-
-#This is are prints to see if our function prints out the correct return types as per spec.
-if __name__ == '__main__':
-
-    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
-    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
-    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
-
-    print(channels_create_v1(dummy_user_1['token'], 'dummy_user_1_channel', True))
-    print("")
-    print(channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True))
-    print("")
-    print(channels_create_v1(dummy_user_3['token'], 'dummy_user_3_channel', True))
-    print("")
-    print(channels_create_v1(dummy_user_1['token'], 'dummy_user_4_channel', True))
-    print("")
-    print(channels_list_v1(dummy_user_1['token']))
-    print("")
-    print(channels_listall_v1(dummy_user_1['token']))
