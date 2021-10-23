@@ -115,23 +115,3 @@ def auth_logout(token):
             user.pop('token')
             return True
     return False
-
-
-if __name__ == '__main__':
-    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
-    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
-    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
-
-    #print(dummy_user_1)
-    #print(dummy_user_2)
-    #print(dummy_user_3)
-    store = data_store.get()
-    for user in store['users']:
-        print(user)
-        print(" ")
-    
-    
-    for user in store['users']:
-        u_id = token_to_user_id(user['token'])
-        print(u_id)
-    

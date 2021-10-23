@@ -15,7 +15,7 @@ def token():
 
 @pytest.fixture
 def channel_id(token):
-    response = requests.post(config.url + '/channels/create', json={'token': token, 'name': 'testChannel01', 'is_public': False})
+    response = requests.post(config.url + '/channels/create/v2', json={'token': token, 'name': 'testChannel01', 'is_public': False})
     return response.json()['channel_id']
 
 @pytest.fixture

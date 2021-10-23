@@ -1,5 +1,5 @@
 from src.error import AccessError, InputError
-from src.data_store import is_valid_token, is_valid_user_id
+from src.data_store import is_valid_token, is_valid_user_id, save_data
 from src.data_store import data_store
 from datetime import datetime
 
@@ -55,7 +55,7 @@ def dm_create(token, u_ids):
 def dm_list(token):
     """Returns the list of DMs that the user is a member of
     Args:
-        token (string): jwt encode dict with keys session_id and user_id
+        token (string): jwt encode dict with user_id
     Raises:
         AccessError: raises if the token is invalid
     Returns:
@@ -71,7 +71,7 @@ def dm_list(token):
 
     for dm in data['dms']:
         for member in dm['members']:
-            if member == decoded_token['user_id']:
+            if member == decoded_token['auth_user_id']:
                 dm_list.append({'dm_id': dm['dm_id'],
                                 'name': dm['name']})
                 break
@@ -91,12 +91,12 @@ def dm_remove(token, dm_id):
         {} on successful removal of a dm
     '''
     data = data_store.get()
-    token_data = is_valid_token(token)
+    decoded_token = is_valid_token(token)
 
-    if token_data == False:
-        raise AccessError(description=f"Token invalid")
+    if decoded_token == False:
+        raise AccessError("Invalid token.")
 
-    auth_user_id = token_data['user_id']
+    auth_user_id = decoded_token['auth_user_id']
     if is_valid_user_id(auth_user_id) == False:
         raise AccessError(
             description=f"Auth_user_id: {auth_user_id} is invalid")
@@ -120,7 +120,7 @@ def dm_details(token, dm_id):
     '''
     Given a valid token from a user that is part of the given dm, returns the details of the given dm
     Args:
-        token (string): jwt encode dict with keys session_id and user_id
+        token (string): jwt encode dict with user_id
         dm_id (int): id of the given dm
     Raises:
         AccessError: raises if the token is invalid
@@ -130,9 +130,9 @@ def dm_details(token, dm_id):
         {name, members}: name is str of the name of the dm, 
         members is a list of dicts with values, u_id, email, name_first, name_last and handle_str
     '''
-    if not is_valid_token(token):
+    if is_valid_token(token) == False:
         raise AccessError("Invalid token")
-    token = is_valid_token(token)
+    decoded_token = is_valid_token(token)
 
     data = data_store.get()
     
@@ -146,19 +146,19 @@ def dm_details(token, dm_id):
 
     if not dm:
         raise InputError("dm_id is invalid")
-
-    if dm['members'].count(token['user_id']) == 0:
+    
+    if dm['members'].count(decoded_token['auth_user_id']) == 0:
         raise AccessError("User is not in this DM")
 
     return_dict = {'name': dm['name'], 'members': []}
     for member_id in dm['members']:
         user = next(user for user in data['users']
-                    if user['user_id'] == member_id)
-        return_dict['members'].append({'user_id': user['user_id'],
-                                       'email': user['email_address'],
-                                       'name_first': user['first_name'],
-                                       'name_last': user['last_name'],
-                                       'handle_str': user['account_handle'],
+                    if user['u_id'] == member_id)
+        return_dict['members'].append({'u_id': user['u_id'],
+                                       'email': user['email'],
+                                       'name_first': user['name_first'],
+                                       'name_last': user['name_last'],
+                                       'handle_str': user['handle_str'],
                                        })
     return return_dict
 
@@ -175,7 +175,7 @@ def dm_leave(token, dm_id):
         Returns {}
     '''
     decoded_token = is_valid_token(token)
-    if decoded_token is False:
+    if decoded_token == False:
         raise AccessError("Invalid Token.")
 
     data = data_store.get()
@@ -187,7 +187,7 @@ def dm_leave(token, dm_id):
         if dm['dm_id'] == dm_id:
             dm_id_found = True
             for member in dm['members']:
-                if member == decoded_token['user_id']:
+                if member == decoded_token['auth_user_id']:
                     user_in_dm = True
             break
 
@@ -199,8 +199,9 @@ def dm_leave(token, dm_id):
 
     for dm in data['dms']:
         if dm['dm_id'] == dm_id:
-            dm['members'].remove(decoded_token['user_id'])
-
+            dm['members'].remove(decoded_token['auth_user_id'])
+    
+    data_store.set(data)
     return {}
 
 def dm_messages(token, dm_id, start):
@@ -228,10 +229,10 @@ def dm_messages(token, dm_id, start):
         raise InputError(description='start must be an integer') from e
     
 
-    if not is_valid_token(token):
+    if is_valid_token(token) == False:
         raise AccessError(description="Token is invalid")
 
-    user_id = is_valid_token(token)['user_id']
+    decoded_token = is_valid_token(token)
 
     if not is_valid_dm_id(dm_id):
         raise InputError(description="DM ID is invalid.")
@@ -239,7 +240,7 @@ def dm_messages(token, dm_id, start):
     dm_info = find_dm(dm_id, data)
     dm_messages = dm_info['messages']
 
-    if not is_user_in_dm(dm_id, user_id):
+    if not is_user_in_dm(dm_id, decoded_token['auth_user_id']):
         raise AccessError(
             description=f"User is not a member of the dm with dm id {dm_id}")
 

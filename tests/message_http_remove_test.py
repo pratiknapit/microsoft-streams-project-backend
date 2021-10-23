@@ -37,13 +37,13 @@ def member():
 
 @pytest.fixture
 def channel_id(auth_user, member):
-    channel_id = requests.post(config.url + '/channels/create', json={
+    channel_id = requests.post(config.url + 'channels/create/v2', json={
         'token': auth_user,
         'name': "channelName1",
         'is_public': True
     }).json()['channel_id']
 
-    requests.post(config.url + 'channels/join', json={'token': auth_user,
+    requests.post(config.url + 'channel/join/v2', json={'token': auth_user,
                                                         'channel_id': channel_id})
     return channel_id
 
@@ -78,7 +78,7 @@ def test_remove_dm_message(clear, auth_user, dm_id):
     assert json.loads(response.text) == {}
 '''
 def test_invalid_token(clear):
-    response = requests.delete(config.url + 'message/remove/v1', json={'token': "invalid_token", 'message_id': 1})
+    response = requests.delete(config.url + '/message/remove/v1', json={'token': "invalid_token", 'message_id': 1})
     assert response.status_code == 403
 
 '''

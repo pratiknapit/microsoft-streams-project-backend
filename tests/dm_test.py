@@ -1,11 +1,11 @@
-'''
+
 import pytest
 import jwt
 from src.other import clear_v1
 from src.error import AccessError, InputError
 from src.auth import auth_register_v1, auth_login_v1
 from src.dm import dm_list, dm_create, dm_remove, dm_details, dm_leave, dm_messages
-#from src.helper import create_token
+from src.data_store import login_token, user_id_check
 #from src.message import message_senddm
 
 ###########
@@ -67,19 +67,6 @@ def user2():
 def clear():
     clear_v1()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 def test_invalid_token(u_id1):
     with pytest.raises(AccessError):
         dm_create("Invalid token", [u_id1])
@@ -100,10 +87,9 @@ def test_valid_return(token, u_id1, u_id2):
 #dm_list#
 #########
 
-def test_token_user_nonexistent(clear):
+def test_token_int_invalid(clear):
 
-    invalid_token = create_token(100000, 1000)
-
+    invalid_token = 10000
     with pytest.raises(AccessError):
         dm_list(invalid_token)
 
@@ -175,9 +161,9 @@ def users(num_members):
     for i in range(num_members):
         email = f"test{i}email@gmail.com"
         password = f"TestTest{i}"
-        firstname = f"firstname{i}"
-        lastname = f"lastname{i}"
-        user = auth_register_v1(email,password,firstname, lastname)
+        name_first = f"firstname{i}"
+        name_last = f"lastname{i}"
+        user = auth_register_v1(email, password, name_first, name_last)
         u_ids.append(user['auth_user_id'])
         tokens.append(user['token'])
     return {'tokens' : tokens, 'u_ids': u_ids}
@@ -206,7 +192,7 @@ def test_valid_dict_keys(clear, users):
     dm = dm_create(users['tokens'][0], users['u_ids'])
     details = dm_details(users['tokens'][1], dm['dm_id'])
     assert 'names' and 'members' in details 
-    assert 'user_id' in details['members'][0] 
+    assert 'u_id' in details['members'][0] 
     assert 'email' in details['members'][0] 
     assert 'name_first' in details['members'][0] 
     assert 'name_last' in details['members'][0]
@@ -244,7 +230,7 @@ def test_auth_user_not_dm_member():
 
     dm_1 = dm_create(admin['token'], member_list)
 
-    invalid_user = create_token(321321, 321)
+    invalid_user = 321321
 
     with pytest.raises(AccessError):
         dm_leave(invalid_user, dm_1['dm_id'])
@@ -320,14 +306,15 @@ def test_unauthorised_user(unauthorised_user, dm_id):
 def test_invalid_start(token2, dm_id):
     # this fail because no message is being sent to the dm yet
     with pytest.raises(InputError):
-        dm_messages(token, dm_id, 51)
-
+        dm_messages(token2, dm_id, 51)
+'''
 def test_last_message(token2, dm_id):
     # Test if end = -1 when there are no more messages to load after the current return
     message_senddm(token2, dm_id, "Hi, everyone!")
     end = dm_messages(token2, dm_id, 0)['end']
     assert end == -1
-
+'''
+'''
 def test_more_messages(token2, dm_id):
     count = 60
     while count >= 0:

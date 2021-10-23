@@ -79,4 +79,3 @@ def channels_create_v1(token, name, is_public):
     return {
         'channel_id': added_channel['channel_id']
     }
-

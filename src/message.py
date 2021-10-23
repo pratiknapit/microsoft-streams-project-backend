@@ -1,5 +1,6 @@
+from _pytest.compat import is_async_function
 from src.data_store import data_store, make_message
-from src.data_store import token_check, channel_id_check, message_id_check
+from src.data_store import token_check, channel_id_check, message_id_check, save_data
 from src.data_store import dm_id_check, is_valid_token, check_if_user_is_channel_member, token_to_user_id, auth_user_id_check, user_id_check 
 from src.error import InputError, AccessError
 
@@ -39,11 +40,6 @@ def message_send(token, channel_id, message):
         if i['message_id'] == message_id:
             user['messages_created'].remove(message_id)
 
-    '''
-        if message_id_check(message_id) == message:
-            user['messages_created'].remove(message)
-            raise AccessError
-    '''
     return {
         'message_id': message_id,
     }
@@ -84,9 +80,8 @@ def message_edit(token, message_id, new_message):
 
     if len(new_message) == 0:
         user['messages_created'].remove(message_id)
-
     else :
-        message['message'] = new_message 
+        message['message'].replace(message['message'], new_message)
     return {}
 
 def message_remove(token, message_id):
@@ -96,80 +91,55 @@ def message_remove(token, message_id):
         message_id(int)
     
     """
-    message = message_id_check(message_id)
-    if message is None:
-        raise InputError
-    is_owner = owner_channel_check(token, message['channel_id'])
-
-    user = token_check(token)
-    if user is False:
-        raise AccessError
-
-    is_sender = False
-
-    if user['u_id'] == message['u_id']:
-        is_sender = True
-
-    if (is_owner or is_sender) == False:
-        raise AccessError
-
-    store = data_store.get()['channels']
-    store['Messages'].remove(message_id)
-    return {}
-
-'''    
-def message_senddm(token, dm_id, message):
-
     data = data_store.get()
-    token_data = is_valid_token(token)
+    in_channel = False
+    in_dm = False
+    is_authorised = False
 
-    if token_data == False:
-        raise AccessError(description=f"Token invalid")
+    if is_valid_token(token) == False:
+        raise AccessError(description="Not an authorised user invalid")
 
-    auth_user_id = token_data['user_id']
-    auth_user = find_user(auth_user_id, data)
+    user_id = is_valid_token(token)['auth_user_id']
 
-    if len(message) > 1000:
-        raise InputError(description=f"message is too long")
+    for channel in data['channels']:
+        for message in channel['Messages']:
+            if message['message_id'] == message_id:
+                in_channel = True
+                if message['u_id'] == user_id:
+                    is_authorised = True
+                if user_id in channel['owner']:
+                    is_authorised = True
 
-    if is_valid_dm_id(dm_id) == False:
-        raise InputError(description='dm is invalid')
-    dm = find_dm(dm_id, data)
-
-    if is_user_in_dm(dm_id, auth_user_id,  data) == False:
+    if in_channel and not is_authorised:
         raise AccessError(
-            description='user is not in the dm they are sharing message to')
+            description="Not the sender nor an owner of the channel the message was sent in")
+    if in_channel and is_authorised:
+        for channel in data['channels']:
+            for message in channel['Messages']:
+                if message['message_id'] == message_id:
+                    channel['Messages'].remove(message)
+                    save_data(data)
+                    return {}
 
-    message_id = data['msg_counter'] + 1
-    new_message = {'message_id': message_id, 'u_id': auth_user_id,
-                   'message': message, "time_created": datetime.now().replace(tzinfo=timezone.utc).timestamp(), 'is_pinned': False, 'reactions': []}
+    for dm in data['dms']:
+        for message in dm['messages']:
+            if message['message_id'] == message_id:
+                in_dm = True
+                if message['u_id'] == user_id:
+                    is_authorised = True
 
-    dm['messages'].insert(0, new_message)
+    if in_dm and not is_authorised:
+        raise AccessError(description="Not the sender nor an owner of Dreams")
+    if in_dm and is_authorised:
+        for dm in data['dms']:
+            for message in dm['messages']:
+                if message['message_id'] == message_id:
+                    dm['messages'].remove(message)                    
+                    save_data(data)
+                    return {}
 
-    # notify tagged users
-    user_message = tag_users(message, auth_user['account_handle'], dm_id, -1)
-    if user_message:
-        user, message = user_message
-        user = next(u for u in data['users'] if u['user_id'] == user)
-        user['notifications'].insert(0, message)
-
-    auth_user['sent_messages'].append(message_id)
-    
-    auth_user['user_stats']['messages_sent'].append({'num_messages_sent':len(auth_user['sent_messages']), 'time_stamp':int(datetime.now().timestamp())})
-    
-    data['msg_counter'] += 1
-    
-    if len(data['dreams_stats']['messages_exist']) == 0:
-        messages_exist = 1
-    else:
-        messages_exist = data['dreams_stats']['messages_exist'][-1]['num_messages_exist'] + 1
-
-    data['dreams_stats']['messages_exist'].append({'num_messages_exist':messages_exist, 'time_stamp':int(datetime.now().timestamp())})
-    
-    save_data(data)
-
-    return {'message_id': message_id}
-'''
+    if not in_channel and not in_dm:
+        raise InputError(description="Message no longer exists.")
 
 def owner_channel_check(token, channel_id):
     u_id = token_to_user_id(token)   #checks if it's a valid user
@@ -181,9 +151,3 @@ def owner_channel_check(token, channel_id):
         if member == u_id:
             return True
     return False
-
-
-if __name__=='__main__':
-    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
-    dummy_user_1_channel = channels_create_v1(dummy_user_1['token'], 'dummy_user_2_channel', True)
-    print(message_send(dummy_user_1['token'], dummy_user_1_channel['channel_id'], 'wqyhefqf'))

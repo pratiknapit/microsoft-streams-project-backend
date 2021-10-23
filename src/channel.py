@@ -156,18 +156,18 @@ def channel_messages_v1(token, channel_id, start):
         raise InputError
 
     message_dictionary = {
-        'message': [],
+        'messages': [],
     }
-    msg_count_char = len(message_dictionary['message'])
+    msg_count_char = len(message_dictionary['messages'])
 
     num_loop = min(msg_count_char, 50)
+    
     data = data_store.get()['channels']
     
     for channel in range(0, num_loop):
-        message_list = data[channel]["Messages"]
-        message = message_list[num_loop - 1]
-        message_dictionary['message'].append(message)
-
+        message_dict_list = data[channel]['Messages']
+        message = message_dict_list[num_loop - 1]
+        message_dictionary['messages'].append(message)
     if num_loop < 50:
         end = -1
     else:
