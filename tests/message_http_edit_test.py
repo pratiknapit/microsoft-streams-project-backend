@@ -91,8 +91,8 @@ def test_success_channel_message(admin, channel, channel_message):
         'token': admin['token'], 'channel_id': channel['channel_id'], 'start': 0}).json()
     assert edit.status_code == 200
     assert response['message'] == 'this edit is valid in this channel.'
-
-'''
+    
+'''   
 def test_success_dm_message(admin, dm, dm_message):
     edit = requests.put(config.url + '/message/edit/v1', json={'token': admin['token'], 'message_id': dm_message['message_id'],
                                                                'message': 'this edit is valid in this dm.'})
