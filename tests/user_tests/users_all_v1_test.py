@@ -99,4 +99,4 @@ def test_proper_dict_values(clear, token, users):
     assert 'name_first' in u_list['users'][0]
     assert 'name_last' in u_list['users'][0]
     assert 'handle_str' in u_list['users'][0]
-'''
+''' 
