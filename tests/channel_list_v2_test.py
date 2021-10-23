@@ -62,7 +62,7 @@ def test_channel_list_listall_v2_basic():
         'token': user_j_payload['token']
     })
 
-    list_payload = response2.json()
+    list_payload = response2.json()['channels']
     assert list_payload == [{
         "channel_id": 1,
         "name": "FirstChannel"
@@ -72,7 +72,7 @@ def test_channel_list_listall_v2_basic():
     response3 = requests.get(config.url + 'channels/listall/v2', params = {
         'token': user_j_payload['token']
     })
-    listall_payload = response3.json()
+    listall_payload = response3.json()['channels']
     assert listall_payload == [{
         "channel_id": 1,
         "name": "FirstChannel"

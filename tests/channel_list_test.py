@@ -32,7 +32,7 @@ def test_channels_list_non_member():
     dummy_user_3_channel = channels_create_v1(dummy_user_3['token'], 'dummy_user_3_channel', True) 
     
     #Dummy user 4, who is not part of the channel, is calling channels list all. 
-    dummy_user_4_channels_list = channels_list_v1(dummy_user_4['token'])
+    dummy_user_4_channels_list = channels_list_v1(dummy_user_4['token'])['channels']
 
     result = 0
     for channel in dummy_user_4_channels_list:
@@ -52,7 +52,7 @@ def test_channels_list_member():
     dummy_user_3_channel = channels_create_v1(dummy_user_3['token'], 'dummy_user_3_channel', True) 
     
     #Dummy user 4, who is not part of the channel, is calling channels list all. 
-    dummy_user_2_channels_list = channels_list_v1(dummy_user_2['token'])
+    dummy_user_2_channels_list = channels_list_v1(dummy_user_2['token'])['channels']
 
     result = 0
     for channel in dummy_user_2_channels_list:
@@ -76,7 +76,7 @@ def test_channels_list_member_and_join_member():
     channel_join_v1(dummy_user_4['token'], dummy_user_2_channel['channel_id'])
 
     #Dummy user 4, who is not part of the channel, is calling channels list all. 
-    dummy_user_4_channels_list = channels_list_v1(dummy_user_4['token'])
+    dummy_user_4_channels_list = channels_list_v1(dummy_user_4['token'])['channels']
 
     result = 0
     for channel in dummy_user_4_channels_list:
@@ -100,7 +100,7 @@ def test_channels_list_member_and_join_member2():
     channel_join_v1(dummy_user_4['token'], dummy_user_3_channel['channel_id'])
     
     #Dummy user 4, who is not part of the channel, is calling channels list all. 
-    dummy_user_4_channels_list = channels_list_v1(dummy_user_4['token'])
+    dummy_user_4_channels_list = channels_list_v1(dummy_user_4['token'])['channels']
 
     result = 0
     for channel in dummy_user_4_channels_list:
@@ -122,7 +122,7 @@ def test_channels_list_member_and_invite_member():
     #empty_dict3 = channel_invite_v1(dummy_user_2['auth_user_id'], dummy_user_2_channel['channel_id'], dummy_user_3['auth_user_id'])
 
     #Dummy user 2, who is part of the channel, is calling channels list. 
-    dummy_user_2_channels_list = channels_list_v1(dummy_user_2['token'])
+    dummy_user_2_channels_list = channels_list_v1(dummy_user_2['token'])['channels']
 
     result = 0
     for channel in dummy_user_2_channels_list:
@@ -131,7 +131,7 @@ def test_channels_list_member_and_invite_member():
 
     assert (result == 1)
 
-"""
+
 def test_channels_list_member_and_invite_member2():
     clear_v1()
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
@@ -143,7 +143,7 @@ def test_channels_list_member_and_invite_member2():
     channel_invite_v1(dummy_user_2['token'], dummy_user_2_channel['channel_id'], dummy_user_3['auth_user_id'])
 
     #Dummy user 3, who is not part of the channel, is calling channels list. 
-    dummy_user_3_channels_list = channels_list_v1(dummy_user_3['token'])
+    dummy_user_3_channels_list = channels_list_v1(dummy_user_3['token'])['channels']
 
     result = 0
     for channel in dummy_user_3_channels_list:
@@ -153,4 +153,3 @@ def test_channels_list_member_and_invite_member2():
             result += 1
 
     assert (result == 2)
-"""
