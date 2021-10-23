@@ -120,16 +120,13 @@ def test_message_sent_by_unauthorised_user_and_not_channel_owner(admin, member, 
         message_edit(member['token'], channel_message['message_id'],
                         'this is an updated message in the dm.')
 
-'''
-#####
 def test_success_channel_message(admin, channel, channel_message):
     message_edit(admin['token'], channel_message['message_id'],
                     'this edit is valid in this channel.')
     channel_messages = channel_messages_v1(
         admin['token'], channel['channel_id'], 0)
     assert channel_messages['message'] == 'this edit is valid in this channel.'
-#####
-'''
+
 '''    
 def test_success_dm_message(admin, dm, dm_message):
     message_edit(admin['token'], dm_message['message_id'],

@@ -53,7 +53,7 @@ def message_edit(token, message_id, new_message):
     Parameters:
         token (string)
         message_id(int)
-        edit_message(string)
+        new_message(string)
     
     """
     if len(new_message) > 1000:
@@ -82,12 +82,11 @@ def message_edit(token, message_id, new_message):
     if (is_owner or is_sender) == False:
         raise AccessError
 
-    auth_user_id = token_to_user_id(token)
-    user = auth_user_id_check(auth_user_id) 
     if len(new_message) == 0:
-        user['messages_created'].remove(message)
+        user['messages_created'].remove(message_id)
 
-    message['message'] = new_message
+    else :
+        message['message'] = new_message 
     return {}
 
 def message_remove(token, message_id):
@@ -115,7 +114,7 @@ def message_remove(token, message_id):
         raise AccessError
 
     store = data_store.get()['channels']
-    store['Messages'].remove(message)
+    store['Messages'].remove(message_id)
     return {}
 
 '''    
