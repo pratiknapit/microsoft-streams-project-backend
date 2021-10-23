@@ -41,7 +41,7 @@ def test_channels_list_all_nonmember_user():
     dummy_user_3_channel = channels_create_v1(dummy_user_3['token'], 'dummy_user_3_channel', True) 
     
     #Dummy user 4, who is not part of the channel, is calling channels list all. 
-    dummy_user_4_channels_list_all = channels_listall_v1(dummy_user_4['token'])
+    dummy_user_4_channels_list_all = channels_listall_v1(dummy_user_4['token'])['channels']
 
     result = 0
     for channel in dummy_user_4_channels_list_all:
@@ -61,7 +61,7 @@ def test_channels_list_all_return_type():
     dummy_user_3_channel = channels_create_v1(dummy_user_3['token'], 'dummy_user_3_channel', True) 
     
     #Dummy user 4, who is not part of the channel, is calling channels list all. 
-    channels_list_all = channels_listall_v1(dummy_user_2['token'])
+    channels_list_all = channels_listall_v1(dummy_user_2['token'])['channels']
 
     assert (channels_list_all == [
         	{
@@ -87,7 +87,7 @@ def test_channels_list_all_multiple_by_user_2():
     dummy_user_4_channel = channels_create_v1(dummy_user_4['token'], 'dummy_user_4_channel', True)
 
     #Dummy user 2 is calling channel list all.
-    dummy_user_2_channels_list_all = channels_listall_v1(dummy_user_2['token'])
+    dummy_user_2_channels_list_all = channels_listall_v1(dummy_user_2['token'])['channels']
 
     result = 0
     for channel in dummy_user_2_channels_list_all:
@@ -112,7 +112,7 @@ def test_channels_list_all_multiple_by_user_3():
     dummy_user_4_channel = channels_create_v1(dummy_user_4['token'], 'dummy_user_4_channel', True)
 
     #Dummy user 2 is calling channel list all.
-    dummy_user_3_channels_list_all = channels_listall_v1(dummy_user_3['token'])
+    dummy_user_3_channels_list_all = channels_listall_v1(dummy_user_3['token'])['channels']
 
     result = 0
     for channel in dummy_user_3_channels_list_all:
