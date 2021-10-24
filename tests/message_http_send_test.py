@@ -15,14 +15,13 @@ def token():
 
 @pytest.fixture
 def channel_id(token):
-    response = requests.post(config.url + '/channels/create', json={'token': token, 'name': 'testChannel01', 'is_public': False})
+    response = requests.post(config.url + '/channels/create/v2', json={'token': token, 'name': 'testChannel01', 'is_public': False})
     return response.json()['channel_id']
 
 @pytest.fixture
 def clear():
     requests.delete(config.url + '/clear/v1')
 
-'''
 def test_message_too_long(clear, token, channel_id):
     message = ''.join(random.choices(string.ascii_letters, k = 1001))
     response = requests.post(config.url + '/message/send/v1', json={'token': token, 'channel_id': channel_id, 'message': message})
@@ -37,17 +36,14 @@ def test_user_not_in_channel(clear, token, channel_id):
     second_token = second_token.json()['token']
     response = requests.post(config.url + '/message/send/v1', json={'token': second_token, 'channel_id': channel_id, 'message': 'test_message'})
     assert response.status_code == 403
-'''
-'''
-#######
+
 def test_message_ids_are_unique(clear, token, channel_id):
     m_id1 = requests.post(config.url + '/message/send/v1', json={'token': token, 'channel_id': channel_id, 'message': 'test_message'})
     m_id2 = requests.post(config.url + '/message/send/v1', json={'token': token, 'channel_id': channel_id, 'message': 'test_message'})
     m_id1 = m_id1.json()['message_id']
     m_id2 = m_id2.json()['message_id']
     assert m_id1 != m_id2
-#######
-'''
+
 def test_invalid_channel_id(clear, token):
     response = requests.post(config.url + '/message/send/v1', json={'token': token, 'channel_id': 'channel_id', 'message': 'test message'})
     assert response.status_code == 400

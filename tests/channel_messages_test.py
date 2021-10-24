@@ -5,6 +5,7 @@ from src.channels import channels_create_v1
 from src.channel import channel_messages_v1
 from src.message import message_send
 from src.other import clear_v1
+from src.data_store import data_store
 
 #################
 #Version 1 Tests#
@@ -52,7 +53,7 @@ def test_channel_messages_auth_not_in_channel_invalid(clear, dummy_cases):
 def test_channel_messages_functionality(clear, dummy_cases):
     assert channel_messages_v1(dummy_cases['dummy_user_2']['token'],
     dummy_cases['dummy_user_2_channel']['channel_id'], 0) == {
-        'message': [],
+        'messages': [],
         'start': 0,
         'end':-1 
     }
