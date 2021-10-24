@@ -6,24 +6,41 @@ from src.channels import channels_create_v1, channels_list_v1
 from src.other import clear_v1
 
 @pytest.fixture
-def dummy_cases():
-    # Dummy case created for testing of different parts of channel_invite_v1
+def user1():
     dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
-    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
-    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'passsssword', 'Ceal', 'CC')
-    # Creating a new channel with the first member as an owner and member
-    dummy_user_2_channel = channels_create_v1(dummy_user_2['token'], 'dummy_user_2_channel', True) # true means public channel
-    combined_data = {
-        "dummy_user_1": dummy_user_1,
-        "dummy_user_2": dummy_user_2,
-        "dummy_user_3": dummy_user_3,
-        "dummy_user_2_channel": dummy_user_2_channel,
-    }
-    return combined_data 
+    return dummy_user_1
+
+@pytest.fixture
+def user2():
+    dummy_user_2 = auth_register_v1('dummy2my@gmail.com', 'random', 'Jack', 'Grealish')
+    return dummy_user_2
+
+@pytest.fixture
+def channel1(user1):
+    channel_user1 = channels_create_v1(user1['token'], "channel1", True)
+    return channel_user1
 
 @pytest.fixture
 def clear():
     clear_v1()
+
+def test_invalid_token():
+    clear_v1()
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+    channel_user1 = channels_create_v1(dummy_user_1['token'], "channel1", True)
+    with pytest.raises(AccessError):
+        assert channel_details_v1("random_token", channel_user1['channel_id'])
+
+def test_if_user_is_channel_member(clear, user1, channel1):
+    user_2 = auth_register_v1('dummy2my@gmail.com', 'random', 'Jack', 'Grealish')
+    with pytest.raises(AccessError):
+        assert channel_details_v1(user_2['token'], channel1['channel_id'])
+
+
+
+def test_channel_invalid(clear, user1, channel1):
+    with pytest.raises(InputError):
+        assert channel_details_v1(user1['token'], 872483)
 
 def test_invalid_channel_details(clear):
     clear_v1()

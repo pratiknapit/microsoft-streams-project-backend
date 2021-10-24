@@ -51,7 +51,7 @@ def test_invalid_channel(clear, user1):
     })
     assert response.status_code == 400
 
-def test_user_is_not_member_of_channel(clear, user2, channel1):
+def test_user_is_not_member_of_channel(clear, user1, user2, channel1):
     response = requests.get(config.url + 'channel/details/v2', params = {
         'token': user2['token'],
         'channel_id': channel1["channel_id"]

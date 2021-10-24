@@ -16,6 +16,41 @@ dummy2_id = dummy_user_2['auth_user_id']
 
 dummy_user_2_channel = channels_create_v1(dummy_user_2['auth_user_id'], 'dummy_user_2_channel', True)
 '''
+
+@pytest.fixture
+def user1():
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+    return dummy_user_1
+
+@pytest.fixture
+def channel1(user1):
+    channel_user1 = channels_create_v1(user1['token'], "channel1", True)
+    return channel_user1
+
+@pytest.fixture
+def channel2(user1):
+    channelpriv_user1 = channels_create_v1(user1['token'], "channelPriv", False)
+    return channelpriv_user1
+
+@pytest.fixture
+def user2():
+    dummy_user_2 = auth_register_v1('dummy2my@gmail.com', 'random', 'Jack', 'Grealish')
+    return dummy_user_2
+
+@pytest.fixture
+def clear():
+    clear_v1()
+
+def test_invalid_token(channel1):
+    clear_v1()
+    with pytest.raises(AccessError):
+        assert channel_join_v1("random_token", channel1['channel_id'])
+
+def test_non_global_owner(clear, user1, user2, channel2):
+    with pytest.raises(AccessError):
+        assert channel_join_v1(user2['token'], channel2['channel_id'])
+
+
 def test_channel_join_invalid_id():
     clear_v1()
     dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'yessword', 'Beta', 'BB')
