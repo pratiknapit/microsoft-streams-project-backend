@@ -39,8 +39,8 @@ def message_send(token, channel_id, message):
     store = channel['Messages']
     auth_user_id = token_to_user_id(token)
     user = auth_user_id_check(auth_user_id) 
-    if check_if_user_is_channel_member(token, channel_id) == True:
-        message_id = make_message(message, channel_id, user['u_id'])
+
+    message_id = make_message(message, channel_id, user['u_id'])
         
     for i in store:
         if i['message_id'] == message_id:
@@ -78,8 +78,6 @@ def message_edit(token, message_id, new_message):
         raise AccessError(description='Invalid Token.')
 
     message = message_id_check(message_id)
-    if message == False:
-        raise InputError
 
     is_owner = owner_channel_check(token, message['channel_id'])
     u_id = token_to_user_id(token)

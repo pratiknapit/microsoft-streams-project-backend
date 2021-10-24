@@ -46,6 +46,10 @@ def test_invalid_token_channel(channel_message):
         message_edit(
             invalid_token, channel_message['message_id'], 'this is an updated message in the dm.')
 
+def test_invalid_msg_id(admin, ):
+    with pytest.raises(InputError):
+        message_edit(admin['token'], '12673476', 'updated message in dm')
+
 def test_message_incorrect_length_channel(admin, channel_message):
     with pytest.raises(InputError):
         message_edit(

@@ -48,12 +48,20 @@ def test_remove_channel_message(clear, auth_user, channel_id):
     message_remove(auth_user, message_id)
     assert len(channel_messages_v1(auth_user, channel_id, 0)['messages']) == 0
 
-
 def test_invalid_token(clear, auth_user, channel_id):
     channel_message_id = message_send(auth_user, channel_id, "Hi!")['message_id']
     with pytest.raises(AccessError):
         message_remove("invalid_token", channel_message_id)
 
+def test_unauthorised_auth_user(clear, auth_user, member, channel_id):
+    channel_message_id = message_send(auth_user, channel_id, "Hi!")['message_id']
+    with pytest.raises(AccessError):
+        message_remove(member['token'], channel_message_id)
+
 def test_invalid_message_id(clear, auth_user):
     with pytest.raises(InputError):
         message_remove(auth_user, 1)
+
+def test_dm_message_count(clear, auth_user, dm_id):
+    dm_message_count = len(dm_messages(auth_user, dm_id, 0)['messages'])
+    assert dm_message_count == 0
