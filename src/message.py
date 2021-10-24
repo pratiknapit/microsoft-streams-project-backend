@@ -3,7 +3,8 @@ This file contains message_send, message_edit, message_remove
 '''
 from src.data_store import data_store, make_message
 from src.data_store import token_check, channel_id_check, message_id_check, save_data
-from src.data_store import is_valid_token, check_if_user_is_channel_member, token_to_user_id, auth_user_id_check, user_id_check 
+from src.data_store import is_valid_token, check_if_user_is_channel_member, token_to_user_id
+from src.data_store import auth_user_id_check, user_id_check, owner_channel_check 
 from src.error import InputError, AccessError
 
 def message_send(token, channel_id, message):
@@ -166,17 +167,3 @@ def message_remove(token, message_id):
 
     if not in_channel and not in_dm:
         raise InputError(description="Message no longer exists.")
-
-#################
-#Helper Function#
-#################
-def owner_channel_check(token, channel_id):
-    u_id = token_to_user_id(token)   #checks if it's a valid user
-    channel = channel_id_check(channel_id)
-    if channel == None:
-        raise InputError
-
-    for member in channel['owner_members']:     
-        if member == u_id:
-            return True
-    return False
