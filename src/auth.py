@@ -1,7 +1,6 @@
 '''
 This file contains auth_login, auth_register
 '''
-
 ###########
 #Functions#
 ###########
@@ -15,11 +14,11 @@ from src.data_store import email_check, email_repeat_check, password_check, is_v
 ###################
 # Error Functions #
 ###################
-from src.error import InputError, AccessError
+from src.error import InputError
 
 def auth_register_v1(email, password, name_first, name_last):                     # Add_user
     '''
-    <Registers an authorised user given its arguments (email, password, name_first, name_last)>
+    Registers an authorised user given its arguments (email, password, name_first, name_last)
 
     Arguments:
         <email> (str) - <A string which holds the email>
@@ -35,7 +34,7 @@ def auth_register_v1(email, password, name_first, name_last):                   
         InputError  - Occurs when length of name_last is less than 1 or greater than 50
 
     Return Value:
-        Returns auth_user_id on condition that the user is valid and passes the check tests
+        Returns auth_user_id and token on condition that the user is valid.
     '''
     if not email_check(email):
         raise InputError
@@ -63,7 +62,7 @@ def auth_register_v1(email, password, name_first, name_last):                   
 
 def auth_login_v1(email, password):
     '''
-    <Logs in an Authorised user with correct password and email.>
+    Logs in an Authorised user with correct password and email
 
     Arguments:
         <email> (str)       - <A string which holds the email>
@@ -75,7 +74,7 @@ def auth_login_v1(email, password):
         InputError  - Occurs when password is not correctly entered
 
     Return Value:
-        Returns auth_user_id on condition that the user is valid and passes the check tests
+        Returns auth_user_id and token on condition that the user is valid
     '''
     if not email_check(email):
         raise InputError
@@ -99,15 +98,15 @@ def auth_login_v1(email, password):
 
 def auth_logout(token):
     '''
-    <Logs out user based on token>
+    Logs out user based on token
 
     Arguments:
         <token> (str)       - <A string which holds the token>
 
-    Exceptions:
+    Exceptions: None
 
     Return Value:
-        Returns empty dictionary
+        Returns empty dictionary and boolean success statement
     '''
     store = data_store.get() 
     for user in store['users']:

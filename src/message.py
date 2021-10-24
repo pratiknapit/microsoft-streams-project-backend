@@ -1,24 +1,29 @@
-from _pytest.compat import is_async_function
+'''
+This file contains message_send, message_edit, message_remove
+'''
 from src.data_store import data_store, make_message
 from src.data_store import token_check, channel_id_check, message_id_check, save_data
-from src.data_store import dm_id_check, is_valid_token, check_if_user_is_channel_member, token_to_user_id, auth_user_id_check, user_id_check 
+from src.data_store import is_valid_token, check_if_user_is_channel_member, token_to_user_id, auth_user_id_check, user_id_check 
 from src.error import InputError, AccessError
 
-from src.auth import auth_register_v1
-from src.channels import channels_create_v1
-
-
 def message_send(token, channel_id, message):
-    """ Sends a message to the designated channel 
-    Parameters:
-        token (string)
-        channel_id(int)
-        message(string)
-    
-    Returns:
-        (dictionary): A dictionary containing the message_id
-        of the message that was sent.
-    """
+    ''' 
+    Sends a message to the designated channel 
+
+    Arguments:
+        token      (str) - A string which holds the token
+        channel_id (int) - The channel id of channel we need details from.
+        message    (str) - The message string to send
+
+    Exceptions:
+        InputError      - Occurs when the inputted channel_id is not valid.
+        InputError      - When message is longer than 1000 characters or less than 1 character.
+        AccessError     - When token is invalid
+        AccessError     - Occurs when user is not authorised and user not member of channel.
+
+    Return Value:
+        A dictionary containing the message_id of the message that was sent.
+    '''
     
     if not token_check(token):
         raise AccessError
@@ -45,16 +50,27 @@ def message_send(token, channel_id, message):
     }
     
 def message_edit(token, message_id, new_message):
-    """Edits a current message  
-    Parameters:
-        token (string)
-        message_id(int)
-        new_message(string)
-    
-    """
+    '''
+    Edits a current message  
+
+    Arguments:
+        token       (str) - A string which holds the token
+        message_id  (int) - The message id of current message
+        new_message (str) - The message to replace current message
+
+    Exceptions:
+        InputError      - Message length is over 1000 characters
+        InputError      - When message id is invalid
+        AccessError     - When token is invalid
+        AccessError     - When u_id is invalid
+        AccessError     - When user is not owner or sender
+
+    Return Value:
+        Empty dictionary
+    '''
     if len(new_message) > 1000:
         raise InputError(description='Message over 1000 characters.')
-    if message_id_check(message_id) is None:
+    if message_id_check(message_id) == None:
         raise InputError
     decoded_token = is_valid_token(token)
     if decoded_token is False:
@@ -81,16 +97,27 @@ def message_edit(token, message_id, new_message):
     if len(new_message) == 0:
         user['messages_created'].remove(message_id)
     else :
-        message['message'].replace(message['message'], new_message)
+        message['message'] = new_message
     return {}
 
 def message_remove(token, message_id):
-    """Removes a message  
-    Parameters:
-        token (string)
-        message_id(int)
-    
-    """
+    '''
+    Removes a message 
+
+    Arguments:
+        token      (str) - A string which holds the token
+        message_id (int) - The message id of current message
+        
+    Exceptions:
+        InputError      - Message length is over 1000 characters
+        InputError      - When message does not exist
+        AccessError     - When token is invalid
+        AccessError     - When authorised user is invalid
+        AccessError     - When user is not owner or sender
+
+    Return Value:
+        Empty dictionary
+    '''
     data = data_store.get()
     in_channel = False
     in_dm = False
@@ -107,7 +134,7 @@ def message_remove(token, message_id):
                 in_channel = True
                 if message['u_id'] == user_id:
                     is_authorised = True
-                if user_id in channel['owner']:
+                if user_id in channel['owner_members']:
                     is_authorised = True
 
     if in_channel and not is_authorised:
@@ -129,18 +156,20 @@ def message_remove(token, message_id):
                     is_authorised = True
 
     if in_dm and not is_authorised:
-        raise AccessError(description="Not the sender nor an owner of Dreams")
+        raise AccessError(description="Not the sender nor an owner")
     if in_dm and is_authorised:
         for dm in data['dms']:
             for message in dm['messages']:
                 if message['message_id'] == message_id:
                     dm['messages'].remove(message)                    
-                    save_data(data)
                     return {}
 
     if not in_channel and not in_dm:
         raise InputError(description="Message no longer exists.")
 
+#################
+#Helper Function#
+#################
 def owner_channel_check(token, channel_id):
     u_id = token_to_user_id(token)   #checks if it's a valid user
     channel = channel_id_check(channel_id)

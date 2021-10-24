@@ -39,30 +39,12 @@ def dm(admin, member):
 def channel_message(admin, channel):
     return requests.post(config.url + '/message/send/v1', json={'token': admin['token'], 'channel_id': channel['channel_id'], 'message': 'this is a message sent to the other user in the channel.'}).json()
 
-'''
-@ pytest.fixture
-def dm_message(admin, dm):
-    return requests.post(config.url + '/message/senddm/v1', json={'token': admin['token'], 'dm_id': dm['dm_id'], 'message': 'this is a message sent to the other user.'}).json()
-'''
-'''
-def test_invalid_token_dm(dm_message):
-    invalid_token = 'invalidtoken123123'
-    message_call = requests.put(config.url + '/message/edit/v1', json={
-        'token': invalid_token, 'message_id': dm_message, 'message': 'this is an updated message in the dm.'})
-    assert message_call.status_code == 403
-'''
+
 def test_invalid_token_channel(channel_message):
     invalid_token = 'invalidtoken123123'
     message_call = requests.put(config.url + '/message/edit/v1', json={
         'token': invalid_token, 'message_id': channel_message['message_id'], 'message': 'this is an updated message in the dm.'})
     assert message_call.status_code == 403
-
-'''
-def test_message_incorrect_length_dm(admin, dm_message):
-    message_call = requests.put(config.url + '/message/edit/v1', json={
-        'token': admin['token'], 'message_id': dm_message, 'message': 1500*'A'})
-    assert message_call.status_code == 400
-'''
 
 def test_message_incorrect_length_channel(admin, channel_message):
     message_call = requests.put(config.url + '/message/edit/v1', json={
@@ -81,14 +63,4 @@ def test_success_channel_message(admin, channel, channel_message):
     response = requests.get(config.url + '/channel/messages/v2', params={
         'token': admin['token'], 'channel_id': channel['channel_id'], 'start': 0}).json()
     assert edit.status_code == 200
-    assert response['messages'] == 'this edit is valid in this channel.'
-
-'''   
-def test_success_dm_message(admin, dm, dm_message):
-    edit = requests.put(config.url + '/message/edit/v1', json={'token': admin['token'], 'message_id': dm_message['message_id'],
-                                                               'message': 'this edit is valid in this dm.'})
-    dm_messages = requests.get(config.url + '/dm/messages/v1', params={
-                               'token': admin['token'], 'dm_id': dm['dm_id'], 'start': 0}).json()
-    assert dm_messages['messages'][0]['message'] == 'this edit is valid in this dm.'
-    assert edit.status_code == 200
-'''
+    assert response['messages'][0]['message'] == 'this edit is valid in this channel.'

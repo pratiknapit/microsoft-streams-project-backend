@@ -1,7 +1,5 @@
 import requests
 from src import config
-from src.data_store import is_valid_token, login_token
-
 
 def test_dm_not_valid():
     requests.delete(config.url + '/clear/v1')

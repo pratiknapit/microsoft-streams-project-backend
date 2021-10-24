@@ -268,7 +268,7 @@ def remove_message():
     data = request.get_json()
 
     token = data['token']
-    message_id = data['message_id']
+    message_id = int(data['message_id'])
     
     message_remove(token, message_id)   
     return dumps({})

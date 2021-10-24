@@ -5,7 +5,7 @@ from src.error import InputError, AccessError
 from src.data_store import check_if_channel_is_public_or_private, check_if_user_is_channel_member
 from src.data_store import channel_id_check, auth_user_id_check, user_id_check, token_check, token_to_user_id, check_existing_owner
 from src.data_store import check_existing_member
-from src.data_store import data_store
+from src.data_store import data_store, save_data
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 
@@ -131,9 +131,9 @@ def channel_details_v1(token, channel_id):
 def channel_messages_v1(token, channel_id, start):
     '''
     Arguments:
-        auth_user_id (int)          - Authorisation hash of the user that is in the channel.
-        channel_id (int)            - The id of channel we need details from.
-        start   (int)               - Index of start
+        token (str)          - Authorisation hash of the user that is in the channel.
+        channel_id (int)     - The channel id of channel we need details from.
+        start   (int)        - Index of start
 
     Exceptions:
         InputError      - Occurs when the inputted channel_id is not valid.
@@ -142,15 +142,14 @@ def channel_messages_v1(token, channel_id, start):
     Return Value:
         Returns a dictionary containing messages, start and end
     '''
-
     if not channel_id_check(channel_id):                                   # Channel does not exist
         raise InputError
 
     if not check_if_user_is_channel_member(token, channel_id):
         raise AccessError
 
-    store = data_store.get()
-    total_messages = len(store['Messages'])
+    channel = channel_id_check(channel_id)
+    total_messages = len(channel['Messages'])
 
     if start > total_messages:
         raise InputError
@@ -158,16 +157,12 @@ def channel_messages_v1(token, channel_id, start):
     message_dictionary = {
         'messages': [],
     }
-    msg_count_char = len(message_dictionary['messages'])
 
-    num_loop = min(msg_count_char, 50)
+    num_loop = min(total_messages, 50)
     
-    data = data_store.get()['channels']
-    
-    for channel in range(0, num_loop):
-        message_dict_list = data[channel]['Messages']
-        message = message_dict_list[num_loop - 1]
-        message_dictionary['messages'].append(message)
+    for msg in range(0, num_loop):
+        message_dict = channel['Messages'][msg]
+        message_dictionary['messages'].append(message_dict)
     if num_loop < 50:
         end = -1
     else:

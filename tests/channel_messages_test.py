@@ -5,6 +5,7 @@ from src.channels import channels_create_v1
 from src.channel import channel_messages_v1
 from src.message import message_send
 from src.other import clear_v1
+from src.data_store import data_store
 
 #################
 #Version 1 Tests#

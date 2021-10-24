@@ -1,23 +1,22 @@
+'''
+This file contains dm_create, dm_details, dm_leave, dm_list, dm_remove, dm_messages
+'''
 from src.error import AccessError, InputError
-from src.data_store import is_valid_token, is_valid_user_id, save_data
+from src.data_store import dm_id_check, is_valid_token, is_valid_user_id
 from src.data_store import data_store
-from datetime import datetime
 
 def dm_create(token, u_ids):
     '''
-    Function to create a channel that is either a public or private with a given name
+    Creates dms given users and token
+
     Arguments:
-        token (string)       - an authorisation hash of the user
-        u_ids (int [])       - user id of the users that this DM is directed to (excluding the creator)
+        token (str)       - an authorisation hash of the user
+        u_ids (int [])    - user ids of the users that this DM is directed to (excluding the creator)
     Exceptions:
         AccessError  - Occurs when the token invalid
         InputError   - Occurs when u_id does not refer to a valid user
     Return Value:
-        a dictionary {dm_id, dm_name}
-    Assumption:
-        - a new dm is created everytime a creator creates one even there is already
-         a dm with the same creator and dm members
-        - a user who is removed from Dreams can not be added to a dm
+        A dictionary containing dm_id
     '''
     
     store = data_store.get()
@@ -53,17 +52,19 @@ def dm_create(token, u_ids):
     return {'dm_id': dm_id}
 
 def dm_list(token):
-    """Returns the list of DMs that the user is a member of
-    Args:
-        token (string): jwt encode dict with user_id
-    Raises:
-        AccessError: raises if the token is invalid
+    '''
+    Returns the list of DMs that the user is a member of
+
+    Arguments:
+        token (str) - an authorisation hash of the user
+    Exceptions:
+        AccessError - When the token is invalid
     Returns:
-        {dms}: a list of dms the user is a member of
-    """
+        A list of dms the user is a member of
+    '''
 
     decoded_token = is_valid_token(token)
-    if decoded_token is False:
+    if decoded_token == False:
         raise AccessError("Invalid Token.")
 
     data = data_store.get()
@@ -88,11 +89,14 @@ def dm_remove(token, dm_id):
         AccessError  - Occurs when the token invalid or when the user is not the dm creator
         InputError   - Occurs when dm_id does not refer to a valid dm
     Return Value:
-        {} on successful removal of a dm
+        Empty dictionary
     '''
     data = data_store.get()
-    decoded_token = is_valid_token(token)
 
+    if dm_id_check(dm_id) == False:
+        raise InputError("Invalid dm_id")
+    
+    decoded_token = is_valid_token(token)
     if decoded_token == False:
         raise AccessError("Invalid token.")
 
@@ -119,16 +123,17 @@ def dm_remove(token, dm_id):
 def dm_details(token, dm_id):
     '''
     Given a valid token from a user that is part of the given dm, returns the details of the given dm
-    Args:
-        token (string): jwt encode dict with user_id
+    Arguments:
+        token (string): an authorisation hash of the user
         dm_id (int): id of the given dm
-    Raises:
-        AccessError: raises if the token is invalid
-        InputError: if the dm_id is not a valid dm
+    Exceptions:
+        AccessError: When the token is invalid
+        InputError: When dm_id is not a valid dm
         AccessError: raises if the authorised user is not a part of the dm
-    Returns:
-        {name, members}: name is str of the name of the dm, 
-        members is a list of dicts with values, u_id, email, name_first, name_last and handle_str
+
+    Return Value:
+        String of the name of the dm, 
+        list of dicts with u_id, email, name_first, name_last and handle_str
     '''
     if is_valid_token(token) == False:
         raise AccessError("Invalid token")
@@ -172,7 +177,7 @@ def dm_leave(token, dm_id):
         AccessError - Occurs when the token is invalid and authorised user is not a member of the dm
         InputError  - Occurs when dm_id is invalid
     Return Value:
-        Returns {}
+        Empty dictionary
     '''
     decoded_token = is_valid_token(token)
     if decoded_token == False:
@@ -208,12 +213,12 @@ def dm_messages(token, dm_id, start):
     '''
     Function to return up to 50 messages between "start" and "start + 50"
     Arguments:
-        token (string)      - an authorisation hash of the user
+        token (str)         - an authorisation hash of the user
         dm_id (int)         - dm_id of the dm the user is part of
         start (int)         - show messages starting from start; start = 0 means the most recent message
     Exceptions:
         AccessError - Occurs when the token is invalid and authorised user is not a member of the dm
-        InputError  - Occurs when dm_id is invalid and "start" is greater than\
+        InputError  - Occurs when dm_id is invalid and "start" is greater than
         the total number of messages in the dm
     Return Value:
         Returns {messages, start, end} where messages is a dictionary
@@ -268,7 +273,6 @@ def dm_messages(token, dm_id, start):
 ####################
 # Helper Functions #
 ####################
-
 def find_user(u_id):
     store = data_store.get()
     for user in store['users']:
@@ -300,7 +304,6 @@ def is_user_in_channel(channel_id, user_id):
             return True
     return False
 
-
 def is_user_in_dm(dm_id, user_id):
     store = data_store.get()
     dm = find_dm(dm_id, store)
@@ -310,4 +313,3 @@ def is_user_in_dm(dm_id, user_id):
     if dm['creator'] == user_id:
         return True
     return False
-
