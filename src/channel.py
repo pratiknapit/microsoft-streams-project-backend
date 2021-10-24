@@ -12,7 +12,7 @@ from src.channels import channels_create_v1, channels_list_v1, channels_listall_
 def channel_invite_v1(token, channel_id, u_id):
     '''
     Arguments:
-        auth_user_id (int)     - Authorisation hash of a user after registration from auth_register
+        token (str)            - Token of a user after registration from auth_register
         channel_id (int)       - The id of a channel
         u_id (int)             - The auth_user_id of someone else
 
@@ -60,7 +60,7 @@ def channel_invite_v1(token, channel_id, u_id):
 def channel_details_v1(token, channel_id):
     '''
     Arguments:
-        auth_user_id (int)          - Authorisation hash of the user that is in the channel.
+        token (str)            - Token of a user after registration from auth_register
         channel_id (int)            - The id of channel we need details from.
 
     Exceptions:
@@ -107,7 +107,7 @@ def channel_details_v1(token, channel_id):
     channel_details_dictionary['owner_members'] = owner_details
 
     #Need to extract the member details to meet spec for details output
-    member_auth_ids = extract_channel_details['all_members'] #this will be a list of member user ids
+    member_auth_ids = extract_channel_details['all_members'] 
     member_details = [
     ]
     for id in member_auth_ids:
@@ -175,7 +175,7 @@ def channel_messages_v1(token, channel_id, start):
 def channel_join_v1(token, channel_id):
     '''
     Arguments:
-        auth_user_id (int)          - Authorisation hash of user that is trying to join channel
+        token (str)            - Token of a user after registration from auth_register
         channel_id (int)            - The id of the channel that the user is trying to join
 
     Exceptions:
@@ -319,8 +319,7 @@ def channel_remove_owner_v2(token, channel_id, u_id):
     if len(channel_info['owner_members']) == 1:
         if check_existing_owner(u_id, channel_id) is True:
             raise InputError("User is only owner of the channel.")
-    
-    #Little bit confused with this part: Can a global owner remove the last owner in the channel" 
+     
     auth_user_id = token_to_user_id(token) 
     user_detail = auth_user_id_check(auth_user_id)
     if user_detail['is_global_owner'] == 2:
