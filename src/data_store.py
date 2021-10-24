@@ -27,6 +27,7 @@ import re
 from json import dumps
 import jwt
 import json
+from src.error import InputError
 
 initial_object = {
     'users': [    
@@ -104,6 +105,7 @@ def make_user(email, password, name_first, name_last, u_id):
             'messages_created':[],
     }
 
+# Function to make message dictionary and returns message_id
 def make_message(message, channel_id, u_id): 
     m_id = 0
     channels = data_store.get()['channels']
@@ -125,12 +127,11 @@ def make_message(message, channel_id, u_id):
 logged_in_users = []
 def login_token(user):
     SECRET = 'abcdedweidjwijdokfwkfwoqkqfw'
-    #token = str(jwt.encode({'handle_str': user['handle_str']}, SECRET, algorithm = 'HS256'))
     token = jwt.encode({'auth_user_id': user['u_id']}, SECRET, algorithm='HS256')
     logged_in_users.append(token)
     return token
 
-
+# Decoding function for encoded jwt
 def is_valid_token(token):
     data = data_store.get()
     SECRET = 'abcdedweidjwijdokfwkfwoqkqfw'
@@ -146,6 +147,7 @@ def is_valid_token(token):
             return payload
         return False
 
+# Token checker for logged_in_users
 def token_check(token):
     store = logged_in_users
     if token in store: 
@@ -159,6 +161,7 @@ def is_valid_user_id(auth_user_id):
             return True
     return False
 
+# Checks for existence of dm_id in dms
 def dm_id_check(dm_id):
     store = data_store.get()
     for dm in store['dms']:
@@ -182,7 +185,6 @@ def create_handle(first_name, last_name):
         count += 1   
     return prototype_handle
 
-
 def user_channels(token):
     u_id = token_to_user_id(token)
     store = data_store.get()
@@ -205,7 +207,6 @@ def user_all_channels(token):
     store = data_store.get()    
     all_channels_list = {
         'channels': [
-
         ]
     }
     for channel in store['channels']:
@@ -222,13 +223,15 @@ def is_public_check(is_public):
         return True
     return False 
 
-def handle_check(handle_str):   # Function to check handle uniqueness
+# Function to check handle uniqueness
+def handle_check(handle_str):
     data = data_store.get()
     for user in data['users']:
         if user['handle_str'] == handle_str:
             return True
     return False
 
+# Check for auth_user_id 
 def auth_user_id_check(auth_user_id):
     data = data_store.get()
     for user in data['users']:
@@ -236,7 +239,7 @@ def auth_user_id_check(auth_user_id):
             return user
     return False
 
-
+# Function check email validity
 def email_check(email):
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
     if (re.fullmatch(regex, email)):
@@ -244,6 +247,7 @@ def email_check(email):
     else:
         return False
 
+# Function check repeated emails
 def email_repeat_check(email):
     data = data_store.get()
     for user in data['users']:
@@ -251,6 +255,7 @@ def email_repeat_check(email):
             return True
     return False
 
+# Function to return user based on email
 def login_email(email):
     data = data_store.get()
     for user in data['users']:
@@ -258,6 +263,7 @@ def login_email(email):
             return user
     return False
 
+# Function to return user with correct password
 def password_check(password):
     data = data_store.get()
     for user in data['users']:
@@ -265,6 +271,7 @@ def password_check(password):
             return user
     return False
 
+# Function to check message_id in respective channel and message
 def message_id_check(message_id):
     channels = data_store.get()['channels']
     for channel in channels:
@@ -334,10 +341,70 @@ def handle_search(handle):
         if user['handle_str'] == handle:
             return user
 
-
 def save_data(data):
     with open('data.json', 'w') as FILE:
         json.dump(data, FILE)
+
+
+################################
+#Helper Function for message.py#
+################################
+def owner_channel_check(token, channel_id):
+    u_id = token_to_user_id(token)                  #checks if it's a valid user
+    channel = channel_id_check(channel_id)
+    if channel == None:
+        raise InputError
+
+    for member in channel['owner_members']:     
+        if member == u_id:
+            return True
+    return False
+#############################
+# Helper Functions for dm.py#
+#############################
+def find_user(u_id):
+    store = data_store.get()
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            return user
+
+def find_dm(dm_id, store):
+    for dm in store['dms']:
+        if dm['dm_id'] == dm_id:
+            return dm
+
+def find_channel(channel_id, data):
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            return channel
+
+# Checks if dm_id exists within dm
+def is_valid_dm_id(dm_id):
+    store = data_store.get()
+    for dm in store['dms']:
+        if dm['dm_id'] == dm_id:
+            return True
+    return False
+
+# Checks if user member is in channel
+def is_user_in_channel(channel_id, user_id):
+    store = data_store.get()
+    channel = find_channel(channel_id, store)
+    for member in channel['members']:
+        if member['user_id'] == user_id:
+            return True
+    return False
+
+# Checks if user member is in dm
+def is_user_in_dm(dm_id, user_id):
+    store = data_store.get()
+    dm = find_dm(dm_id, store)
+    for member in dm['members']:
+        if member == user_id:
+            return True
+    if dm['creator'] == user_id:
+        return True
+    return False
 
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 

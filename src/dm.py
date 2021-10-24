@@ -2,7 +2,8 @@
 This file contains dm_create, dm_details, dm_leave, dm_list, dm_remove, dm_messages
 '''
 from src.error import AccessError, InputError
-from src.data_store import dm_id_check, is_valid_token, is_valid_user_id
+from src.data_store import dm_id_check, is_user_in_channel, is_user_in_dm, is_valid_token, is_valid_user_id, is_user_in_dm
+from src.data_store import find_user, find_dm, find_channel, is_valid_dm_id, is_user_in_channel
 from src.data_store import data_store
 
 def dm_create(token, u_ids):
@@ -269,47 +270,3 @@ def dm_messages(token, dm_id, start):
             messages_dict['messages'].append(dm_messages[i])
 
     return messages_dict
-
-####################
-# Helper Functions #
-####################
-def find_user(u_id):
-    store = data_store.get()
-    for user in store['users']:
-        if user['u_id'] == u_id:
-            return user
-
-def find_dm(dm_id, store):
-    for dm in store['dms']:
-        if dm['dm_id'] == dm_id:
-            return dm
-
-def find_channel(channel_id, data):
-    for channel in data['channels']:
-        if channel['channel_id'] == channel_id:
-            return channel
-
-def is_valid_dm_id(dm_id):
-    store = data_store.get()
-    for dm in store['dms']:
-        if dm['dm_id'] == dm_id:
-            return True
-    return False
-
-def is_user_in_channel(channel_id, user_id):
-    store = data_store.get()
-    channel = find_channel(channel_id, store)
-    for member in channel['members']:
-        if member['user_id'] == user_id:
-            return True
-    return False
-
-def is_user_in_dm(dm_id, user_id):
-    store = data_store.get()
-    dm = find_dm(dm_id, store)
-    for member in dm['members']:
-        if member == user_id:
-            return True
-    if dm['creator'] == user_id:
-        return True
-    return False
