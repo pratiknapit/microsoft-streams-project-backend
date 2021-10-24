@@ -328,13 +328,11 @@ def user_id_check(u_id):
             return user
     return False
 
-
 def handle_search(handle):
     data = data_store.get()
     for user in data['users']:
         if user['handle_str'] == handle:
             return user
-    return
 
 
 def save_data(data):
