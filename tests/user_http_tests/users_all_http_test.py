@@ -50,7 +50,6 @@ def test_user_all_valid(clear, dummy_user):
         ]
     }
 
-
 def test_user_all_invalid(clear):
     # generate an invalid token
     invalid_token = 'incorrectoken'

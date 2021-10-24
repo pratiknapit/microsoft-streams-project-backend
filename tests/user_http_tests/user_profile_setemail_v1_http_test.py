@@ -3,8 +3,6 @@ import pytest
 from src import config
 import json
 
-
-
 @pytest.fixture
 def dummy_user():
     requests.post(config.url + "/auth/register/v2", json={
@@ -45,8 +43,6 @@ def test_invalid_profile_setemail_v1(clear, dummy_user):
     })
     payload = registration.json()
     assert payload['code'] == 400 #InputError
-    
-
 
 def test_valid_profile_setemail_v1(clear, dummy_user):
     user2 = dummy_user

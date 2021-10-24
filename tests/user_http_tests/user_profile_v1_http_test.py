@@ -23,7 +23,6 @@ def dummy_user():
     payload = user2.json()
     return payload
 
-
 @pytest.fixture
 def clear():
     requests.delete(config.url + 'clear/v1')

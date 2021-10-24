@@ -3,6 +3,7 @@ import pytest
 from src import config
 import json
 
+
 @pytest.fixture
 def dummy_user():
     requests.post(config.url + "/auth/register/v2", json={
