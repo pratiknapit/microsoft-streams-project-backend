@@ -57,3 +57,13 @@ def test_taken_handle(clear, dummy_user):
     })
     payload = result.json()
     assert payload['code'] == 400 #InputError
+
+def test_invalid_token_handle(clear):
+    user_token = "nevergonnagiveyouupnevergonnaletyoudown"
+    new_user_handle = "bobmonk"
+    result = requests.put(config.url + "/user/profile/sethandle/v1", json={
+        'token': user_token,
+        'handle_str': new_user_handle,
+    })
+    payload = result.json()
+    assert payload ['code'] == 403

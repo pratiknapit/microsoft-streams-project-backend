@@ -88,3 +88,15 @@ def test_invalid_long_last_name(clear, dummy_user):
     })
     payload = result.json()
     assert payload['code'] == 400 # InputError
+
+def test_invalid_token(clear, dummy_user):
+    user_token = 'pleasenomoretestwriting'
+    new_first_name = "Normal"
+    new_last_name = "Name"
+    result = requests.put(config.url + "/user/profile/setname/v1", json={
+        'token': user_token,
+        'name_first': new_first_name,
+        'name_last': new_last_name,
+    })
+    payload = result.json()
+    assert payload['code'] == 403 # InputError

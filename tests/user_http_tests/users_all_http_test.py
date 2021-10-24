@@ -50,8 +50,7 @@ def test_user_all_valid(clear, dummy_user):
         ]
     }
 
-def test_user_all_invalid(clear):
-    # generate an invalid token
+def test_user_all_invalid_token(clear):
     invalid_token = 'incorrectoken'
     query = urllib.parse.urlencode({
         'token': invalid_token

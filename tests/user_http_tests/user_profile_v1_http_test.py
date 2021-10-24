@@ -27,9 +27,13 @@ def dummy_user():
 def clear():
     requests.delete(config.url + 'clear/v1')
 
-def test_invalid_failed_case(clear):
-    call = requests.get(config.url + 'user/profile/v1', params={'token' : 'invalidtokencauseisaidso', 'u_id':0})
+def test_invalid_token(clear, dummy_user):
+    call = requests.get(config.url + 'user/profile/v1', params={'token' : 'invalidtokencauseisaidso', 'u_id' : dummy_user['auth_user_id']})
     assert call.status_code == 403
+
+def test_invalid_u_id(clear, dummy_user):
+    call = requests.get(config.url + 'user/profile/v1', params={'token' : dummy_user['token'], 'u_id' : 0})
+    assert call.status_code == 400
 
 def test_user_profile_v1_successful_case(clear, dummy_user):
     result = requests.get(config.url + "user/profile/v1", params={'token' : dummy_user['token'], 'u_id' : dummy_user['auth_user_id']})

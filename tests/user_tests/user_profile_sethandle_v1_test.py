@@ -35,6 +35,11 @@ def test_valid_sethandle(clear, dummy_cases):
     result = user_profile_sethandle_v1(token, "newdummy")
     assert result == {}
 
+def test_invalid_token(clear):
+    token = 'incorrecttoken'
+    with pytest.raises(AccessError):
+        user_profile_sethandle_v1(token, "newdummy")
+
 
 
 

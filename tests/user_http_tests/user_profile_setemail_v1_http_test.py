@@ -54,6 +54,16 @@ def test_valid_profile_setemail_v1(clear, dummy_user):
     payload = registration.json()
     assert payload == {}
 
+def test_invalid_token(clear, dummy_user):
+    token = 'pleasestopmakingmewritesomanytests'
+    new_setemail = "smartdummy@gmail.com"
+    registration = requests.put(config.url + "/user/profile/setemail/v1", json={
+        'token': token,
+        'email': new_setemail,
+    })
+    payload = registration.json()
+    assert payload['code'] == 403
+
 
 
 
