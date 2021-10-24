@@ -259,8 +259,6 @@ def channel_add_owner_v2(token, channel_id, u_id):
             Returns an empty dictionary
     '''
 
-    data = data_store.get()
-
     if token_check(token) == False:
         raise AccessError(description="token not found")
     
