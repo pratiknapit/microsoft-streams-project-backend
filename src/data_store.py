@@ -182,6 +182,7 @@ def create_handle(first_name, last_name):
         count += 1   
     return prototype_handle
 
+# Function used to list all channels that a user is part of.
 
 def user_channels(token):
     u_id = token_to_user_id(token)
@@ -199,7 +200,7 @@ def user_channels(token):
         
     return user_list_channel
 
-# def function to return list of channels that user is part of including private channels
+# Function to list all channels in the database.
 
 def user_all_channels(token):
     store = data_store.get()    
@@ -214,6 +215,50 @@ def user_all_channels(token):
         )
   
     return all_channels_list
+
+# Function to leave a channel given the token and channel_id. It returns if a member 
+# was found or not.
+
+def leave_channel(token, channel_id):
+    data = data_store.get()
+    user_id = token_to_user_id(token)
+    for channel in data['channels']:
+        if channel_id == channel['channel_id']:
+            #Remove the user from the owner members if they are an owner 
+            for owner in channel['owner_members']:
+                if owner == user_id:
+                    channel['owner_members'].remove(user_id)
+                    break
+            #Remove the user for the member list
+            valid_member = False
+            for member in channel['all_members']:  
+                if user_id == member: 
+                    channel['all_members'].remove(user_id)
+                    valid_member = True
+                    break
+    return valid_member
+
+# Function to add a new owner to the channel.
+
+def add_owner_channel(channel_id, u_id):
+    data = data_store.get()
+    new_owner_id = u_id  
+    for channel in data['channels']:	
+        if channel["channel_id"] == channel_id:
+            channel['owner_members'].append(new_owner_id)
+            break
+    return {}
+
+# Function to remove an owner from a channel.
+
+def remove_owner_channel(channel_id, u_id):
+    data = data_store.get()
+    new_owner_id = u_id  
+    for channel in data['channels']:	
+        if channel["channel_id"] == channel_id:
+            channel['owner_members'].remove(new_owner_id)
+            break
+    return {}
 
 # def functions to help with Channel create, channels_list and channels_listall 
 
@@ -274,11 +319,11 @@ def message_id_check(message_id):
     return None
 
 def channel_id_check(channel_id):
-	store = data_store.get()
-	for channel in store['channels']:
-		if int(channel['channel_id']) == int(channel_id):
-			return channel	
-	return False
+    store = data_store.get()
+    for channel in store['channels']:
+        if int(channel['channel_id']) == int(channel_id):
+            return channel	
+    return False
 
 def check_existing_owner(u_id, channel_id):
     data = data_store.get()
