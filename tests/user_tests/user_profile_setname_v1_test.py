@@ -18,8 +18,6 @@ def dummy_cases():
 def clear():
     clear_v1()
 
-
-
 def test_first_name_too_short(clear, dummy_cases):
     token = dummy_cases
     with pytest.raises(InputError):

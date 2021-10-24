@@ -5,7 +5,6 @@ from src.user import user_profile_v1
 from src.channels import channels_create_v1
 from src.other import clear_v1
 
-
 @pytest.fixture
 def dummy_cases():
 

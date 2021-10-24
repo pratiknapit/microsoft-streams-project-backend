@@ -17,7 +17,6 @@ def dummy_cases():
 def clear():
     clear_v1()
     
-
 def test_handle_already_taken(clear, dummy_cases):
     with pytest.raises(InputError):
         user_profile_sethandle_v1(dummy_cases, "bettabb")

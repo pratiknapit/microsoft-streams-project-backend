@@ -41,7 +41,6 @@ def test_users_all(dummy_cases):
     }
 
 
-
 def test_invalid_token(dummy_cases):
     token = 'invalidtoken'
     with pytest.raises(AccessError):
