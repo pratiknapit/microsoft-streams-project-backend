@@ -50,7 +50,6 @@ def test_invalid_channel_id(clear, token):
     with pytest.raises(InputError):
         message_send(token, 'channel_id', 'test message')
 
-
 #############################
 #General functionality check#
 #############################
