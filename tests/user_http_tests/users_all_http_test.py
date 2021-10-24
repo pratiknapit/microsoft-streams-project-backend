@@ -52,9 +52,6 @@ def test_user_all_valid(clear, dummy_user):
 
 def test_user_all_invalid_token(clear):
     invalid_token = 'incorrectoken'
-    query = urllib.parse.urlencode({
-        'token': invalid_token
-    })
-    result = requests.get(config.url + "/users/all/v1?{query}")
+    result = requests.get(config.url + "/users/all/v1?", params={'token' : invalid_token})
     payload = result.json()
     assert payload['code'] == 403 # AccessError
