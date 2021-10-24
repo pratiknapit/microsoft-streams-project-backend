@@ -27,7 +27,14 @@ def clear():
     requests.delete(config.url + "/clear/v1")
 
 def test_already_taken_profile_setemail_v1(clear, dummy_user):
-    pass
+    user2 = dummy_user
+    new_setemail = "dummy1@gmail.com"
+    res = requests.put(config.url + "/user/profile/setemail/v1", json={
+        'token': user2['token'],
+        'email': new_setemail,
+    })
+    payload = res.json()
+    assert payload['code'] == 400 #InputError
 
 def test_invalid_profile_setemail_v1(clear, dummy_user):
     user2 = dummy_user

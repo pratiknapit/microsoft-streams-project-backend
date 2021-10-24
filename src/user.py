@@ -10,20 +10,19 @@ def users_all_v1(token):
     if is_valid_token(token) == False:
         raise AccessError("Token not valid")
 
-
-    token = is_valid_token(token)
     user_list = []
     data = data_store.get()
-    for user in range(len(data['users'])):
+    for user in data['users']:
         user = {
-            'u_id': data['user_list'][user]['u_id'],
-            'email': data['user_list'][user]['email'],
-            'name_first': data['user_list'][user]['name_first'],
-            'name_last': data['user_list'][user]['name_last'],
-            'handle_str': data['user_list'][user]['handle'],
+            'u_id': user['u_id'],
+            'email': user['email'],
+            'name_first': user['name_first'],
+            'name_last': user['name_last'],
+            'handle_str': user['handle_str'],
         }
         user_list.append(user)
-    return{"user_list": user_list}
+        user = {}  
+    return{"users": user_list}
 
 def user_profile_v1(token, u_id):
 
@@ -31,7 +30,7 @@ def user_profile_v1(token, u_id):
             raise AccessError ("Token provided is not valid")
 
     if not user_id_check(u_id):
-            raise AccessError("Incorrect user id")
+            raise InputError("Incorrect user id")
 
     data = data_store.get()
     for user in data['users']:

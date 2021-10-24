@@ -5,7 +5,7 @@ import json
 
 @pytest.fixture
 def dummy_user():
-    requests.post(config.url + "/auth/register/v1", json={
+    requests.post(config.url + "/auth/register/v2", json={
         "email": "dummy1@gmail.com",
         "password": "password1",
         "name_first": "First",
@@ -29,12 +29,12 @@ def test_valid_case_setname(clear, dummy_user):
     user_token = user2['token']
     new_first_name = "Yes"
     new_last_name = "Yeetus"
-    registration = requests.put(config.url + "/user/profile/setname/v1", json={
+    result = requests.put(config.url + "/user/profile/setname/v1", json={
         'token': user_token,
         'name_first': new_first_name,
         'name_last': new_last_name,
     })
-    payload = registration.json()
+    payload = result.json()
     assert payload == {}
 
 def test_invalid_short_first_name(clear, dummy_user):
@@ -42,12 +42,12 @@ def test_invalid_short_first_name(clear, dummy_user):
     user_token = user2['token']
     new_first_name = ""
     new_last_name = "Yeetus"
-    registration = requests.put(config.url + "/user/profile/setname/v1", json={
+    result = requests.put(config.url + "/user/profile/setname/v1", json={
         'token': user_token,
         'name_first': new_first_name,
         'name_last': new_last_name,
     })
-    payload = registration.json()
+    payload = result.json()
     assert payload['code'] == 400 # InputError
 
 def test_invalid_long_first_name(clear, dummy_user):
@@ -55,12 +55,12 @@ def test_invalid_long_first_name(clear, dummy_user):
     user_token = user2['token']
     new_first_name = "d"*99
     new_last_name = "Yeetus"
-    registration = requests.put(config.url + "/user/profile/setname/v1", json={
+    result = requests.put(config.url + "/user/profile/setname/v1", json={
         'token': user_token,
         'name_first': new_first_name,
         'name_last': new_last_name,
     })
-    payload = registration.json()
+    payload = result.json()
     assert payload['code'] == 400 # InputError
 
 def test_invalid_short_last_name(clear, dummy_user):
@@ -68,12 +68,12 @@ def test_invalid_short_last_name(clear, dummy_user):
     user_token = user2['token']
     new_first_name = "Yes"
     new_last_name = ""
-    registration = requests.put(config.url + "/user/profile/setname/v1", json={
+    result = requests.put(config.url + "/user/profile/setname/v1", json={
         'token': user_token,
         'name_first': new_first_name,
         'name_last': new_last_name,
     })
-    payload = registration.json()
+    payload = result.json()
     assert payload['code'] == 400 # InputError
 
 def test_invalid_long_last_name(clear, dummy_user):
@@ -81,10 +81,10 @@ def test_invalid_long_last_name(clear, dummy_user):
     user_token = user2['token']
     new_first_name = "Yes"
     new_last_name = "d"*99
-    registration = requests.put(config.url + "/user/profile/setname/v1", json={
+    result = requests.put(config.url + "/user/profile/setname/v1", json={
         'token': user_token,
         'name_first': new_first_name,
         'name_last': new_last_name,
     })
-    payload = registration.json()
+    payload = result.json()
     assert payload['code'] == 400 # InputError

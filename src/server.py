@@ -276,14 +276,13 @@ def remove_message():
 @APP.route("/users/all/v1", methods=["GET"])
 def users():
     token = request.args.get('token')
-
     all_users = users_all_v1(token)
     return dumps(all_users)
 
 @APP.route("/user/profile/v1", methods=["GET"])
 def profile_users():
     token = request.args.get('token')
-    u_id = request.args.get('u_id')
+    u_id = int(request.args.get('u_id'))
 
     user_profile = user_profile_v1(token, u_id)
     return dumps(user_profile)
@@ -314,7 +313,7 @@ def sethandle():
     data = request.get_json()
 
     token = data["token"]
-    handle_str = data['handle']
+    handle_str = data['handle_str']
 
     profile_set_handle = user_profile_sethandle_v1(token, handle_str)
     return dumps(profile_set_handle)

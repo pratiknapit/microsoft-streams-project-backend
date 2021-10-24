@@ -5,7 +5,7 @@ import json
 
 @pytest.fixture
 def dummy_user():
-    requests.post(config.url + "/auth/register/v1", json={
+    requests.post(config.url + "/auth/register/v2", json={
         "email": "dummy1@gmail.com",
         "password": "password1",
         "name_first": "First",
