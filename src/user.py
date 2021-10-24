@@ -8,6 +8,9 @@ from src.data_store import save_data
 def users_all_v1(token):
 
     '''
+    When given a valid token, it returns a list of dictionaries of each user's details. 
+    Each user's details is a dictionary and there is a list of them. Hence a list of dictionaries.
+
     Arguments:
         token (str)     - A jwt encoded dictionary with u_id key
 
@@ -15,9 +18,10 @@ def users_all_v1(token):
         AccessError     - Occurs when the token is invalid
 
     Return Value:
-        Returns {users}, a list of dictionaries of each user's details (user id, email, first name, last name and handle)
+        Returns {users}, a list of dictionaries of each user's details 
+        (user id, email, first name, last name and handle)
     '''
-
+    # token check (AccessError if invalid token)
     if is_valid_token(token) == False:
         raise AccessError("Token not valid")
 
@@ -38,6 +42,9 @@ def users_all_v1(token):
 def user_profile_v1(token, u_id):
 
     '''
+    When given a valid u_id and valid token of the selected user,
+    it returns a profile (the user details) of that user.
+
     Arguments:
         token (str)     - A jwt encoded dictionary with u_id key
         u_id (int)      - The user id of the selected user's details which is to be returned
@@ -47,12 +54,14 @@ def user_profile_v1(token, u_id):
         InputError    - Entered user id is incorrect
 
     Return Value:
-        Returns {user}, a dictionary of the selected user's details (user id, email, first name, last name and handle)
+        Returns {user}, a dictionary of the selected user's details 
+        (user id, email, first name, last name and handle)
     '''
-
+    # Token check (AccessError if invalid token)
     if not token_check(token):
             raise AccessError ("Token provided is not valid")
 
+    # u_id check (InputError if invalid/incorrect u_id)
     if not user_id_check(u_id):
             raise InputError("Incorrect user id")
 
@@ -72,6 +81,9 @@ def user_profile_v1(token, u_id):
 def user_profile_setname_v1(token, name_first, name_last):
 
     '''
+    When provided with a valid token, the user can change their current first and last name to newer ones. 
+    This is on the condition that they are valid names.
+
     Arguments:
         token (str)     - A jwt encoded dictionary with u_id key
         name_first (str)        - The new first name of the user
@@ -86,13 +98,16 @@ def user_profile_setname_v1(token, name_first, name_last):
         Returns {}, an empty dictionary on the condition that everything is correct
     '''
 
+    # Token check (AccessError if invalid token)
     if not token_check(token):
             raise AccessError("Token provided is not valid")
 
+    # If first name isnt in correct range of length, it raises an InputError
     if (len(name_first) < 1 or len(name_first) > 50):
         raise InputError(
             "First name has to be between 1 and 50 characters inclusively")
 
+    # If last name isnt in correct range of length, it raises an InputError
     if (len(name_last) < 1 or len(name_last) > 50):
         raise InputError(
             "Last name has to be between 1 and 50 characters inclusively")
@@ -110,6 +125,9 @@ def user_profile_setname_v1(token, name_first, name_last):
 def user_profile_setemail_v1(token, email):
 
     '''
+    When provided with a valid token, the user can change their current email to a newer one. 
+    This is on the condition that the email is valid and not already taken by another user.
+
     Arguments:
         token (str)     - A jwt encoded dictionary with u_id key
         email (str)     - The new email of the user
@@ -123,17 +141,18 @@ def user_profile_setemail_v1(token, email):
         Returns {}, an empty dictionary on the condition that everything is correct 
     '''
 
+    # Token check (AccessError if invalid token)
     if token_check(token) == False:
         raise AccessError("Token provided is not valid")
 
+    # Raises an InputError if the new given email is not in a valid format
     if not email_check(email):
             raise InputError("Email is invalid")
 
+    # Raises an InputError if the new given email is already taken by someone else
     if email_repeat_check(email) == True:
             raise InputError("Email is already taken")
 
-    # Also validates the token, raises AccessError when token is invalid
-    # Change the name associated with the user
     id = is_valid_token(token) 
     data = data_store.get()
     for user in data['users']:
@@ -146,6 +165,9 @@ def user_profile_setemail_v1(token, email):
 def user_profile_sethandle_v1(token, handle_str):
 
     '''
+    When provided with a valid token, the user can change their current handle_str to a newer one. 
+    This is on the condition that the handle_str is valid and not already taken by another user.
+
     Arguments:
         token (str)     - A jwt encoded dictionary with u_id key
         handle_str (str)        - The new handle of the user
@@ -160,12 +182,15 @@ def user_profile_sethandle_v1(token, handle_str):
         Returns {}, an empty dictionary on the condition that everything is correct
     '''
 
+    # Token check (AccessError if invalid token)
     if token_check(token) == False:
         raise AccessError("Token provided is not valid")
     
+    # If handle string is not in correct range of length (between 3 and 20 characters inclusively)
     if (len(handle_str) < 3 or len(handle_str) > 20):
         raise InputError("Invalid handle_str")
 
+    # If handle string is already taken by another user, it raises an InputError
     if handle_check(handle_str) == True:
         raise InputError("Handle_str is already taken")
     
