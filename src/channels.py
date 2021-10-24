@@ -10,7 +10,7 @@ def channels_list_v1(token):
     <Provide a list of all channels that the authorised user is part of.>
 
     Arguments:
-        <auth_user_id> (Int)    - <Authorised user id.>
+        token (str)            - Token of a user after registration from auth_register
 
     Exceptions:
         AccessError     - Occurs when auth_user_id passed in is not a valid id.
@@ -31,7 +31,7 @@ def channels_listall_v1(token):
     <Provide a list of all channels, including private channels, (and their associated details).>
 
     Arguments:
-        <auth_user_id> (Int)  - Authorised user id.
+        token (str)            - Token of a user after registration from auth_register
 
     Exceptions:
         AccessError       - Occurs when auth_user_id passed in is not a valid id.
@@ -52,7 +52,7 @@ def channels_create_v1(token, name, is_public):
     <Creates a new channel with the given name that is either a public or private channel.>
 
     Arguments:
-        <auth_user_id> (Int)    - Authorised user id.
+        token (str)            - Token of a user after registration from auth_register
         <is_public> (Bool)    - Public or private channel.
 
     Exceptions:
