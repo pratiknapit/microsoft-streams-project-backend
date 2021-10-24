@@ -5,7 +5,6 @@ import json
 from src.data_store import save_data
 
 
-
 def users_all_v1(token):
     if is_valid_token(token) == False:
         raise AccessError("Token not valid")
@@ -45,8 +44,6 @@ def user_profile_v1(token, u_id):
                 },
             }
     
-
-
 def user_profile_setname_v1(token, name_first, name_last):
 
     if not token_check(token):
@@ -90,7 +87,6 @@ def user_profile_setemail_v1(token, email):
     
     save_data(data)
     return {}
-
 
 def user_profile_sethandle_v1(token, handle_str):
 
