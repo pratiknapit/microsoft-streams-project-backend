@@ -249,6 +249,21 @@ def channel_leave_v2(token, channel_id):
 
 def channel_add_owner_v2(token, channel_id, u_id):
 
+    '''
+        Arguments:
+            token (str)                 - Token of user that is trying to join channel
+            channel_id (int)            - The id of the channel that the user is trying to join
+            u_id (int)                  - The id of the user is trying to join
+
+
+        Exceptions:
+            InputError - Occurs when the inputted channel_id is not valid and user is not channel member
+            AccessError- Occurs when user not authorised and when user is trying to join private channel
+
+        Return Value:
+            Returns an empty dictionary
+    '''
+
     data = data_store.get()
 
     if token_check(token) == False:
@@ -278,6 +293,22 @@ def channel_add_owner_v2(token, channel_id, u_id):
     return add_owner_channel(channel_id, u_id)
     
 def channel_remove_owner_v2(token, channel_id, u_id):
+
+    '''
+        Arguments:
+            token (str)                 - Token of user that is trying to join channel
+            channel_id (int)            - The id of the channel that the user is trying to join
+            u_id (int)                  - The id of the user is trying to join
+
+
+        Exceptions:
+            InputError - Occurs when the inputted channel_id is not valid and user is not channel member
+            AccessError- Occurs when user not authorised and when user is trying to join private channel
+
+        Return Value:
+            Returns an empty dictionary
+    '''
+    
 
     if token_check(token) == False:
         raise AccessError(description="token not found")
