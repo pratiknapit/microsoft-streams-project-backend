@@ -6,7 +6,6 @@ from src.channels import channels_create_v1
 from src.other import clear_v1
 from src.data_store import login_token
 
-
 @pytest.fixture
 def dummy_cases():
     # Dummy case created for testing of different parts of channel_invite_v1

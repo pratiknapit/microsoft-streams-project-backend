@@ -5,7 +5,6 @@ from src.user import user_profile_v1
 from src.channels import channels_create_v1
 from src.other import clear_v1
 
-
 @pytest.fixture
 def dummy_cases():
 
@@ -19,11 +18,18 @@ def dummy_cases():
 def clear():
     clear_v1()    
 
-def test_invalid_token(clear, dummy_cases):
+def test_invalid_id(clear, dummy_cases):
     token, dummy_id = dummy_cases
     dummy_id = dummy_id + 1
+    with pytest.raises(InputError):
+        user_profile_v1(token, dummy_id)
+
+def test_invalid_token(clear, dummy_cases):
+    dummy_id = dummy_cases
+    token = 'yeetusdeletus'
     with pytest.raises(AccessError):
         user_profile_v1(token, dummy_id)
+
 
 def test_valid_output(clear, dummy_cases):
     token, dummy_id = dummy_cases

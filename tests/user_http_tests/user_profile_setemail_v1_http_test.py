@@ -3,8 +3,6 @@ import pytest
 from src import config
 import json
 
-
-
 @pytest.fixture
 def dummy_user():
     requests.post(config.url + "/auth/register/v2", json={
@@ -27,7 +25,14 @@ def clear():
     requests.delete(config.url + "/clear/v1")
 
 def test_already_taken_profile_setemail_v1(clear, dummy_user):
-    pass
+    user2 = dummy_user
+    new_setemail = "dummy1@gmail.com"
+    res = requests.put(config.url + "/user/profile/setemail/v1", json={
+        'token': user2['token'],
+        'email': new_setemail,
+    })
+    payload = res.json()
+    assert payload['code'] == 400 #InputError
 
 def test_invalid_profile_setemail_v1(clear, dummy_user):
     user2 = dummy_user
@@ -38,8 +43,6 @@ def test_invalid_profile_setemail_v1(clear, dummy_user):
     })
     payload = registration.json()
     assert payload['code'] == 400 #InputError
-    
-
 
 def test_valid_profile_setemail_v1(clear, dummy_user):
     user2 = dummy_user
@@ -50,6 +53,16 @@ def test_valid_profile_setemail_v1(clear, dummy_user):
     })
     payload = registration.json()
     assert payload == {}
+
+def test_invalid_token(clear, dummy_user):
+    token = 'pleasestopmakingmewritesomanytests'
+    new_setemail = "smartdummy@gmail.com"
+    registration = requests.put(config.url + "/user/profile/setemail/v1", json={
+        'token': token,
+        'email': new_setemail,
+    })
+    payload = registration.json()
+    assert payload['code'] == 403
 
 
 
