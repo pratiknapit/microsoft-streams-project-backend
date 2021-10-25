@@ -1,0 +1,6 @@
+************* Module tests.dm_details_test
+tests/dm_details_test.py:54:11: R1726: Boolean condition ''names' and 'members' in details' may be simplified to ''members' in details' (simplifiable-condition)
+
+--------------------------------------------------------------------
+Your code has been rated at 10.00/10 (previous run: 10.00/10, -0.00)
+
