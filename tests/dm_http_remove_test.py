@@ -28,7 +28,7 @@ def owner():
 @pytest.fixture
 def dm(owner, user0):
     dm = requests.post(config.url + '/dm/create/v1',
-                        json={'token':owner['token'], 'u_ids':[user0['auth_user_id']]})
+                        json={'token': owner['token'], 'u_ids':[user0['auth_user_id']]})
     return json.loads(dm.text)
 
 @pytest.fixture

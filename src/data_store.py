@@ -24,9 +24,9 @@ Example usage:
     data_store.set(store)
 '''
 import re
-from json import dumps
 import jwt
 import json
+import hashlib
 from src.error import InputError
 
 initial_object = {
@@ -95,7 +95,7 @@ def make_user(email, password, name_first, name_last, u_id):
     return {
             'u_id': u_id,
             'email': email,  
-            'password': password, 
+            'password': hash_password(password), 
             'name_first': name_first,
             'name_last': name_last, 
             'handle_str': create_handle(name_first, name_last),
@@ -103,6 +103,9 @@ def make_user(email, password, name_first, name_last, u_id):
             'channel_id_members': [],
             'is_global_owner': is_global_owner,
             'messages_created':[],
+            'session_list': [],
+            'notifications': [],
+            'sent_messages': [],
     }
 
 # Function to make message dictionary and returns message_id
@@ -125,9 +128,9 @@ def make_message(message, channel_id, u_id):
     return message_id
 
 logged_in_users = []
-def login_token(user):
+def create_token(user, session_id):
     SECRET = 'abcdedweidjwijdokfwkfwoqkqfw'
-    token = jwt.encode({'auth_user_id': user['u_id']}, SECRET, algorithm='HS256')
+    token = jwt.encode({'auth_user_id': user['u_id'], 'session_id': session_id}, SECRET, algorithm='HS256')
     logged_in_users.append(token)
     return token
 
@@ -144,7 +147,8 @@ def is_valid_token(token):
         user = next(
             (user for user in data['users'] if user['u_id'] == payload['auth_user_id']), False)
         if user:
-            return payload
+            if user['session_list'].count(payload['session_id']) != 0:
+                return payload
         return False
 
 # Token checker for logged_in_users
@@ -153,6 +157,9 @@ def token_check(token):
     if token in store: 
         return token
     return False
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
 def is_valid_user_id(auth_user_id):
     store = data_store.get()
@@ -313,7 +320,7 @@ def login_email(email):
 def password_check(password):
     data = data_store.get()
     for user in data['users']:
-        if user['password'] == password:
+        if user['password'] == hash_password(password):
             return user
     return False
 
