@@ -73,6 +73,7 @@ def add_channel(token, name, is_public):
     store['channels'].append(channel)
 
     data_store.set(store) 
+    save_data(store) 
     return channel
 
 # Function to add_user to list 
@@ -200,6 +201,8 @@ def user_channels(token):
                 user_list_channel['channels'].append(
                     {'channel_id': channel['channel_id'], 'name': channel['name']}
                 )
+    
+    save_data(store) 
         
     return user_list_channel
 
@@ -215,6 +218,8 @@ def user_all_channels(token):
         all_channels_list['channels'].append(
             {'channel_id': channel['channel_id'], 'name': channel['name']}
         )
+    
+    save_data(store) 
   
     return all_channels_list
 

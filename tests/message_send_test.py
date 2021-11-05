@@ -80,7 +80,7 @@ def test_message_send():
         message_send(token1, ch_id2, "ilegal")
 
     #creating channel messages
-    message_send(token1, ch_id1, 'h'*1000)
+    message_send(token1, ch_id1, 'h'*999)
     message_send(token1, ch_id1, 'hey')
 
     message_send(token2, ch_id2, "hello")

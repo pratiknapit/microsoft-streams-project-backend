@@ -11,7 +11,7 @@ from src.channels import channels_create_v1, channels_list_v1, channels_listall_
 from src.data_store import password_check, email_check, email_repeat_check
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1, auth_logout
-from src.message import message_send, message_edit, message_remove
+from src.message import message_send, message_edit, message_remove, notifications_get
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
 from src.user import user_profile_sethandle_v1, users_all_v1
 from src.dm import dm_create, dm_list, dm_remove, dm_details, dm_leave, dm_messages
@@ -356,6 +356,12 @@ def messages_dm():
     start = request.args.get('start')
     messages_dict = dm_messages(token, dm_id, start)
     return dumps(messages_dict)
+
+@APP.route("/notifications/get/v1", methods=['GET'])
+def notifications():
+    token = request.args.get('token')
+    notification_return = notifications_get(token); 
+    return dumps(notification_return)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

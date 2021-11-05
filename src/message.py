@@ -42,8 +42,8 @@ def message_send(token, channel_id, message):
 
     message_id = make_message(message, channel_id, user['u_id'])
         
-    for i in store:
-        if i['message_id'] == message_id:
+    for msg in store:
+        if msg['message_id'] == message_id:
             user['messages_created'].remove(message_id)
 
     return {
@@ -165,3 +165,16 @@ def message_remove(token, message_id):
 
     if not in_channel and not in_dm:
         raise InputError(description="Message no longer exists.")
+
+
+def notifications_get(token):
+
+    df = -1; 
+
+    return { 'notifications': [
+            {
+            'channel_id': df,
+            'dm_id': df,
+            'notification_message': "This is just a dummy message."
+        }]
+    }
