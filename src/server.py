@@ -1,6 +1,6 @@
 import sys
 import signal
-from json import dumps
+from json import dump, dumps
 from flask import Flask, request
 from src.channel import channel_add_owner_v2, channel_join_v1, channel_details_v1, channel_leave_v2
 from src.channel import channel_remove_owner_v2, channel_invite_v1, channel_messages_v1
@@ -12,9 +12,12 @@ from src.data_store import password_check, email_check, email_repeat_check
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1, auth_logout
 from src.message import message_send, message_edit, message_remove, notifications_get
+from src.standup import standup_start_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
 from src.user import user_profile_sethandle_v1, users_all_v1
 from src.dm import dm_create, dm_list, dm_remove, dm_details, dm_leave, dm_messages
+from src.standup import standup_active_v1, standup_start_v1, standup_send_v1
+
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -362,6 +365,25 @@ def notifications():
     token = request.args.get('token')
     notification_return = notifications_get(token); 
     return dumps(notification_return)
+
+@APP.route("/standup/start/v1", mehotds = ['POST'])
+def standup_start():
+    data = request.get_json()
+    response = standup_start_v1(data['token'], data['channel_id'], data['length'])
+    return dumps(response) 
+
+@APP.route("/standup/active/v1", methods=['GET'])
+def standup_active():
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    response = standup_active_v1(token, channel_id)
+    return dumps(response) 
+
+@APP.route("/standup/send/v1", methods=['POST'])
+def standup_send():
+    data = request.get_json()
+    standup_send_v1(data['token'], data['channel_id'], data['message'])
+    return dumps({})
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
