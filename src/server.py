@@ -11,7 +11,7 @@ from src.channels import channels_create_v1, channels_list_v1, channels_listall_
 from src.data_store import password_check, email_check, email_repeat_check
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1, auth_logout
-from src.message import message_send, message_edit, message_remove, notifications_get
+from src.message import message_react_v1, message_send, message_edit, message_remove, message_share_v1, notifications_get, message_unreact_v1
 from src.standup import standup_start_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
 from src.user import user_profile_sethandle_v1, users_all_v1
@@ -366,7 +366,7 @@ def notifications():
     notification_return = notifications_get(token); 
     return dumps(notification_return)
 
-@APP.route("/standup/start/v1", mehotds = ['POST'])
+@APP.route("/standup/start/v1", methods = ['POST'])
 def standup_start():
     data = request.get_json()
     response = standup_start_v1(data['token'], data['channel_id'], data['length'])
@@ -384,6 +384,25 @@ def standup_send():
     data = request.get_json()
     standup_send_v1(data['token'], data['channel_id'], data['message'])
     return dumps({})
+
+@APP.route("/message/share/v1", methods=['POST'])
+def message_share():
+    data = request.get_json()
+    message_share_v1(data['token'], data['og_message_id'], data['message'], data['channel_id'], data['dm_id'] )
+    return dumps({})
+
+@APP.route("/message/react/v1", methods=['POST'])
+def message_react():
+    data = request.get_json()
+    message_react_v1(data['token'], data['message_id'], data['react_id'])
+    return dumps({})
+
+@APP.route("/message/unreact/v1", methods=['POST'])
+def message_unreact():
+    data = request.get_json()
+    message_unreact_v1(data['token'], data['message_id'], data['react_id'])
+    return dumps({})
+
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

@@ -121,7 +121,8 @@ def make_message(message, channel_id, u_id):
                             'channel_id': channel_id, 
                             'message_id': message_id, 
                             'u_id': u_id, 
-                            'message': message, 
+                            'message': message,
+                            'reacts': []
                             })
     return message_id
 
@@ -456,6 +457,11 @@ def is_user_in_dm(dm_id, user_id):
     if dm['creator'] == user_id:
         return True
     return False
+
+#################################
+# Helper Functions for message.py
+#################################
+
 
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 

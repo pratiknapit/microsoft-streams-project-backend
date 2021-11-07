@@ -4,7 +4,7 @@ This file contains message_send, message_edit, message_remove
 from src.data_store import data_store, make_message
 from src.data_store import token_check, channel_id_check, message_id_check, save_data
 from src.data_store import is_valid_token, check_if_user_is_channel_member, token_to_user_id
-from src.data_store import auth_user_id_check, user_id_check, owner_channel_check 
+from src.data_store import auth_user_id_check, user_id_check, owner_channel_check, find_dm, is_valid_dm_id
 from src.error import InputError, AccessError
 
 def message_send(token, channel_id, message):
@@ -165,6 +165,134 @@ def message_remove(token, message_id):
 
     if not in_channel and not in_dm:
         raise InputError(description="Message no longer exists.")
+
+def message_share_v1(token, og_message_id, message, channel_id, dm_id): 
+
+    data = data_store.get()
+
+    #valid token check
+    if not is_valid_token(token):
+        raise AccessError(description="Not an authorised user invalid")
+
+    #valid channel id check 
+
+    if not channel_id_check(channel_id):
+        raise InputError(description='Channel does not exist')
+
+    #valid dm id check 
+
+    if not is_valid_dm_id(dm_id):
+        raise InputError(description='Not a valid dm')
+    
+    #check length of message is not more than 1000 characters
+    if (len(message) > 1000):
+        raise InputError('Message is longer than 1000 characters.')
+
+    if channel_id == -1:
+        #share the message to a dm 
+
+        #check if message is in dm datastore - use helper func
+
+        dm = find_dm(dm_id, data)
+        #send a dm msg
+
+        return 
+    else: 
+        #share message to a channel 
+
+        #check if message is in channel datastore - use helper func 
+
+
+        channel = channel_id_check(channel_id)
+        message_send(token, channel_id, f", {message}: {og_message_id}")
+
+def message_react_v1(token, message_id, react_id): 
+    """
+    Given a message within a channel or DM the authorised user is part of, 
+    add a "react" to that particular message.
+
+    """
+
+    data = data_store.get()
+
+    #token check 
+    if not is_valid_token(token):
+        raise AccessError(description="Not an authorised user invalid")
+
+    #check if react id is a valid react id - current the only valid react ID the frontend has 
+    # is 1
+
+    if react_id != 1:
+        raise InputError("React id must be 1.")
+
+
+    #check if message id is valid id (exists in the datastore channel or dm) 
+
+    message = message_id_check(message_id) #this will only check for messages in channels 
+    if message == None:
+        raise InputError("Message_id does not exist within a channel.")
+
+    react_user = token_to_user_id(token) 
+
+     #check if message already has a react with id react_id from the auth user
+    if not message['reacts']:
+        pass
+    else:
+        for react in message['reacts']:
+            for user in react['u_ids']:
+                if user == react_user:
+                    raise InputError("User has already reacted to this message.")
+            
+    if message['reacts'] != []:
+        for react in message['reacts']:
+            react['u_ids'].append(react_user)
+    
+    else:
+        u_ids = []
+        u_ids.append(react_user)
+        message['reacts'].append({'react_id': react_id, 'u_ids': u_ids, 'is_this_user_reacted': True})
+
+def message_unreact_v1(token, message_id, react_id): 
+
+    data = data_store.get()
+
+    #token check 
+    if not is_valid_token(token):
+        raise AccessError(description="Not an authorised user invalid")
+    
+    user = token_to_user_id(token)
+    
+    message = message_id_check(message_id) #this will only check for messages in channels 
+    
+    if message == None:
+        raise InputError("Message_id does not exist within a channel.")
+    
+    for react in message['reacts']:
+        for user_id in react['u_ids']:
+            if user_id == user:
+                react['u_ids'].remove(user)
+
+
+
+
+
+
+    
+
+
+
+
+ 
+
+
+    
+
+
+
+
+
+
+
 
 
 def notifications_get(token):
