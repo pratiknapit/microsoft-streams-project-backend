@@ -37,7 +37,6 @@ def owner_token():
                         json={'email': "dmcreator@gmail.com", 'password': "TestTest1"})
     return json.loads(owner.text)['token']
 
-
 @pytest.fixture
 def clear():
     requests.delete(config.url + '/clear/v1')

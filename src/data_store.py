@@ -36,6 +36,7 @@ initial_object = {
     ],
     'dms': [
     ],
+    'msg_counter': 0,
 }
 # Channels Helper Check Functions 
 
@@ -117,13 +118,15 @@ def make_message(message, channel_id, u_id):
     message_id = m_id + 1
     user = user_id_check(u_id)
     user['messages_created'].append(message_id)
-
+    is_pinned = False
+    
     channel = channel_id_check(channel_id)
     channel['Messages'].append({
                             'channel_id': channel_id, 
                             'message_id': message_id, 
                             'u_id': u_id, 
                             'message': message, 
+                            'is_pinned': is_pinned,
                             })
     return message_id
 
@@ -403,7 +406,7 @@ def save_data(data):
 #Helper Function for message.py#
 ################################
 def owner_channel_check(token, channel_id):
-    u_id = token_to_user_id(token)                  #checks if it's a valid user
+    u_id = token_to_user_id(token)                  # checks if it's a valid user
     channel = channel_id_check(channel_id)
     if channel == None:
         raise InputError
@@ -412,10 +415,22 @@ def owner_channel_check(token, channel_id):
         if member == u_id:
             return True
     return False
+
+def find_message_source(message_id, data):
+    for channel in data['channels']:
+        for message in channel['Messages']:
+            if message['message_id'] == message_id:
+                return channel
+
+    for dm in data['dms']:
+        for message in dm['messages']:
+            if message['message_id'] == message_id:
+                return dm
+    return None
 #############################
 # Helper Functions for dm.py#
 #############################
-def find_user(u_id):
+def find_user(u_id):                                # == auth_user_id function
     store = data_store.get()
     for user in store['users']:
         if user['u_id'] == u_id:
@@ -443,8 +458,8 @@ def is_valid_dm_id(dm_id):
 def is_user_in_channel(channel_id, user_id):
     store = data_store.get()
     channel = find_channel(channel_id, store)
-    for member in channel['members']:
-        if member['user_id'] == user_id:
+    for member in channel['all_members']:
+        if member == user_id:
             return True
     return False
 
