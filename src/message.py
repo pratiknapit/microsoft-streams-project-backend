@@ -420,7 +420,3 @@ def message_unpin(token, message_id):
     save_data(data)
 
     return {}
-
-
-
-
