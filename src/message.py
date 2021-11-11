@@ -169,7 +169,6 @@ def message_remove(token, message_id):
     if not in_channel and not in_dm:
         raise InputError(description="Message no longer exists.")
 
-<<<<<<< HEAD
 def message_share_v1(token, og_message_id, message, channel_id, dm_id): 
 
     data = data_store.get()
@@ -310,7 +309,6 @@ def notifications_get(token):
             'notification_message': "This is just a dummy message."
         }]
     }
-=======
 
 def message_senddm(token, dm_id, message):
 
@@ -562,4 +560,3 @@ def message_unpin(token, message_id):
     save_data(data)
 
     return {}
->>>>>>> master
