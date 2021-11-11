@@ -1,5 +1,6 @@
 from json import load 
 from src.data_store import channel_id_check, data_store, token_to_user_id, save_data
+from src.data_store import is_valid_token
 from os import access 
 from datetime import datetime, timezone
 import threading
@@ -11,12 +12,24 @@ def standup_start_v1(token, channel_id, length):
     data = data_store.get() 
 
     #token check 
+    if not is_valid_token(token):
+        raise AccessError(description="not an authorised user")
 
     #channel id check 
 
+    if not channel_id_check(channel_id):
+        raise InputError(description='channel_id does not refer to a valid channel')
+
     #standup active check 
     if standup_active_v1(token, channel_id)['is_active'] == True:
-        raise InputError("Standup already in progress")
+        raise InputError("an active standup is currently running in the channel")
+
+    #check if length is negative 
+
+    if length <= 0: 
+        raise InputError("length is a negative integer")
+    
+    #check if token user is part of the channel.
 
     channel = channel_id_check(channel_id)
     channel['standup']['is_active'] = True
@@ -52,16 +65,22 @@ def standup_end(*args):
     global t 
     t.cancel()
 
+    return {}
+
 
 def standup_active_v1(token, channel_id):
 
     data = data_store.get()
 
     #check valid token
+    if not is_valid_token(token):
+        raise AccessError(description="not an authorised user")
 
     #check if channel_id is an int type variable 
 
     #check valid channel id
+    if not channel_id_check(channel_id):
+        raise InputError(description='channel_id does not refer to a valid channel')
 
     channel = channel_id_check(channel_id)
 
@@ -81,15 +100,20 @@ def standup_send_v1(token, channel_id, message):
     data = data_store.get()
 
     #check valid token
+    if not is_valid_token(token):
+        raise AccessError(description="not an authorised user")
 
     #check if channel_id is an int type variable 
 
     #check valid channel id
+    if not channel_id_check(channel_id):
+        raise InputError(description='channel_id does not refer to a valid channel')
+
 
     if len(message) > 1000: 
         raise InputError("Message is longer than 1000 characters.")
     
-    if not standup_active_v1(token, channel_id)['is_active']:
+    if standup_active_v1(token, channel_id)['is_active'] == False:
         raise InputError("No active standup")
     
     channel = channel_id_check(channel_id)

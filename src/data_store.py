@@ -60,6 +60,7 @@ def make_channel(channel_id, name, is_public):
         'owner_members': [],
         'all_members': [],
         'Messages': [],
+        'standup': {}
     }
         
 # Function to add_channel to list 

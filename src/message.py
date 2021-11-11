@@ -191,28 +191,49 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     if (len(message) > 1000):
         raise InputError('Message is longer than 1000 characters.')
 
-    if channel_id == -1:
-        #share the message to a dm 
+    if channel_id == -1 and dm_id == -1:
+        raise InputError("A channel if or dm if must be an input.")
 
-        #check if message is in dm datastore - use helper func
+    if channel_id != -1 and dm_id != -1:
+        raise InputError("A channel if or dm if must be an input.")
 
-        dm = find_dm(dm_id, data)
-        #send a dm msg
+    auth_user = token_to_user_id(token)
+    user = auth_user_id_check(auth_user)
+    user_handle = user['handle_str']
 
-        return 
-    else: 
+    if channel_id != -1:
         #share message to a channel 
 
         #check if message is in channel datastore - use helper func 
+        og_message = message_id_check(og_message_id)
+        new_message = message + '\n"""\n' + og_message + '\n"""\n'
 
+        #channel = channel_id_check(channel_id)
+        msg_send = message_send(token, channel_id, f"{user_handle} shared this {message}: {new_message}")
+        save_data(data)
+        return { 'shared_message_id': msg_send['message_id']}
+    
+    if dm_id != -1: 
+        #share the message to a dm 
+        og_message = find_dm(dm_id, data)
+        new_message = message + '\n"""\n' + og_message + '\n"""\n'
 
-        channel = channel_id_check(channel_id)
-        message_send(token, channel_id, f", {message}: {og_message_id}")
+        #check if message is in dm datastore - use helper func
+
+        dm_send = message_senddm(token, dm_id, new_message)
+        save_data(data)
+        return { 'shared_message_id': dm_send['message_id']}
+        #send a dm msg
+    
+    
+        
 
 def message_react_v1(token, message_id, react_id): 
     """
     Given a message within a channel or DM the authorised user is part of, 
     add a "react" to that particular message.
+
+    Need to add dm implementation. But first test with channel msgs.
 
     """
 
@@ -235,7 +256,7 @@ def message_react_v1(token, message_id, react_id):
     if message == None:
         raise InputError("Message_id does not exist within a channel.")
 
-    react_user = token_to_user_id(token) 
+    react_user_id = token_to_user_id(token) 
 
      #check if message already has a react with id react_id from the auth user
     if not message['reacts']:
@@ -243,19 +264,36 @@ def message_react_v1(token, message_id, react_id):
     else:
         for react in message['reacts']:
             for user in react['u_ids']:
-                if user == react_user:
+                if user == react_user_id:
                     raise InputError("User has already reacted to this message.")
             
     if message['reacts'] != []:
         for react in message['reacts']:
-            react['u_ids'].append(react_user)
+            react['u_ids'].append(react_user_id)
     
     else:
         u_ids = []
-        u_ids.append(react_user)
-        message['reacts'].append({'react_id': react_id, 'u_ids': u_ids, 'is_this_user_reacted': True})
+        u_ids.append(react_user_id)
+        message['reacts'].append({'react_id': react_id, 'u_ids': u_ids})
+
+    #Add notification to the user's notifications
+
+    react_user = auth_user_id_check(react_user_id)
+    react_user_str_handle = react_user['handle_str']
+
+    user_og_msg_id = message['u_id'] 
+    user_og = auth_user_id_check(user_og_msg_id)
+    channel_name = channel_id_check(message['channel_id'])['name']
+    notif_message = f"{react_user_str_handle} reacted to your message in {channel_name}"
+    user_og['notifications'].append({'channel_id': message['channel_id'], 'dm_id': -1, 'notification_message': notif_message})
+    
+    save_data(data)
+
+    return {}
 
 def message_unreact_v1(token, message_id, react_id): 
+
+    #Still need to implement for dm use.
 
     data = data_store.get()
 
@@ -267,6 +305,9 @@ def message_unreact_v1(token, message_id, react_id):
     
     message = message_id_check(message_id) #this will only check for messages in channels 
     
+    if react_id != 1:
+        raise InputError("React id must be 1.")
+        
     if message == None:
         raise InputError("Message_id does not exist within a channel.")
     
@@ -275,39 +316,22 @@ def message_unreact_v1(token, message_id, react_id):
             if user_id == user:
                 react['u_ids'].remove(user)
 
+    save_data(data)
 
-
-
-
-
-    
-
-
-
-
- 
-
-
-    
-
-
-
-
-
-
-
+    return {}
 
 
 def notifications_get(token):
 
-    df = -1; 
+    user_id = token_to_user_id(token)
+    user = auth_user_id_check(user_id)
+    return_list = [] 
+    i = 0; 
+    while (i < 20):
+        return_list.append(user['notifcations'][i])
+        i = i + 1
 
-    return { 'notifications': [
-            {
-            'channel_id': df,
-            'dm_id': df,
-            'notification_message': "This is just a dummy message."
-        }]
+    return { 'notifications': return_list 
     }
 
 def message_senddm(token, dm_id, message):
