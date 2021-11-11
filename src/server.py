@@ -11,7 +11,7 @@ from src.channels import channels_create_v1, channels_list_v1, channels_listall_
 from src.data_store import password_check, email_check, email_repeat_check
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1, auth_logout
-from src.message import message_send, message_edit, message_remove
+from src.message import message_send, message_edit, message_remove, message_senddm, message_sendlater, message_sendlaterdm, message_pin, message_unpin
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
 from src.user import user_profile_sethandle_v1, users_all_v1
 from src.dm import dm_create, dm_list, dm_remove, dm_details, dm_leave, dm_messages
@@ -271,6 +271,39 @@ def remove_message():
     message_id = int(data['message_id'])
     
     message_remove(token, message_id)   
+    return dumps({})
+
+@APP.route("/message/senddm/v1", methods=["POST"])
+def senddm_message():
+    data = request.get_json()
+    token = data['token']
+    dm_id = data['dm_id']
+    message = data['message']
+    message_id = message_senddm(token, dm_id, message)
+    return dumps(message_id)
+
+@APP.route("/message/sendlater/v1", methods=['POST'])
+def sendlater_message():
+    data = request.get_json()
+    message_id = message_sendlater(data['token'], data['channel_id'], data['message'], data['time_sent'])
+    return dumps(message_id)
+
+@APP.route("/message/sendlaterdm/v1", methods=['POST'])
+def sendlaterdm_message():
+    data = request.get_json()
+    message_id = message_sendlaterdm(data['token'], data['dm_id'], data['message'], data['time_sent'])
+    return dumps(message_id)
+
+@APP.route("/message/pin/v1", methods=["POST"])
+def pin_message():
+    data = request.get_json()
+    message_pin(data['token'], data['message_id'])
+    return dumps({})
+
+@APP.route("/message/unpin/v1", methods=["POST"])
+def unpin_message():
+    data = request.get_json()
+    message_unpin(data['token'], data['message_id'])
     return dumps({})
 
 @APP.route("/users/all/v1", methods=["GET"])
