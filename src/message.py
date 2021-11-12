@@ -175,17 +175,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
     #valid token check
     if not is_valid_token(token):
-        raise AccessError(description="Not an authorised user invalid")
-
-    #valid channel id check 
-
-    if not channel_id_check(channel_id):
-        raise InputError(description='Channel does not exist')
-
-    #valid dm id check 
-
-    if not is_valid_dm_id(dm_id):
-        raise InputError(description='Not a valid dm')
+        raise AccessError(description="Not an authorised user invalid") 
     
     #check length of message is not more than 1000 characters
     if (len(message) > 1000):
@@ -203,18 +193,22 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
     if channel_id != -1:
         #share message to a channel 
+        if not channel_id_check(channel_id):
+            raise InputError(description='Channel does not exist')
 
         #check if message is in channel datastore - use helper func 
         og_message = message_id_check(og_message_id)
-        new_message = message + '\n"""\n' + og_message + '\n"""\n'
+        new_message = message + '\n"""\n' + og_message['message'] + '\n"""\n'
 
         #channel = channel_id_check(channel_id)
         msg_send = message_send(token, channel_id, f"{user_handle} shared this {message}: {new_message}")
         save_data(data)
-        return { 'shared_message_id': msg_send['message_id']}
+        return {'shared_message_id': msg_send['message_id']}
     
     if dm_id != -1: 
         #share the message to a dm 
+        if not is_valid_dm_id(dm_id):
+            raise InputError(description='Not a valid dm')
         og_message = find_dm(dm_id, data)
         new_message = message + '\n"""\n' + og_message + '\n"""\n'
 
@@ -222,7 +216,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
         dm_send = message_senddm(token, dm_id, new_message)
         save_data(data)
-        return { 'shared_message_id': dm_send['message_id']}
+        return {'shared_message_id': dm_send['message_id']}
         #send a dm msg
     
     
@@ -270,11 +264,17 @@ def message_react_v1(token, message_id, react_id):
     if message['reacts'] != []:
         for react in message['reacts']:
             react['u_ids'].append(react_user_id)
+            if react_user_id == message['u_id']:
+                react['is_this_user_reacted'] == True 
     
     else:
         u_ids = []
         u_ids.append(react_user_id)
-        message['reacts'].append({'react_id': react_id, 'u_ids': u_ids})
+        if react_user_id == message['u_id']:
+            user_reacted = True
+        else:
+            user_reacted = False
+        message['reacts'].append({'react_id': react_id, 'u_ids': u_ids, 'is_this_user_reacted': user_reacted})
 
     #Add notification to the user's notifications
 

@@ -5,7 +5,7 @@ from src.auth import auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.channel import channel_join_v1, channel_leave_v2, channel_add_owner_v2, channel_details_v1, channel_remove_owner_v2
 from src.data_store import channel_id_check, data_store
-from src.message import message_send, message_edit, message_remove
+from src.message import message_send, message_edit, message_remove, message_share_v1
 from src.other import clear_v1
 from src.dm import dm_create 
 
@@ -94,13 +94,35 @@ def test_dm_create(clear, user1, user2):
         if dm['dm_id'] == dm_id:
             assert dm['creator'] == user1['auth_user_id']
 
-def test_dm_messages(clear, user1, user2):
-
-    data = data_store.get()
 
     
 
-def test_message_share():
-    return 
+def test_message_share_to_same_channel(clear, user1, channel1):
+    message = "hello"
+    message_id = message_send(user1['token'], channel1['channel_id'], message)['message_id']
+    channel = channel_id_check(channel1['channel_id'])
+    for msg in channel['Messages']:
+        if msg['message_id'] == message_id:
+            assert message == msg['message']
+
+    #Now that a msg has been sent, can we share this msg to the same channel
+    new_message = "bye"
+    return_msg = message_share_v1(user1['token'], message_id, new_message, channel['channel_id'], -1)
+    assert return_msg == {'shared_message_id': return_msg['shared_message_id']}
+
+
+def test_message_share_to_different_channel(clear, user1,channel1, channel2):
+    message = "hello"
+    message_id = message_send(user1['token'], channel1['channel_id'], message)['message_id']
+    channel = channel_id_check(channel1['channel_id'])
+    for msg in channel['Messages']:
+        if msg['message_id'] == message_id:
+            assert message == msg['message']
+
+    #Now that a msg has been sent, can we share this msg to the same channel
+    new_message = "bye"
+    return_msg = message_share_v1(user1['token'], message_id, new_message, channel2['channel_id'], -1)
+    assert return_msg == {'shared_message_id': return_msg['shared_message_id']}
+    
     
 

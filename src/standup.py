@@ -1,9 +1,12 @@
 from json import load 
-from src.data_store import channel_id_check, data_store, token_to_user_id, save_data
+from src.data_store import auth_user_id_check, channel_id_check, data_store, token_to_user_id, save_data
 from src.data_store import is_valid_token
+from src.auth import auth_register_v1
+from src.channels import channels_create_v1
 from os import access 
 from datetime import datetime, timezone
 import threading
+import time
 from src.error import AccessError, InputError
 
 from src.message import message_send 
@@ -34,7 +37,7 @@ def standup_start_v1(token, channel_id, length):
     channel = channel_id_check(channel_id)
     channel['standup']['is_active'] = True
     channel['standup']['time_finish'] = datetime.now().replace(tzinfo=timezone.utc).timestamp() + length
-    channel['standup']['messages'] = ''
+    channel['standup']['messages'] = ""
     channel['standup']['user_id'] = token_to_user_id(token) 
 
     global t
@@ -44,16 +47,17 @@ def standup_start_v1(token, channel_id, length):
 
     save_data(data)
 
-    return; 
+    return {'time_finish': channel['standup']['time_finish']}
 
 
 def standup_end(*args):
 
-    channel = channel_id_check[args[1]]
+    channel = channel_id_check(args[1])
 
     message = channel['standup']['messages']
 
-    message_send(args[0], args[1], message)
+    if len(message) != 0:
+        message_send(args[0], args[1], message) #at the end of the timer, send all the queued msgs
 
     data = data_store.get()
 
@@ -83,7 +87,6 @@ def standup_active_v1(token, channel_id):
         raise InputError(description='channel_id does not refer to a valid channel')
 
     channel = channel_id_check(channel_id)
-
     if channel['standup']['is_active'] == False:
         return {
             'is_active': False,
@@ -118,8 +121,21 @@ def standup_send_v1(token, channel_id, message):
     
     channel = channel_id_check(channel_id)
 
-    channel['standup']['messages'] = channel['standup']['messages'] + ' ' + message
+    user_id = token_to_user_id(token) 
+    user_handle = auth_user_id_check(user_id)['handle_str']
+
+    if len(channel['standup']['messages']) == 0: #empty string 
+        channel['standup']['messages'] = f"{user_handle}: {message}"
+    else: 
+        channel['standup']['messages'] = channel['standup']['messages'] + '\n' f"{user_handle}: {message}"
 
     save_data(data) 
 
     return {} 
+
+
+if __name__ == '__main__':
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+    channel_user1 = channels_create_v1(dummy_user_1['token'], "channel1", True)
+    standup_start_v1(dummy_user_1['token'], channel_user1['channel_id'], 1)
+    
