@@ -326,13 +326,22 @@ def notifications_get(token):
     user_id = token_to_user_id(token)
     user = auth_user_id_check(user_id)
     return_list = [] 
-    i = 0; 
-    while (i < 20):
-        return_list.append(user['notifcations'][i])
-        i = i + 1
+    if len(user['notifications']) == 0:
+        return {'notifications': return_list }
+    
+    elif len(user['notifications']) <= 20:
+        for notifs in user['notifications']:
+            return_list.append(notifs)
+        return {'notifications': return_list }
 
-    return { 'notifications': return_list 
-    }
+    else:
+        i = 0; 
+        while (i < 20):
+            return_list.append(user['notifications'][i])
+            i = i + 1
+
+        return {'notifications': return_list 
+        }
 
 def message_senddm(token, dm_id, message):
 

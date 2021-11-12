@@ -18,6 +18,7 @@ from src.user import user_profile_v1, user_profile_setname_v1, user_profile_sete
 from src.user import user_profile_sethandle_v1, users_all_v1
 from src.dm import dm_create, dm_list, dm_remove, dm_details, dm_leave, dm_messages
 from src.standup import standup_active_v1, standup_start_v1, standup_send_v1
+from src.admin import admin_user_permission_change_v1
 
 
 def quit_gracefully(*args):
@@ -435,6 +436,12 @@ def message_react():
 def message_unreact():
     data = request.get_json()
     message_unreact_v1(data['token'], data['message_id'], data['react_id'])
+    return dumps({})
+
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+def admin_user_permission_change():
+    data = request.get_json()
+    admin_user_permission_change_v1(data['token'], data['u_id'], data['permission_id'])
     return dumps({})
 
 

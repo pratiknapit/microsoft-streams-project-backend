@@ -114,6 +114,7 @@ def make_user(email, password, name_first, name_last, u_id):
             'session_list': [],
             'notifications': [],
             'sent_messages': [],
+            'permission_id': is_global_owner
     }
 
 # Function to make message dictionary and returns message_id
