@@ -110,3 +110,24 @@ def test_last_message(clear, token, channel_id):
     end = channel_messages_v1(token, channel_id, 0)['end']
     assert end == -1
     clear_v1()
+
+def test_more_messages(clear, token, channel_id):
+    count = 60
+    while count >= 0:
+        message_send(token, channel_id, f"{count}")
+        count -= 1
+
+    # Test first 50 newest messages
+    message_1 = channel_messages_v1(token, channel_id, 0)['messages'][49]['message']
+    assert message_1 == "49"
+    # Test the first message in the returned message dictionary
+    message_2 = channel_messages_v1(token, channel_id, 10)['messages'][0]['message']
+    assert message_2 == "10"
+    # Test the second message in the returned message dictionary
+    message_3 = channel_messages_v1(token, channel_id, 30)['messages'][1]['message']
+    assert message_3 == '31'
+    # Test the earliest message that was sent to the channel
+    message_4 = channel_messages_v1(token, channel_id, 60)['messages'][0]['message']
+    assert message_4 == '60'
+
+    clear_v1()

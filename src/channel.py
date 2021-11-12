@@ -327,5 +327,3 @@ def channel_remove_owner_v2(token, channel_id, u_id):
             raise AccessError
     
     return remove_owner_channel(channel_id, u_id)
-
-

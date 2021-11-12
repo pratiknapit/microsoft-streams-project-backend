@@ -7,39 +7,39 @@ def clear():
     requests.delete(config.url + '/clear/v1')
 
 @pytest.fixture
-def token():
-    email = "testmail@gamil.com"
+def toke():
+    email = "testmail@gmail.com"
     password = "Testpass12345"
     first_name = "firstname"
     last_name = "lastname"
-    auth_resp = requests.post(config.url + '/auth/register/v2', json={
+
+    token = requests.post(config.url + '/auth/register/v2', json={
         'email': email,
         'password': password,
         'name_first': first_name,
         'name_last': last_name
-    }).json()
-    token = auth_resp['token']
+    }).json()['token']
     return token
 
 @pytest.fixture
-def channel_id(token):
-    resp = requests.post(config.url + '/channels/create', json={
-        'token': token,
+def channel_id(toke):
+    resp = requests.post(config.url + '/channels/create/v2', json={
+        'token': toke,
         'name': "channelName1",
         'is_public': True
     }).json()
 
     channel_id = resp['channel_id']
     return channel_id
-'''
-def test_invalid_input(token, channel_id):
+
+def test_invalid_input(toke, channel_id):
     resp1 = requests.get(config.url + '/channel/messages/v2', params={
-        'token': token,
+        'token': toke,
         'channel_id': "abc",
         'start': 0
     })
     resp2 = requests.get(config.url + '/channel/messages/v2', params={
-        'token': token,
+        'token': toke,
         'channel_id': channel_id,
         'start': "ab"
     })
@@ -59,9 +59,9 @@ def test_invalid_token(clear, channel_id):
     status_code = resp.status_code
     assert status_code == 403
 
-def test_invalid_channel_id(clear, token, channel_id):
+def test_invalid_channel_id(clear, toke, channel_id):
     resp = requests.get(config.url + '/channel/messages/v2', params={
-        'token': token,
+        'token': toke,
         'channel_id': channel_id + 1,
         'start': 0
     })
@@ -85,9 +85,9 @@ def test_user_not_in_channel(clear, channel_id):
     status_code = resp.status_code
     assert status_code == 403
 
-def test_invalid_start(clear, token, channel_id):
+def test_invalid_start(toke, channel_id):
     resp = requests.get(config.url + '/channel/messages/v2', params={
-        'token': token,
+        'token': toke,
         'channel_id': channel_id,
         'start': 51
     })
@@ -95,20 +95,19 @@ def test_invalid_start(clear, token, channel_id):
     status_code = resp.status_code
     assert status_code == 400
 
-def test_messages(clear, token, channel_id):
+def test_messages(clear, toke, channel_id):
     for i in range(3):
         requests.post(config.url + '/message/send/v1', json={
-            'token': token,
+            'token': toke,
             'channel_id': channel_id,
             'message': f"{i}"
         })
 
     messages_dict = requests.get(config.url + '/channel/messages/v2', params={
-            'token': token,
+            'token': toke,
             'channel_id': channel_id,
             'start': 0
         })
     resp_dict = messages_dict.json()
     assert messages_dict.status_code == 200
     assert 'messages' and 'start' and 'end' in resp_dict
-'''
