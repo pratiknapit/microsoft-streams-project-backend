@@ -60,6 +60,12 @@ def make_channel(channel_id, name, is_public):
         'owner_members': [],
         'all_members': [],
         'Messages': [],
+        'standup': {
+            'is_active': False,
+            'time_finish': None,
+            'messages': "",
+            'user_id': -1
+        }
     }
         
 # Function to add_channel to list 
@@ -74,6 +80,7 @@ def add_channel(token, name, is_public):
     store['channels'].append(channel)
 
     data_store.set(store) 
+    save_data(store) 
     return channel
 
 # Function to add_user to list 
@@ -107,6 +114,7 @@ def make_user(email, password, name_first, name_last, u_id):
             'session_list': [],
             'notifications': [],
             'sent_messages': [],
+            'permission_id': is_global_owner
     }
 
 # Function to make message dictionary and returns message_id
@@ -125,7 +133,8 @@ def make_message(message, channel_id, u_id):
                             'channel_id': channel_id, 
                             'message_id': message_id, 
                             'u_id': u_id, 
-                            'message': message, 
+                            'message': message,
+                            'reacts': [],
                             'is_pinned': is_pinned,
                             })
     return message_id
@@ -210,6 +219,8 @@ def user_channels(token):
                 user_list_channel['channels'].append(
                     {'channel_id': channel['channel_id'], 'name': channel['name']}
                 )
+    
+    save_data(store) 
         
     return user_list_channel
 
@@ -225,6 +236,8 @@ def user_all_channels(token):
         all_channels_list['channels'].append(
             {'channel_id': channel['channel_id'], 'name': channel['name']}
         )
+    
+    save_data(store) 
   
     return all_channels_list
 
@@ -473,6 +486,11 @@ def is_user_in_dm(dm_id, user_id):
     if dm['creator'] == user_id:
         return True
     return False
+
+#################################
+# Helper Functions for message.py
+#################################
+
 
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
