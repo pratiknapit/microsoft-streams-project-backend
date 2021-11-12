@@ -258,7 +258,7 @@ def edit_message():
 
     token = data['token']
     message_id = data['message_id']
-    message = data['message']
+    message = data['new_message']
     
     message_edit(token, message_id, message)
     return dumps({})
