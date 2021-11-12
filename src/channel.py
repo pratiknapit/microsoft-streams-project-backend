@@ -54,6 +54,18 @@ def channel_invite_v1(token, channel_id, u_id):
     #user['channel_id_members'].append(channel_id)
     #data_store.set(data)
 
+
+    #Adding this to notifications
+    user_id = token_to_user_id(token)
+    react_user = auth_user_id_check(user_id)
+    channel = channel_id_check(channel_id)
+    
+    react_user_str_handle = react_user['handle_str']
+    channel_name = channel['name']
+    notif_message = f"{react_user_str_handle} added you to {channel_name}"
+    user_notif = auth_user_id_check(u_id)
+    user_notif['notifications'].append({'channel_id': channel_id, 'dm_id': -1, 'notification_message': notif_message})
+
     return {}
 
 
