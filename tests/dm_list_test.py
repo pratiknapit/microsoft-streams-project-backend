@@ -4,11 +4,13 @@ from src.error import AccessError, InputError
 from src.auth import auth_register_v1
 from src.dm import dm_list, dm_create
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def clear():
     clear_v1() 
+    yield
+    clear_v1
 
-def test_token_user_nonexistent(clear):
+def test_token_user_nonexistent():
 
     invalid_token = 100000
 
@@ -16,7 +18,7 @@ def test_token_user_nonexistent(clear):
         dm_list(invalid_token)
 
 
-def test_success_case(clear):
+def test_success_case():
 
     admin = auth_register_v1('test1@unsw.au', 'password1', 'first1', 'last1')
     member_1 = auth_register_v1(

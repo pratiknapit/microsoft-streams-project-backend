@@ -73,12 +73,12 @@ def message_edit(token, message_id, new_message):
         Empty dictionary
     '''
     if len(new_message) > 1000:
-        raise InputError(description='Message over 1000 characters.')
-    if message_id_check(message_id) == None:
-        raise InputError
+        raise InputError('Message over 1000 characters.')
+    if message_id_check(message_id) == False:
+        raise InputError('message_id does not refer to a valid message within channel/DM')
     decoded_token = is_valid_token(token)
     if decoded_token is False:
-        raise AccessError(description='Invalid Token.')
+        raise AccessError('Invalid Token.')
 
     message = message_id_check(message_id)
 
@@ -163,7 +163,8 @@ def message_remove(token, message_id):
         for dm in data['dms']:
             for message in dm['messages']:
                 if message['message_id'] == message_id:
-                    dm['messages'].remove(message)                    
+                    dm['messages'].remove(message)     
+                    save_data(data)               
                     return {}
 
     if not in_channel and not in_dm:
