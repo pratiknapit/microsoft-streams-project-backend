@@ -331,11 +331,11 @@ def notifications_get(token):
     
     elif len(user['notifications']) <= 20:
         for notifs in user['notifications']:
-            return_list.append(notifs)
+            return_list.append(notifs) 
         return {'notifications': return_list }
 
     else:
-        i = 0; 
+        i = 0
         while (i < 20):
             return_list.append(user['notifications'][i])
             i = i + 1

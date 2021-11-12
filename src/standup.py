@@ -88,11 +88,13 @@ def standup_active_v1(token, channel_id):
 
     channel = channel_id_check(channel_id)
     if channel['standup']['is_active'] == False:
+        save_data(data) 
         return {
             'is_active': False,
             'time_finish': None
         }
     else: 
+        save_data(data) 
         return {
             'is_active': True,
             'time_finish': channel['standup']['time_finish']
