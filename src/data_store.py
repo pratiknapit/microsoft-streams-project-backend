@@ -334,7 +334,7 @@ def message_id_check(message_id):
         for message in channel['Messages']:
             if message['message_id'] == message_id:
                 return message
-    return None
+    return False
 
 def channel_id_check(channel_id):
     store = data_store.get()
