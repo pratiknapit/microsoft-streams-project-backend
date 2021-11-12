@@ -1,3 +1,4 @@
+"""
 import pytest
 import requests
 from src import config
@@ -8,7 +9,7 @@ def clear():
 
 @pytest.fixture
 def token():
-    email = "testmail@gamil.com"
+    email = "testmail@gmail.com"
     password = "Testpass12345"
     first_name = "firstname"
     last_name = "lastname"
@@ -23,7 +24,7 @@ def token():
 
 @pytest.fixture
 def channel_id(token):
-    resp = requests.post(config.url + '/channels/create', json={
+    resp = requests.post(config.url + '/channels/create/v2', json={
         'token': token,
         'name': "channelName1",
         'is_public': True
@@ -31,7 +32,7 @@ def channel_id(token):
 
     channel_id = resp['channel_id']
     return channel_id
-'''
+
 def test_invalid_input(token, channel_id):
     resp1 = requests.get(config.url + '/channel/messages/v2', params={
         'token': token,
@@ -97,7 +98,7 @@ def test_invalid_start(clear, token, channel_id):
 
 def test_messages(clear, token, channel_id):
     for i in range(3):
-        requests.post(config.url + '/message/send/v1', json={
+        requests.post(config.url + '/message/send/v2', json={
             'token': token,
             'channel_id': channel_id,
             'message': f"{i}"
@@ -107,8 +108,8 @@ def test_messages(clear, token, channel_id):
             'token': token,
             'channel_id': channel_id,
             'start': 0
-        })
-    resp_dict = messages_dict.json()
-    assert messages_dict.status_code == 200
-    assert 'messages' and 'start' and 'end' in resp_dict
-'''
+        }).json()
+
+    assert messages_dict['messages'][0]['message'] == '2'
+
+"""

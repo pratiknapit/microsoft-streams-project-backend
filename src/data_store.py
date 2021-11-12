@@ -28,6 +28,8 @@ import jwt
 import json
 import hashlib
 from src.error import InputError
+from datetime import datetime, timezone
+import time
 
 initial_object = {
     'users': [    
@@ -135,6 +137,7 @@ def make_message(message, channel_id, u_id):
                             'u_id': u_id, 
                             'message': message,
                             'reacts': [],
+                            "time_created": datetime.now().replace(tzinfo=timezone.utc).timestamp(),
                             'is_pinned': is_pinned,
                             })
     return message_id
@@ -223,6 +226,31 @@ def user_channels(token):
     save_data(store) 
         
     return user_list_channel
+
+def return_valid_tagged_handles(message, channel_id):
+    data = data_store.get()
+    split_message = message.split()
+    handles = []
+    for word in split_message:
+        if word.startswith('@'):
+            handles.append(word.strip('@'))
+
+    real_handles = []
+    for handle in handles:
+        if next((user for user in data['users'] if user['account_handle'] == handle), False):
+            real_handles.append(handle)
+
+    real_handles_in_channel = []
+    channel = next(
+        (channel for channel in data['channels'] if channel['channel_id'] == channel_id), False)
+    for handle in real_handles:
+        for member in channel['members']:
+            m_handle = next(user['account_handle']
+                            for user in data['users'] if user['user_id'] == member['user_id'])
+            if m_handle == handle:
+                real_handles_in_channel.append(handle)
+
+    return real_handles_in_channel
 
 # Function to list all channels in the database.
 
