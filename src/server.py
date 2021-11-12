@@ -398,7 +398,7 @@ def messages_dm():
 @APP.route("/notifications/get/v1", methods=['GET'])
 def notifications():
     token = request.args.get('token')
-    notification_return = notifications_get(token); 
+    notification_return = notifications_get(token)
     return dumps(notification_return)
 
 @APP.route("/standup/start/v1", methods = ['POST'])
