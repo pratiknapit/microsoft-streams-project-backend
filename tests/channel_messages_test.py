@@ -111,7 +111,6 @@ def test_last_message(clear, token, channel_id):
     assert end == -1
     clear_v1()
 
-"""
 def test_more_messages(clear, token, channel_id):
     count = 60
     while count >= 0:
@@ -132,4 +131,3 @@ def test_more_messages(clear, token, channel_id):
     assert message_4 == '60'
 
     clear_v1()
-"""

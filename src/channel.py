@@ -4,7 +4,7 @@ This file contains channel_invite, channel_details, channel_messages, channel_jo
 from src.error import InputError, AccessError
 from src.data_store import check_if_channel_is_public_or_private, check_if_user_is_channel_member, remove_owner_channel
 from src.data_store import channel_id_check, auth_user_id_check, user_id_check, token_check, token_to_user_id, check_existing_owner
-from src.data_store import check_existing_member, leave_channel, add_owner_channel, remove_owner_channel
+from src.data_store import check_existing_member, leave_channel, add_owner_channel, remove_owner_channel, is_valid_token, find_channel, is_user_in_channel
 from src.data_store import data_store, save_data
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
@@ -173,32 +173,25 @@ def channel_messages_v1(token, channel_id, start):
     channel = channel_id_check(channel_id)
     total_messages = len(channel['Messages'])
 
-    if start > total_messages:
-        raise InputError
+    if start >= total_messages and start != 0:
+        raise InputError('Start is greater than the total number of messages in the channel.')
 
-    message_dictionary = {
-        'messages': [],
-    }
+    # calculate the ending return value
+    end = start + 50 if (start + 50 < len(data['channels']) - 1) else -1
+    message_dictionary = {'messages': [],
+                          'start': start,
+                          'end': end
+                          }
 
-    num_loop = min(total_messages, 50)
-    
-    for msg in range(0, num_loop):
-        message_dict = channel['Messages'][msg]
-        message_dictionary['messages'].append(message_dict)
-    if num_loop < 50:
-        end = -1
+    if end == -1:
+        for i in range(start, len(channel['Messages'])):
+            message_dictionary['messages'].append(channel['Messages'][i])
     else:
-        end = start + 50
-
-
-    message_dictionary["start"] = start
-    message_dictionary["end"] = end
+        for i in range(start, end):
+            message_dictionary['messages'].append(channel['Messages'][i])
 
     save_data(data)
-
     return message_dictionary
-
-   
 
 def channel_join_v1(token, channel_id):
     '''
@@ -371,5 +364,3 @@ def channel_remove_owner_v2(token, channel_id, u_id):
     save_data(data)
     
     return remove_owner_channel(channel_id, u_id)
-
-

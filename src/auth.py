@@ -137,8 +137,6 @@ def auth_logout(token):
     Return Value:
         Returns empty dictionary and boolean success statement
     '''
-
-
     store = data_store.get() 
     for user in store['users']:
         if user['token'] == token:

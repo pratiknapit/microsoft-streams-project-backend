@@ -131,7 +131,7 @@ def make_message(message, channel_id, u_id):
     is_pinned = False
     
     channel = channel_id_check(channel_id)
-    channel['Messages'].append({
+    channel['Messages'].insert(0, {
                             'channel_id': channel_id, 
                             'message_id': message_id, 
                             'u_id': u_id, 

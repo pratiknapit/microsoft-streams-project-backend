@@ -43,13 +43,7 @@ def channel_message(admin, channel):
 @pytest.fixture
 def dm_msg(admin, dm):
     return message_senddm(admin['token'], dm['dm_id'], 'this is a message sent to the other user.')
-'''
-def test_invalid_token_dm(dm_msg):
-    invalid_token = 'invalidtoken123123'
-    with pytest.raises(AccessError):
-        message_edit(
-            invalid_token, dm_msg['message_id'], 'this is an updated message in the dm.')
-'''
+
 def test_invalid_token_channel(channel_message):
     invalid_token = 'invalidtoken123123'
     with pytest.raises(AccessError):
@@ -80,10 +74,15 @@ def test_success_channel_message(admin, channel, channel_message):
     channel_messages = channel_messages_v1(
         admin['token'], channel['channel_id'], 0)
     assert channel_messages['messages'][0]['message'] == 'this edit is valid in this channel.'
-'''
+
 def test_success_dm_message(admin, dm, dm_msg):
     message_edit(admin['token'], dm_msg['message_id'],
                     'this edit is valid in this dm.')
     dm_mess = dm_messages(admin['token'], dm['dm_id'], 0)
     assert dm_mess['messages'][0]['message'] == 'this edit is valid in this dm.'
-'''
+
+def test_invalid_token_dm(dm_msg):
+    invalid_token = 'invalidtoken123123'
+    with pytest.raises(AccessError):
+        message_edit(
+            invalid_token, dm_msg['message_id'], 'this is an updated message in the dm.')
