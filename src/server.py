@@ -68,17 +68,6 @@ def register_auth():
     name_first = data['name_first']
     name_last = data['name_last']
 
-    if not email_check(email):
-        raise InputError(description="Email not valid")
-    if email_repeat_check(email):
-        raise InputError(description="Email already used")
-    if len(password) < 6:
-        raise InputError(description="Password less than 6 characters")
-    if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError(description="First name is invalid")
-    if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError(description="Last name is invalid")
-
     user = auth_register_v1(email, password, name_first, name_last)
     auth_uid = user['auth_user_id']
     auth_token = user['token']
@@ -94,13 +83,6 @@ def login_auth():
 
     email = data["email"]
     password = data["password"]
-
-    if not email_check(email):
-        raise InputError(description="Email not valid")
-    if not email_repeat_check(email):
-        raise InputError(description="Email already used")
-    if not password_check(password):
-        raise InputError(description="Password incorrect")
 
     login_info = auth_login_v1(email, password)
     u_id = login_info['auth_user_id']
@@ -120,7 +102,6 @@ def logout_auth():
     return dumps({
         'is_success': result
     })
-
 
 #Channels HTTP Server Wrappers
 
