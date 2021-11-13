@@ -10,7 +10,7 @@ from src import config
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.data_store import password_check, email_check, email_repeat_check
 from src.other import clear_v1, notifications_get
-from src.auth import auth_register_v1, auth_login_v1, auth_logout
+from src.auth import auth_register_v1, auth_login_v1, auth_logout, auth_passwordreset_request, auth_passwordreset_reset
 from src.message import message_react_v1, message_send, message_edit, message_remove, message_share_v1, message_unreact_v1
 from src.standup import standup_start_v1
 from src.message import message_send, message_edit, message_remove, message_senddm, message_sendlater, message_sendlaterdm, message_pin, message_unpin
@@ -102,6 +102,18 @@ def logout_auth():
     return dumps({
         'is_success': result
     })
+
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def auth_passwordreset_request_v1_http():
+    data = request.get_json()
+    auth_passwordreset_request(data['email'])
+    return dumps({})
+
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def auth_passwordreset_reset_v1_http():
+    data = request.get_json()
+    auth_passwordreset_reset(data['reset_code'], data['new_password'])
+    return dumps({})
 
 #Channels HTTP Server Wrappers
 

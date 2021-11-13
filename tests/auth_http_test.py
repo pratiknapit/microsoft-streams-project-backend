@@ -1,6 +1,7 @@
 import requests
 import pytest
 from src import config
+from src.data_store import data_store
 
 @pytest.fixture(autouse=True)
 def clear():
@@ -90,16 +91,28 @@ def test_correct_login_details():
 #############
 
 @pytest.fixture
-def token():
-    email = "test@unsw.au"
+def user1():
+    email = "jackyzhu@gmail.com"
     password = "testPassword"
     firstname = "firstName"
     lastname = "lastName"
     response = requests.post(config.url + 'auth/register/v2', json={'email': email, 'password': password, 'name_first': firstname, 'name_last': lastname})
-    token = response.json()['token']
-    return token
+    user = response.json()
+    return user
 
-def test_valid_response(token):
-    response = requests.post(config.url + 'auth/logout/v1', json={'token': token})
+def test_valid_response(user1):
+    response = requests.post(config.url + 'auth/logout/v1', json={'token': user1['token']})
     assert response.json()['is_success'] == True
     assert response.status_code == 200
+
+##################################
+#auth_passwordreset_request/reset#
+##################################
+
+def test_for_request_and_reset_password(user1):
+    requests.post(config.url + "auth/register/v2", json= user1)
+    respo = requests.post(config.url + "auth/passwordreset/request/v1", json={'email': 'jokeame@gmail.com'})
+    assert respo.status_code == 400
+
+    resp = requests.post(config.url + "auth/passwordreset/request/v1", json={'email': 'jackyzhu@gmail.com'})
+    assert resp.status_code == 200
