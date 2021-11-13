@@ -9,9 +9,9 @@ from src.error import InputError
 from src import config
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.data_store import password_check, email_check, email_repeat_check
-from src.other import clear_v1
+from src.other import clear_v1, notifications_get
 from src.auth import auth_register_v1, auth_login_v1, auth_logout
-from src.message import message_react_v1, message_send, message_edit, message_remove, message_share_v1, notifications_get, message_unreact_v1
+from src.message import message_react_v1, message_send, message_edit, message_remove, message_share_v1, message_unreact_v1
 from src.standup import standup_start_v1
 from src.message import message_send, message_edit, message_remove, message_senddm, message_sendlater, message_sendlaterdm, message_pin, message_unpin
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
@@ -238,7 +238,7 @@ def c_invite():
     return dumps(out)
 
 @APP.route("/channel/messages/v2", methods=['GET'])
-def c_messages():
+def channel_msg():
     
     token = request.args.get('token')
     channel_id = int(request.args.get('channel_id'))

@@ -51,6 +51,9 @@ def auth_register_v1(email, password, name_first, name_last):                   
     Return Value:
         Returns auth_user_id and token on condition that the user is valid.
     '''
+
+    data = data_store.get()
+
     if not email_check(email):
         raise InputError('Email Invalid')
     if email_repeat_check(email) is True:
@@ -70,6 +73,8 @@ def auth_register_v1(email, password, name_first, name_last):                   
     for user in store['users']:
         if user['u_id'] == added_user['u_id']:
             user['token'] = token
+
+    save_data(data)
 
     return {
         'auth_user_id': added_user['u_id'],
@@ -92,6 +97,9 @@ def auth_login_v1(email, password):
     Return Value:
         Returns auth_user_id and token on condition that the user is valid
     '''
+
+    data = data_store.get()
+
     if not email_check(email):
         raise InputError('Email invalid')
     if email_repeat_check(email) is False:
@@ -109,6 +117,8 @@ def auth_login_v1(email, password):
                 save_data(store)                                                        # Everytime made something
                 token = create_token(cur_user, session_id) 
                 user['token'] = token
+
+    save_data(data)
             
     return {
         'auth_user_id': cur_user['u_id'],
@@ -127,9 +137,13 @@ def auth_logout(token):
     Return Value:
         Returns empty dictionary and boolean success statement
     '''
+
+
     store = data_store.get() 
     for user in store['users']:
         if user['token'] == token:
             user.pop('token')
+            save_data(store)
             return True
+    save_data(store)
     return False

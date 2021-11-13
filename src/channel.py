@@ -9,6 +9,7 @@ from src.data_store import data_store, save_data
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 
+
 def channel_invite_v1(token, channel_id, u_id):
     '''
     Arguments:
@@ -27,6 +28,9 @@ def channel_invite_v1(token, channel_id, u_id):
     '''
 
     # check if corect channel id otherwise return Input error (not valid channel)
+    
+    data = data_store.get()
+    
     if channel_id_check(channel_id) == False:
         raise InputError
     
@@ -64,7 +68,9 @@ def channel_invite_v1(token, channel_id, u_id):
     channel_name = channel['name']
     notif_message = f"{react_user_str_handle} added you to {channel_name}"
     user_notif = auth_user_id_check(u_id)
-    user_notif['notifications'].append({'channel_id': channel_id, 'dm_id': -1, 'notification_message': notif_message})
+    user_notif['notifications'].insert(0, {'channel_id': channel_id, 'dm_id': -1, 'notification_message': notif_message})
+
+    save_data(data)
 
     return {}
 
@@ -82,6 +88,8 @@ def channel_details_v1(token, channel_id):
     Return Value:
         Returns a dictionary containing information about channel.
     '''
+
+    data = data_store.get()
 
     if token_check(token) == False:
         raise AccessError(description="token not found")
@@ -133,6 +141,8 @@ def channel_details_v1(token, channel_id):
         member_details.append(member_det)
     
     channel_details_dictionary['all_members'] = member_details
+
+    save_data(data)
     
     return channel_details_dictionary
 
@@ -151,6 +161,9 @@ def channel_messages_v1(token, channel_id, start):
     Return Value:
         Returns a dictionary containing messages, start and end
     '''
+
+    data = data_store.get()
+
     if not channel_id_check(channel_id):                                   # Channel does not exist
         raise InputError
 
@@ -181,7 +194,10 @@ def channel_messages_v1(token, channel_id, start):
     message_dictionary["start"] = start
     message_dictionary["end"] = end
 
+    save_data(data)
+
     return message_dictionary
+
    
 
 def channel_join_v1(token, channel_id):
@@ -197,6 +213,9 @@ def channel_join_v1(token, channel_id):
     Return Value:
         Returns an empty dictionary
     '''
+
+    data = data_store.get()
+
     if not token_check(token):
         raise AccessError
 
@@ -217,6 +236,8 @@ def channel_join_v1(token, channel_id):
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
             channel['all_members'].append(auth_user_id)
+
+    save_data(data)
 
     return {}
 
@@ -241,6 +262,8 @@ def channel_leave_v2(token, channel_id):
         Returns an empty dictionary
     ''' 
 
+    data = data_store.get()
+
     if token_check(token) == False:
         raise AccessError(description="token not found")
 
@@ -251,6 +274,8 @@ def channel_leave_v2(token, channel_id):
     
     if v_member == False:
         raise AccessError("User is not a member of the channel")
+
+    save_data(data)
 
     return {}
 
@@ -270,6 +295,8 @@ def channel_add_owner_v2(token, channel_id, u_id):
         Return Value:
             Returns an empty dictionary
     '''
+
+    data = data_store.get()
 
     if token_check(token) == False:
         raise AccessError(description="token not found")
@@ -295,6 +322,8 @@ def channel_add_owner_v2(token, channel_id, u_id):
         
     #If no error was raised, we can then add a new owner to the channel.
 
+    save_data(data)
+
     return add_owner_channel(channel_id, u_id)
     
 def channel_remove_owner_v2(token, channel_id, u_id):
@@ -314,6 +343,7 @@ def channel_remove_owner_v2(token, channel_id, u_id):
             Returns an empty dictionary
     '''
     
+    data = data_store.get()
 
     if token_check(token) == False:
         raise AccessError(description="token not found")
@@ -337,6 +367,8 @@ def channel_remove_owner_v2(token, channel_id, u_id):
     if user_detail['is_global_owner'] == 2:
         if check_existing_owner(auth_user_id, channel_id) is False:
             raise AccessError
+
+    save_data(data)
     
     return remove_owner_channel(channel_id, u_id)
 

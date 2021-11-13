@@ -3,9 +3,7 @@ import requests
 import json
 from src import config
 from src import data_store
-from src.data_store import channel_id_check, data_store
-import time
-from src.channel import channel_messages_v1
+
 
 @pytest.fixture
 def clear():
@@ -106,4 +104,9 @@ def test_notifications_returns_correctly(clear, user1, user2, channel1):
 
     assert resp.status_code == 200
 
+    resp = requests.get(config.url + 'notifications/get/v1', params={
+        'token': user2['token']
+    })
+
+    assert resp.status_code == 200
     
