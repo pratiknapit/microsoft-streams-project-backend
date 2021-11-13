@@ -404,20 +404,33 @@ def message_senddm(token, dm_id, message):
     
     data['msg_counter'] += 1
     
-    #if len(data['dreams_stats']['messages_exist']) == 0:
-    #    messages_exist = 1
-    #else:
-    #    messages_exist = data['dreams_stats']['messages_exist'][-1]['num_messages_exist'] + 1
-
-    #data['dreams_stats']['messages_exist'].append({'num_messages_exist':messages_exist, 'time_stamp':int(datetime.now().timestamp())})
-    
     save_data(data)
 
     return {'message_id': message_id}
 
 
 def message_sendlater(token, channel_id, message, time_sent):
+    '''
+    Send a message from the authorised user to the channel specified by channel_id automatically at a specified time in the future.
 
+    Arguments:
+        token      (str) - A string which holds the token
+        channel_id (int) - The channel id of channel specified
+        message    (str) - The message to be sent
+        time_sent  (int) - The unix timestamps of time message to be sent 
+        
+    Exceptions:
+        InputError      - When message does not exist
+        InputError      - When channel id is invalid
+        InputError      - When length of message longer than 1000 characters
+        InputError      - Time of messgae to send is in the past
+        AccessError     - When token is invalid
+        AccessError     - When authorised user is invalid
+        AccessError     - When user not member of channel
+
+    Return Value:
+        The message dictionary
+    '''
     data = data_store.get()
     if not is_valid_token(token):
         raise AccessError("Invalid token id.")
@@ -443,6 +456,27 @@ def message_sendlater(token, channel_id, message, time_sent):
     return messageID_dict
 
 def message_sendlaterdm(token, dm_id, message, time_sent):
+    '''
+    Send a message from the authorised user to the DM specified by dm_id automatically at a specified time in the future.
+
+    Arguments:
+        token      (str) - A string which holds the token
+        dm_id      (int) - The dm id of dm specified
+        message    (str) - The message to be sent
+        time_sent  (int) - The unix timestamps of time message to be sent 
+        
+    Exceptions:
+        InputError      - When message does not exist
+        InputError      - When dm id is invalid
+        InputError      - When length of message longer than 1000 characters
+        InputError      - Time of messgae to send is in the past
+        AccessError     - When token is invalid
+        AccessError     - When authorised user is invalid
+        AccessError     - When user not member of DM
+
+    Return Value:
+        The message dictionary
+    '''
     data = data_store.get()
 
     if not is_valid_token(token):
@@ -470,6 +504,22 @@ def message_sendlaterdm(token, dm_id, message, time_sent):
     return messageID_dict
 
 def message_pin(token, message_id):
+    '''
+    Given a message within a channel or DM, mark it as "pinned".
+
+    Arguments:
+        token      (str) - A string which holds the token
+        message_id (int) - The message id of current message
+        
+    Exceptions:
+        InputError      - When message does not exist
+        AccessError     - When token is invalid
+        AccessError     - When authorised user is invalid
+        AccessError     - When user is not owner or sender
+
+    Return Value:
+        Empty dictionary
+    '''
     decoded_token = is_valid_token(token)
     if decoded_token is False:
         raise AccessError(description="Invalid Token.")
@@ -541,6 +591,22 @@ def message_pin(token, message_id):
 
 
 def message_unpin(token, message_id):
+    '''
+    Given a message within a channel or DM, remove its mark as pinned.
+
+    Arguments:
+        token      (str) - A string which holds the token
+        message_id (int) - The message id of current message
+        
+    Exceptions:
+        InputError      - When message does not exist
+        AccessError     - When token is invalid
+        AccessError     - When authorised user is invalid
+        AccessError     - When user is not owner or sender
+
+    Return Value:
+        Empty dictionary
+    '''
     decoded_token = is_valid_token(token)
     if decoded_token is False:
         raise AccessError("Invalid Token.")

@@ -15,6 +15,8 @@ from src.data_store import email_check, email_repeat_check, password_check, is_v
 # Error Functions #
 ###################
 from src.error import InputError
+import random
+import string
 import uuid
 import json
 
@@ -145,3 +147,35 @@ def auth_logout(token):
             return True
     save_data(store)
     return False
+
+def auth_passwordreset_request(email):
+    data = data_store.get()
+    if not email_repeat_check(email):
+        raise InputError('Invalid Email')
+
+    for user in data['users']:
+        if user['email'] == email:
+            reset_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+            user['reset_code'] = reset_code
+            break
+    save_data(data)
+    return reset_code
+
+def auth_passwordreset_reset(reset_code, new_password):
+    data = data_store.get()
+    if len(new_password) < 6:
+        raise InputError("Invalid password length")
+
+    found = False
+    for user in data['users']:
+        if user['reset_code'] == reset_code:
+            user['password'] = hash_password(new_password)
+            user['reset_code'] = 0
+            found = True
+            break
+
+    save_data(data)
+
+    if not found:
+        raise InputError("Invalid reset_code")
+    return {}

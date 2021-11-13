@@ -1,9 +1,9 @@
 import pytest
 import jwt
 from src.error import InputError, AccessError
-from src.auth import auth_register_v1, auth_login_v1, auth_logout
+from src.auth import auth_register_v1, auth_login_v1, auth_logout, auth_passwordreset_request, auth_passwordreset_reset
 from src.other import clear_v1
-from src.data_store import is_valid_token
+from src.data_store import is_valid_token, data_store
 
 @pytest.fixture
 def clear():
@@ -119,3 +119,44 @@ def test_auth_logout_invalid():
 
 def test_auth_correct_return(clear, token):    
     assert auth_logout(token) == True
+
+
+#############################
+#auth_password_request/reset#
+#############################
+
+def test_auth_password_request_test(clear):
+    data = data_store.get()
+    auth_register_v1('validemail@gmail.com', '123abc!@#', 'Jacky', 'Zhu')
+    auth_passwordreset_request('validemail@gmail.com')
+
+    for user in data['users']:
+        if user['u_id'] == 1:
+            assert user['reset_code'] != 0
+            break
+
+def test_auth_passwordreset_success(clear):
+    id_check = auth_register_v1('jokeame@gmail.com', '123123123', 'Jack', 'Sparrow')['auth_user_id']
+    reset_code = auth_passwordreset_request('jokeame@gmail.com')
+    auth_passwordreset_reset(reset_code, 'TheNewPassword')
+    assert auth_login_v1('jokeame@gmail.com', 'TheNewPassword')['auth_user_id'] == id_check
+
+
+def test_auth_passwordrequest_invalid_email(clear):
+    auth_register_v1('jokeame@gmail.com', '123123123', 'Jack', 'Sparrow')
+    with pytest.raises(InputError):
+        auth_passwordreset_request('dokesmate@gmail.com')
+
+def test_auth_passwordreset_reset_invalid_password(clear):
+    auth_register_v1('jokeame@gmail.com', '123123123', 'Jack', 'Sparrow')
+    reset_code = auth_passwordreset_request('jokeame@gmail.com')
+    invalid_password = '123'
+    with pytest.raises(InputError):
+        auth_passwordreset_reset(reset_code, invalid_password)
+
+def test_auth_passwordreset_reset_invalid_reset_code(clear):
+    auth_register_v1('jokeame@gmail.com', '123123123', 'Jack', 'Sparrow')
+    reset_code = auth_passwordreset_request('jokeame@gmail.com')
+    invalid_reset_code = reset_code + '123'
+    with pytest.raises(InputError):
+        auth_passwordreset_reset(invalid_reset_code, 'TheNewPassword')
