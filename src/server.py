@@ -63,10 +63,10 @@ def clear():
 def register_auth():
     data = request.get_json()
 
-    email = data["email"]
-    password = data["password"]
-    name_first = data["name_first"]
-    name_last = data["name_last"]
+    email = data['email']
+    password = data['password']
+    name_first = data['name_first']
+    name_last = data['name_last']
 
     if not email_check(email):
         raise InputError(description="Email not valid")
@@ -238,8 +238,7 @@ def c_invite():
     return dumps(out)
 
 @APP.route("/channel/messages/v2", methods=['GET'])
-def channel_msg():
-    
+def c_messages():
     token = request.args.get('token')
     channel_id = int(request.args.get('channel_id'))
     start = int(request.args.get('start'))
@@ -263,7 +262,7 @@ def edit_message():
 
     token = data['token']
     message_id = data['message_id']
-    message = data['new_message']
+    message = data['message']
     
     message_edit(token, message_id, message)
     return dumps({})
