@@ -2,7 +2,7 @@
 This file contains message_send, message_edit, message_remove
 '''
 from src.data_store import data_store, is_valid_user_id, make_message, find_message_source
-from src.data_store import token_check, channel_id_check, message_id_check, save_data
+from src.data_store import token_check, channel_id_check, message_id_check, save_data, return_valid_tagged_handles
 from src.data_store import is_valid_token, check_if_user_is_channel_member, token_to_user_id
 from src.data_store import auth_user_id_check, user_id_check, owner_channel_check, find_dm, is_valid_dm_id
 from src.data_store import find_user, find_dm, find_channel, is_valid_dm_id, is_user_in_dm, is_user_in_channel
@@ -28,6 +28,8 @@ def message_send(token, channel_id, message):
     Return Value:
         A dictionary containing the message_id of the message that was sent.
     '''
+
+    data = data_store.get()
     
     if not token_check(token):
         raise AccessError
@@ -44,10 +46,18 @@ def message_send(token, channel_id, message):
     user = auth_user_id_check(auth_user_id) 
 
     message_id = make_message(message, channel_id, user['u_id'])
-        
+    """
+    tagged_handles = return_valid_tagged_handles(message, channel_id)
+    notif_message = f"{tagged_handles[0]} tagged you in {channel_id}: {message}"
+    for user in channel['members']:
+        if user and tagged_handles.count(user['account_handle']) != 0:
+            user['notifications'].insert(0,{'channel_id': message['channel_id'], 'dm_id': -1, 'notification_message': notif_message} )
+    """
     for msg in store:
         if msg['message_id'] == message_id:
             user['messages_created'].remove(message_id)
+
+    save_data(data)
 
     return {
         'message_id': message_id,
@@ -72,6 +82,9 @@ def message_edit(token, message_id, new_message):
     Return Value:
         Empty dictionary
     '''
+
+    data = data_store.get()
+
     if len(new_message) > 1000:
         raise InputError('Message over 1000 characters.')
     if message_id_check(message_id) == False:
@@ -100,6 +113,8 @@ def message_edit(token, message_id, new_message):
         user['messages_created'].remove(message_id)
     else :
         message['message'] = new_message
+
+    save_data(data)
     return {}
 
 def message_remove(token, message_id):
@@ -286,7 +301,7 @@ def message_react_v1(token, message_id, react_id):
     user_og = auth_user_id_check(user_og_msg_id)
     channel_name = channel_id_check(message['channel_id'])['name']
     notif_message = f"{react_user_str_handle} reacted to your message in {channel_name}"
-    user_og['notifications'].append({'channel_id': message['channel_id'], 'dm_id': -1, 'notification_message': notif_message})
+    user_og['notifications'].insert(0, {'channel_id': message['channel_id'], 'dm_id': -1, 'notification_message': notif_message})
     
     save_data(data)
 
@@ -320,29 +335,6 @@ def message_unreact_v1(token, message_id, react_id):
     save_data(data)
 
     return {}
-
-
-def notifications_get(token):
-
-    user_id = token_to_user_id(token)
-    user = auth_user_id_check(user_id)
-    return_list = [] 
-    if len(user['notifications']) == 0:
-        return {'notifications': return_list }
-    
-    elif len(user['notifications']) <= 20:
-        for notifs in user['notifications']:
-            return_list.append(notifs) 
-        return {'notifications': return_list }
-
-    else:
-        i = 0
-        while (i < 20):
-            return_list.append(user['notifications'][i])
-            i = i + 1
-
-        return {'notifications': return_list 
-        }
 
 def message_senddm(token, dm_id, message):
 
