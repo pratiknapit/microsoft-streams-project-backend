@@ -3,7 +3,9 @@ This file contains channels_list, channels_listall, channels_create.
 '''
 from src.data_store import save_data, token_check, user_channels, add_channel, user_all_channels
 from src.error import AccessError, InputError
-from src.data_store import data_store
+from src.data_store import data_store, token_to_user_id
+from datetime import datetime
+
 
 
 def channels_list_v1(token):
@@ -87,7 +89,28 @@ def channels_create_v1(token, name, is_public):
     #The function below will add the new channel that is created to the database.
     added_channel = add_channel(token, name, is_public)
 
+    #User stats implementation
+    u_id = token_to_user_id(token)
+    for user in data['users']:
+        if user['u_id'] == u_id:
+            channels_joined = len(user['user_stats']['channels_joined']) #Dont need to check prev because channels cannot be deleted
+            user['user_stats']['channels_joined'].append({
+                'num_channels_joined': channels_joined, 
+                'time_stamp':int(datetime.now().timestamp())
+            })
+    
+    if len(data['workspace_stats']['channels_exist']) == 1:
+        channel_exist = 1
+    else:
+        channel_exist = data['workspace_stats']['channels_exist'][-1]['num_channels_exist'] + 1
+    
+    data['workspace_stats']['channels_exist'].append({
+        'num_channels_exist': channel_exist,
+        'time_stamp':int(datetime.now().timestamp())
+    })
+
     save_data(data)
+
 
     #Our return value is a dictionary with these keys, as per the spec requirements.
     return {

@@ -38,7 +38,21 @@ initial_object = {
     ],
     'dms': [
     ],
-    'msg_counter': 0,
+    'workspace_stats': {
+        'channels_exist': [{
+            'num_channels_exist': 0,
+            'time_stamp': int(datetime.now().timestamp()),
+        }],
+        'dms_exist': [{
+            'num_dms_exist': 0,
+            'time_stamp': int(datetime.now().timestamp()),
+        }],
+        'messages_exist': [{
+            'num_messages_exist': 0,
+            'time_stamp': int(datetime.now().timestamp()),
+        }]
+    },
+    'msg_counter': 0
 }
 # Channels Helper Check Functions 
 
@@ -72,17 +86,17 @@ def make_channel(channel_id, name, is_public):
         
 # Function to add_channel to list 
 def add_channel(token, name, is_public):
-    store = data_store.get()                                                    # retrieve data from initial_object data base
-    channel_id = len(store['channels']) + 1                                   
+    data = data_store.get()                                                    # retrieve data from initial_object data base
+    channel_id = len(data['channels']) + 1                                   
     channel = make_channel(channel_id, name, is_public)
     u_id = token_to_user_id(token)
     channel['owner_members'].append(u_id)
     channel['all_members'].append(u_id)
 
-    store['channels'].append(channel)
+    data['channels'].append(channel)
 
-    data_store.set(store) 
-    save_data(store) 
+    data_store.set(data) 
+    save_data(data) 
     return channel
 
 # Function to add_user to list 
@@ -113,10 +127,28 @@ def make_user(email, password, name_first, name_last, u_id):
             'channel_id_members': [],
             'is_global_owner': is_global_owner,
             'messages_created':[],
+            'profile_img_url': [],
             'session_list': [],
             'notifications': [],
             'sent_messages': [],
             'permission_id': is_global_owner,
+            'is_removed': False,
+            'user_stats': {
+                'channels_joined': [{
+                    'num_channels_joined': 0,
+                    'time_stamp': int(datetime.now().timestamp())
+                }],
+                'dms_joined': [{
+                    'num_dms_joined': 0,
+                    'time_stamp': int(datetime.now().timestamp())
+                }],
+                'messages_sent': [{
+                    'num_messages_sent': 0,
+                    'time_stamp': int(datetime.now().timestamp())
+                }]
+            },
+            
+
             'reset_code': ''
     }
 

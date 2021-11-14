@@ -11,7 +11,7 @@ def dummy_cases():
     dummy = auth_register_v1("dummydum@gmail.com", "wordpass", "dummy", "dum")
     token = dummy['token']
     dummy_id = dummy['auth_user_id']
-
+       
     return token, dummy_id
 
 @pytest.fixture
@@ -40,6 +40,7 @@ def test_valid_output(clear, dummy_cases):
     assert result['user']['name_first'] == 'dummy'
     assert result['user']['name_last'] == 'dum'
     assert result['user']['handle_str'] == 'dummydum'
+    assert result['user']['profile_img_url'] == []
 
 
 
