@@ -60,7 +60,7 @@ def channel2(user2):
         })
     return channel.json()
 
-def test_user_stat(clear, user1, channel1):
+def test_user_stat(clear, user1):
     response = requests.get(config.url + 'user/stats/v1', params={
         'token': user1['token']
     })
@@ -80,9 +80,6 @@ def test_user_stat_function(clear, user1):
     })
 
     assert response.status_code == 200
-    stats = response.json() 
+    
 
 
-def test_users_stat(clear, user1, channel1, channel2):
-    response = requests.get(config.url + 'users/stats/v1')
-    assert response.status_code == 200 
