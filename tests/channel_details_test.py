@@ -6,6 +6,10 @@ from src.channels import channels_create_v1, channels_list_v1
 from src.other import clear_v1
 
 @pytest.fixture
+def clear():
+    clear_v1()
+
+@pytest.fixture
 def user1():
     dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
     return dummy_user_1
@@ -19,10 +23,6 @@ def user2():
 def channel1(user1):
     channel_user1 = channels_create_v1(user1['token'], "channel1", True)
     return channel_user1
-
-@pytest.fixture
-def clear():
-    clear_v1()
 
 def test_invalid_token():
     clear_v1()

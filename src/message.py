@@ -366,6 +366,9 @@ def message_react_v1(token, message_id, react_id):
     notif_message = f"{react_user_str_handle} reacted to your message in {channel_name}"
     user_og['notifications'].insert(0, {'channel_id': message['channel_id'], 'dm_id': -1, 'notification_message': notif_message})
     
+    
+
+
     save_data(data)
 
     return {}

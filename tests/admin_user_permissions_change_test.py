@@ -4,12 +4,14 @@ import json
 from src import config
 
 OWNER_PERMISSION = 1
-
 MEMBER_PERMISSION = 2 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def clear():
-    requests.delete(config.url + 'clear/v1')
+    requests.delete(config.url + '/clear/v1')
+    yield
+    requests.delete(config.url + '/clear/v1')
+
 
 @pytest.fixture
 def user1(clear):

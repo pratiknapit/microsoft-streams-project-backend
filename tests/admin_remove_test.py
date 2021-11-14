@@ -1,5 +1,7 @@
 import re
 import pytest
+import requests
+from src import config
 from src.admin import admin_user_remove_v1
 from src.data_store import check_existing_member
 from src.error import InputError, AccessError
@@ -8,9 +10,12 @@ from src.channels import channels_create_v1
 from src.channel import channel_join_v1
 from src.other import clear_v1
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def clear():
-    clear_v1()
+    requests.delete(config.url + '/clear/v1')
+    yield
+    requests.delete(config.url + '/clear/v1')
+
 
 @pytest.fixture
 def globaluser():

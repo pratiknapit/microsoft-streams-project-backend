@@ -4,9 +4,10 @@ from src import config
 from src.data_store import check_existing_member
 
 
-
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def clear():
+    requests.delete(config.url + '/clear/v1')
+    yield
     requests.delete(config.url + '/clear/v1')
 
 

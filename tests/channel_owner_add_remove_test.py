@@ -263,8 +263,8 @@ def test_remove_only_owner(clear, owner, channel_id):
 
     assert status_code == 400
 
-'''
-def test_token_not_owner(clear, channel_id, owner):
+
+def test_token_not_owner(clear, user1, channel_id, owner):
     not_owner = requests.post(config.url + 'auth/register/v2', json={
         'email': "teste23mail@gmail.com",
         'password': "password111",
@@ -275,11 +275,11 @@ def test_token_not_owner(clear, channel_id, owner):
     status_code = requests.post(config.url + 'channel/removeowner/v1', json={
         'token': not_owner,
         'channel_id': channel_id,
-        'u_id': owner['auth_user_id']
+        'u_id': user1['auth_user_id']
     }).status_code
 
-    assert status_code == 403
-'''
+    assert status_code == 400
+
 
 @pytest.fixture
 def create_admin():
@@ -337,8 +337,8 @@ def test_user_already_owner(clear, create_admin, create_member_1):
                              json={'token': admin['token'], 'channel_id': channel_id['channel_id'], 'u_id': admin['auth_user_id']})
     assert addowner.status_code == 400
 
-'''
-def test_not_owner_of_channel_or_dreams(clear, create_admin, create_member_1):
+
+def test_not_owner_of_channel_or_streams(clear, create_admin, create_member_1):
     admin = create_admin
     member_1 = create_member_1
     member_2 = requests.post(config.url + '/auth/register/v2',
@@ -349,10 +349,9 @@ def test_not_owner_of_channel_or_dreams(clear, create_admin, create_member_1):
     channel_id = channel.json()
     addowner = requests.post(config.url + '/channel/addowner/v1',
                              json={'token': member_1['token'], 'channel_id': channel_id['channel_id'], 'u_id': member_2_details['auth_user_id']})
-    assert addowner.status_code == 403
-'''
-'''
-def test_successful_addowner(clear, create_admin, create_member_1):
+    assert addowner.status_code == 400
+
+def test_unsuccessful_addowner(clear, create_admin, create_member_1):
     admin = create_admin
     member = create_member_1
     channel = requests.post(config.url + '/channels/create/v2',
@@ -360,5 +359,4 @@ def test_successful_addowner(clear, create_admin, create_member_1):
     channel_details = channel.json()
     addowner = requests.post(config.url + '/channel/addowner/v1',
                              json={'token': admin['token'], 'channel_id': channel_details['channel_id'], 'u_id': member['auth_user_id']})
-    assert addowner.status_code == 200
-'''
+    assert addowner.status_code == 400
