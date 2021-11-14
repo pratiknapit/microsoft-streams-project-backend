@@ -10,7 +10,7 @@ from src.data_store import data_store, add_user, login_email, create_token, hash
 # Helper Check Functions #
 ##########################
 from src.data_store import email_check, email_repeat_check, password_check, is_valid_token, token_to_user_id, save_data
-
+from src.helper import token_logout, generate_reset_code, change_password
 ###################
 # Error Functions #
 ###################
@@ -140,42 +140,52 @@ def auth_logout(token):
         Returns empty dictionary and boolean success statement
     '''
     store = data_store.get() 
-    for user in store['users']:
-        if user['token'] == token:
-            user.pop('token')
-            save_data(store)
-            return True
-    save_data(store)
-    return False
+    is_loggedout = token_logout(token)
 
+    save_data(store)
+    return is_loggedout
 def auth_passwordreset_request(email):
+    '''
+    Given authorised email returns a reset code to change password
+
+    Arguments:
+        <email> (str)       - <A string which holds the email of user>
+
+    Exceptions: Input error raised for emails only for sanity check
+
+    Return Value:
+        Returns reset code
+    '''
     data = data_store.get()
     if not email_repeat_check(email):
         raise InputError('Invalid Email')
 
-    for user in data['users']:
-        if user['email'] == email:
-            reset_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-            user['reset_code'] = reset_code
-            break
+    reset_code = generate_reset_code(email)
+    
     save_data(data)
     return reset_code
 
 def auth_passwordreset_reset(reset_code, new_password):
+    '''
+    Given a reset code for a user, set that user's new password to the password provided.
+
+    Arguments:
+        <reset_code>    (str)           - Unique codes used to authorise password change
+        <new_password>  (new_password)  - New password to replace old password.
+
+    Exceptions: Input error raised for invalid reset codes
+                Input error raised for length of password less than 6 characters
+
+    Return Value:
+        None
+    '''
     data = data_store.get()
     if len(new_password) < 6:
         raise InputError("Invalid password length")
 
-    found = False
-    for user in data['users']:
-        if user['reset_code'] == reset_code:
-            user['password'] = hash_password(new_password)
-            user['reset_code'] = 0
-            found = True
-            break
-
+    is_found = change_password(reset_code, new_password)
     save_data(data)
 
-    if not found:
+    if is_found == False:
         raise InputError("Invalid reset_code")
     return {}
