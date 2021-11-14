@@ -4,6 +4,8 @@ from src.error import InputError, AccessError
 from src.auth import auth_register_v1, auth_login_v1, auth_logout, auth_passwordreset_request, auth_passwordreset_reset
 from src.other import clear_v1
 from src.data_store import is_valid_token, data_store
+import requests
+from src import config
 
 @pytest.fixture
 def clear():
