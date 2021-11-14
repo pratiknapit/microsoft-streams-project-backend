@@ -4,7 +4,7 @@ This file contains auth_login, auth_register
 ###########
 #Functions#
 ###########
-from src.data_store import data_store, add_user, login_email, create_token, hash_password
+from src.data_store import data_store, add_user, login_email, create_token, hash_password, token_check
 
 ##########################
 # Helper Check Functions #
@@ -14,7 +14,7 @@ from src.data_store import email_check, email_repeat_check, password_check, is_v
 ###################
 # Error Functions #
 ###################
-from src.error import InputError
+from src.error import InputError, AccessError
 import random
 import string
 import uuid
@@ -140,12 +140,15 @@ def auth_logout(token):
         Returns empty dictionary and boolean success statement
     '''
     store = data_store.get() 
-    for user in store['users']:
-        if user['token'] == token:
-            user.pop('token')
-            save_data(store)
-            return True
-    save_data(store)
+    if not is_valid_token(token):
+        raise AccessError('Token is invalid')
+    else:    
+        token = is_valid_token(token)
+        for user in store['users']:
+            if user['session_list'].count(token['session_id']) != 0:
+                user['session_list'].remove(token['session_id'])
+                save_data(store)
+                return True
     return False
 
 def auth_passwordreset_request(email):
