@@ -70,15 +70,17 @@ def dm_list(token):
         raise AccessError("Invalid Token.")
 
     data = data_store.get()
-    dm_list = []
 
+    dm_list = []
+    data = data_store.get()
     for dm in data['dms']:
         for member in dm['members']:
             if member == decoded_token['auth_user_id']:
                 dm_list.append({'dm_id': dm['dm_id'],
                                 'name': dm['name']})
                 break
-
+   
+    save_data(data)            
     return {'dms': dm_list}
 
 def dm_remove(token, dm_id):
