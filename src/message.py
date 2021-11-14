@@ -62,6 +62,27 @@ def message_send(token, channel_id, message):
         if msg['message_id'] == message_id:
             user['messages_created'].remove(message_id)
 
+    #User stats implementation
+
+    u_id = token_to_user_id(token)
+
+    for user in data['users']:
+        if user['u_id'] == u_id:
+            user['user_stats']['messages_sent'].append({
+                'num_messages_sent': len(user['user_stats']['messages_sent']), 
+                'time_stamp':int(datetime.now().timestamp())
+                })
+    
+    if len(data['workspace_stats']['messages_exist']) == 0:
+        dms_exist = 1
+    else:
+        dms_exist = data['workspace_stats']['messages_exist'][-1]['num_messages_exist'] + 1
+    
+    data['workspace_stats']['messages_exist'].append({
+        'num_messages_exist': dms_exist,
+        'time_stamp':int(datetime.now().timestamp())
+    })
+    
     save_data(data)
 
     return {
@@ -185,6 +206,16 @@ def message_remove(token, message_id):
             for message in channel['Messages']:
                 if message['message_id'] == message_id:
                     channel['Messages'].remove(message)
+
+                    # User stats implementation 
+                    
+                    msgs_exist = data['workspace_stats']['messages_exist'][-1]['num_messages_exist'] - 1
+                    
+                    data['workspace_stats']['messages_exist'].append({
+                        'num_messages_exist': msgs_exist,
+                        'time_stamp':int(datetime.now().timestamp())
+                    })
+
                     save_data(data)
                     return {}
 
@@ -201,12 +232,23 @@ def message_remove(token, message_id):
         for dm in data['dms']:
             for message in dm['messages']:
                 if message['message_id'] == message_id:
-                    dm['messages'].remove(message)     
+                    dm['messages'].remove(message)   
+
+                    # User stats implementation 
+
+                    msgs_exist = data['workspace_stats']['messages_exist'][-1]['num_messages_exist'] - 1
+                    
+                    data['workspace_stats']['messages_exist'].append({
+                        'num_messages_exist': msgs_exist,
+                        'time_stamp':int(datetime.now().timestamp())
+                    })
+
                     save_data(data)               
                     return {}
 
     if not in_channel and not in_dm:
         raise InputError(description="Message no longer exists.")
+
 
 def message_share_v1(token, og_message_id, message, channel_id, dm_id): 
 
@@ -366,7 +408,6 @@ def message_senddm(token, dm_id, message):
         raise AccessError("Token invalid")
 
     auth_user_id = token_data['auth_user_id']
-    auth_user = find_user(auth_user_id)
 
     if len(message) > 1000 or len(message) < 1:
         raise InputError("message length invalid")
@@ -395,12 +436,33 @@ def message_senddm(token, dm_id, message):
     #    user, message = user_message
     #    user = next(u for u in data['users'] if u['user_id'] == user)
     #    user['notifications'].insert(0, message)
+    
+    #User stats implementation
 
-    auth_user['sent_messages'].append(message_id)
+    u_id = token_to_user_id(token)
+
+    for user in data['users']:
+        if user['u_id'] == u_id:
+            if len(user['user_stats']['messages_sent']) == 0:
+                msg_exist = 1
+            else:
+                msg_exist = user['user_stats']['messages_sent'][-1]['num_messages_sent'] + 1
+
+            user['user_stats']['messages_sent'].append({
+                'num_messages_sent': msg_exist, 
+                'time_stamp':int(datetime.now().timestamp())
+                })
     
-    #auth_user['user_stats']['messages_sent'].append({'num_messages_sent':len(auth_user['sent_messages']), 'time_stamp':int(datetime.now().timestamp())})
+    if len(data['workspace_stats']['messages_exist']) == 0:
+        dms_exist = 1
+    else:
+        dms_exist = data['workspace_stats']['messages_exist'][-1]['num_messages_exist'] + 1
     
-    data['msg_counter'] += 1
+    data['workspace_stats']['messages_exist'].append({
+        'num_messages_exist': dms_exist,
+        'time_stamp':int(datetime.now().timestamp())
+    })
+    
     
     save_data(data)
 
@@ -450,6 +512,33 @@ def message_sendlater(token, channel_id, message, time_sent):
     delay_time = time_sent - current_timestamp
     time.sleep(delay_time)
     messageID_dict = message_send(token, channel_id, message)
+
+    #User stats implementation
+    
+    u_id = token_to_user_id(token)
+
+    for user in data['users']:
+        if user['u_id'] == u_id:
+            if len(user['user_stats']['messages_sent']) == 0:
+                msg_exist = 1
+            else:
+                msg_exist = user['user_stats']['messages_sent'][-1]['num_messages_sent'] + 1
+
+            user['user_stats']['messages_sent'].append({
+                'num_messages_sent': msg_exist, 
+                'time_stamp':int(datetime.now().timestamp())
+                })
+    
+    if len(data['workspace_stats']['messages_exist']) == 0:
+        dms_exist = 1
+    else:
+        dms_exist = data['workspace_stats']['messages_exist'][-1]['num_messages_exist'] + 1
+    
+    data['workspace_stats']['messages_exist'].append({
+        'num_messages_exist': dms_exist,
+        'time_stamp':int(datetime.now().timestamp())
+    }) 
+
     save_data(data)
     return messageID_dict
 
@@ -497,6 +586,33 @@ def message_sendlaterdm(token, dm_id, message, time_sent):
     delay_time = time_sent - current_timestamp
     time.sleep(delay_time)
     messageID_dict = message_senddm(token, dm_id, message)
+
+    #User stats implementation
+    
+    u_id = token_to_user_id(token)
+
+    for user in data['users']:
+        if user['u_id'] == u_id:
+            if len(user['user_stats']['messages_sent']) == 0:
+                msg_exist = 1
+            else:
+                msg_exist = user['user_stats']['messages_sent'][-1]['num_messages_sent'] + 1
+
+            user['user_stats']['messages_sent'].append({
+                'num_messages_sent': msg_exist, 
+                'time_stamp':int(datetime.now().timestamp())
+                })
+    
+    if len(data['workspace_stats']['messages_exist']) == 0:
+        dms_exist = 1
+    else:
+        dms_exist = data['workspace_stats']['messages_exist'][-1]['num_messages_exist'] + 1
+    
+    data['workspace_stats']['messages_exist'].append({
+        'num_messages_exist': dms_exist,
+        'time_stamp':int(datetime.now().timestamp())
+    })
+
     save_data(data)
 
     return messageID_dict

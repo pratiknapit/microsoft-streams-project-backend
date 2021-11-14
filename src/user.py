@@ -1,8 +1,15 @@
-from src.data_store import data_store, user_id_check, token_check
+from src.data_store import auth_user_id_check, data_store, message_id_check, token_to_user_id, user_id_check, token_check
 from src.error import InputError, AccessError
 from src.data_store import handle_check, email_check, email_repeat_check, is_valid_token, token_to_user_id
 import json
 from src.data_store import save_data
+from datetime import datetime
+from src.auth import auth_register_v1 
+from src.channels import channels_create_v1, channels_list_v1
+from src.other import clear_v1
+import time
+from src.dm import dm_create, dm_remove
+from src.message import message_remove, message_send, message_senddm
 import os
 import time
 import requests
@@ -37,15 +44,17 @@ def users_all_v1(token):
     user_list = []
     data = data_store.get()
     for user in data['users']:
-        user = {
-            'u_id': user['u_id'],
-            'email': user['email'],
-            'name_first': user['name_first'],
-            'name_last': user['name_last'],
-            'handle_str': user['handle_str'],
-        }
-        user_list.append(user)
-        # useless user = {}  
+        if user['is_removed'] != True:
+            user = {
+                'u_id': user['u_id'],
+                'email': user['email'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last'],
+                'handle_str': user['handle_str'],
+            }
+            user_list.append(user)
+            #user = {}  
+
     return{"users": user_list}
 
 def user_profile_v1(token, u_id):
@@ -213,6 +222,160 @@ def user_profile_sethandle_v1(token, handle_str):
     save_data(data)        
     return {}
 
+
+def user_stat(token): 
+    '''
+    When provided a valid token, it returns all of the selected user's statistics for their usage of UNSW Streams.
+
+    Each of the stats are time-series data types for:
+        - The number of channels which the selected user is a part of
+        - The number of DMs which the selected user is a part of
+        - The number of messages which the selected user has sent
+
+    Arguments:
+        token (str)   - A jwt encoded dictionary with u_id key
+
+    Exceptions:
+        AccessError     - Occurs when the token is invalid
+
+    Return Value:
+        Returns {user_stats}, on the condition that everything is correct. Where user_stats is a dictionary which contains 
+        {
+            channels_joined: [{num_channels_joined, time_stamp}],
+            dms_joined: [{num_dms_joined, time_stamp}], 
+            messages_sent: [{num_messages_sent, time_stamp}], 
+            involvement_rate 
+        }
+    '''
+
+    data = data_store.get()
+
+    if not is_valid_token(token):
+        raise AccessError("Token Invalid")
+
+    user_id = token_to_user_id(token)
+
+    user = auth_user_id_check(user_id)
+
+    user_data = user['user_stats']
+    involvement_rate_nom = len(user_data['channels_joined']) + len(user_data['dms_joined']) 
+    + len(user_data['messages_sent'])
+
+    streams_data = data['workspace_stats']
+
+    involvement_rate_dem = len(streams_data['channels_exist']) + len(streams_data['dms_exist'])
+    + len(streams_data['messages_exist'])
+
+    involvement = involvement_rate_nom / involvement_rate_dem
+
+    save_data(data)
+    
+    return {
+        'user_stats': {
+                'channels_joined': user_data['channels_joined'],
+                'dms_joined': user_data['dms_joined'],
+                'messages_sent': user_data['messages_sent'],
+                'involvement_rate': involvement,
+            }
+    }
+
+    
+def users_stat():
+    '''
+    When provided a valid token, it returns all the statistics for all users' usage on the UNSW Streams platform.
+
+    Each of the stats are time-series data types for:
+        - The number of channels which currently exist
+        - The number of DMs which currently exist
+        - The number of messages which currently exist
+
+    Arguments:
+        token (str)   - A jwt encoded dictionary with u_id key
+
+    Exceptions:
+        AccessError     - Occurs when the token is invalid
+
+    Return Value:
+        Returns {workspace_stats}, on the condition that everything is correct. Where workspace_stats is a dictionary which contains 
+        {
+            channels_exist: [{num_channels_exist, time_stamp}], 
+            dms_exist: [{num_dms_exist, time_stamp}], 
+            messages_exist: [{num_messages_exist, time_stamp}], 
+            utilization_rate 
+        }
+    '''
+
+    data = data_store.get() 
+
+    workspace = data['workspace_stats']
+
+    count = 0
+    for user in data['users']:
+        if len(user['user_stats']['channels_joined']) > 1 or len(user['user_stats']['dms_joined']) > 1:
+            count += 1
+    
+    total_users = len(data['users'])
+
+    utilization = count/total_users
+
+    return {
+        'workspace_stats': {
+            'channels_exist': workspace['channels_exist'],
+            'dms_exist': workspace['dms_exist'],
+            'messages_exist': workspace['messages_exist'],
+            'utilization_rate': utilization    
+        }
+    }
+
+
+if __name__ == "__main__":
+    clear_v1()
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+    time.sleep(1)
+    #print(user_stat(dummy_user_1['token']))
+    channels_create_v1(dummy_user_1['token'], "Yayyy", True)
+    time.sleep(1)
+    #print(user_stat(dummy_user_1['token']))
+    channels_create_v1(dummy_user_1['token'], "asdfay", True)
+    time.sleep(1)
+    #print(user_stat(dummy_user_1['token']))
+
+    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'psafasadf', 'Beta', 'nn')
+    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'yyfasadf', 'Jack', 'nn')
+    channels_create_v1(dummy_user_2['token'], "Conpect", True)
+    #print(user_stat(dummy_user_1['token']))
+
+    dm = dm_create(dummy_user_1['token'], [dummy_user_2['auth_user_id']])
+    print(user_stat(dummy_user_1['token']))
+
+    message_send(dummy_user_1['token'], 1, "hello")
+
+    print(user_stat(dummy_user_1['token']))
+
+    print(user_stat(dummy_user_2['token']))
+
+    print("______________________________________________")
+
+    print(users_stat()) 
+
+    print("______________________________________________")
+
+    message_remove(dummy_user_1['token'], 1)
+
+    print(users_stat())
+
+    message_senddm(dummy_user_1['token'], dm['dm_id'], "hello there")
+
+    print("______________________________________________")
+
+    print(users_stat())
+
+    dm_remove(dummy_user_1['token'], dm['dm_id'])
+
+    print("______________________________________________")
+
+    print(users_stat())
+
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     '''
@@ -285,59 +448,5 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
 
 
-def user_stats_v1(token):
-    #make sure to return {user_stats}
-    '''
-    When provided a valid token, it returns all of the selected user's statistics for their usage of UNSW Streams.
-
-    Each of the stats are time-series data types for:
-        - The number of channels which the selected user is a part of
-        - The number of DMs which the selected user is a part of
-        - The number of messages which the selected user has sent
-
-    Arguments:
-        token (str)   - A jwt encoded dictionary with u_id key
-
-    Exceptions:
-        AccessError     - Occurs when the token is invalid
-
-    Return Value:
-        Returns {user_stats}, on the condition that everything is correct. Where user_stats is a dictionary which contains 
-        {
-            channels_joined: [{num_channels_joined, time_stamp}],
-            dms_joined: [{num_dms_joined, time_stamp}], 
-            messages_sent: [{num_messages_sent, time_stamp}], 
-            involvement_rate 
-        }
-    '''
-
-    pass
-
-def users_stats_v1(token):
-    #make sure to return {workspace_stats}
-    '''
-    When provided a valid token, it returns all the statistics for all users' usage on the UNSW Streams platform.
-
-    Each of the stats are time-series data types for:
-        - The number of channels which currently exist
-        - The number of DMs which currently exist
-        - The number of messages which currently exist
-
-    Arguments:
-        token (str)   - A jwt encoded dictionary with u_id key
-
-    Exceptions:
-        AccessError     - Occurs when the token is invalid
-
-    Return Value:
-        Returns {workspace_stats}, on the condition that everything is correct. Where workspace_stats is a dictionary which contains 
-        {
-            channels_exist: [{num_channels_exist, time_stamp}], 
-            dms_exist: [{num_dms_exist, time_stamp}], 
-            messages_exist: [{num_messages_exist, time_stamp}], 
-            utilization_rate 
-        }
-    '''
-    pass
 
 

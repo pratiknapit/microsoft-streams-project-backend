@@ -8,6 +8,7 @@ from src.data_store import check_existing_member, leave_channel, add_owner_chann
 from src.data_store import data_store, save_data
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
+from datetime import datetime
 
 
 def channel_invite_v1(token, channel_id, u_id):
@@ -69,6 +70,21 @@ def channel_invite_v1(token, channel_id, u_id):
     notif_message = f"{react_user_str_handle} added you to {channel_name}"
     user_notif = auth_user_id_check(u_id)
     user_notif['notifications'].insert(0, {'channel_id': channel_id, 'dm_id': -1, 'notification_message': notif_message})
+
+
+    #User stats implementation
+
+    for user in data['users']:
+        if user['u_id'] == u_id:
+            if len(user['user_stats']['channels_joined']) == 0:
+                channels_joined = 1
+            else:
+                channels_joined = user['user_stats']['channels_joined'][-1]['num_channels_joined'] + 1  
+            
+            user['user_stats']['channels_joined'].append({
+                'num_channels_joined':channels_joined, 
+                'time_stamp':int(datetime.now().timestamp())
+                })
 
     save_data(data)
 
@@ -189,6 +205,7 @@ def channel_messages_v1(token, channel_id, start):
     else:
         for i in range(start, end):
             message_dictionary['messages'].append(channel['Messages'][i])
+    
 
     save_data(data)
     return message_dictionary
@@ -230,6 +247,21 @@ def channel_join_v1(token, channel_id):
         if channel['channel_id'] == channel_id:
             channel['all_members'].append(auth_user_id)
 
+
+    #User stats implementation
+    u_id = token_to_user_id(token)
+    for user in data['users']:
+        if user['u_id'] == u_id:
+            if len(user['user_stats']['channels_joined']) == 0:
+                channels_joined = 1
+            else:
+                channels_joined = user['user_stats']['channels_joined'][-1]['num_channels_joined'] + 1  
+            
+            user['user_stats']['channels_joined'].append({
+                'num_channels_joined':channels_joined, 
+                'time_stamp':int(datetime.now().timestamp())
+                })
+
     save_data(data)
 
     return {}
@@ -268,6 +300,19 @@ def channel_leave_v2(token, channel_id):
     if v_member == False:
         raise AccessError("User is not a member of the channel")
 
+
+    #User stats implementation
+    u_id = token_to_user_id(token)
+    for user in data['users']:
+        if user['u_id'] == u_id:
+
+            channels_joined = user['user_stats']['channels_joined'][-1]['num_channels_joined'] - 1  
+            
+            user['user_stats']['channels_joined'].append({
+                'num_channels_joined':channels_joined, 
+                'time_stamp':int(datetime.now().timestamp())
+                })
+    
     save_data(data)
 
     return {}

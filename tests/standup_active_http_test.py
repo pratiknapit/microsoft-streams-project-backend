@@ -82,64 +82,46 @@ def channel_priv(user1):
 
 #test invalid token 
 
+def test_invalid_token(clear, user1, channel1):
+
+    response = requests.get(config.url + 'standup/active/v1', json={
+        'token': -1,
+        'channel_id': channel1['channel_id'],
+        'length': 2
+    })
+
+    assert response.status_code == 403
+
 #test invalid channel id 
+
+def test_invalid_channel(clear, user1, channel1):
+
+    response = requests.post(config.url + 'standup/start/v1', json={
+        'token': user1['token'],
+        'channel_id': channel1['channel_id'],
+        'length': 1
+    })
+
+    assert response.status_code == 200 
+
+    response = requests.get(config.url + 'standup/active/v1', params={
+        'token': user1['token'],
+        'channel_id': 99
+    })
+
+    assert response.status_code == 400
 
 #test standup start while standup is already running 
 
-#test user start standup but user is not in the channel 
+def test_standup_active_basic(clear, user1, channel1):
 
-def test_standup_start_basic(clear, user1, channel1):
-    response1 = requests.post(config.url + 'standup/start/v1', json={
+    response = requests.post(config.url + 'standup/start/v1', json={
         'token': user1['token'],
         'channel_id': channel1['channel_id'],
-        'length': 5
-    })
-
-    assert response1.status_code == 200 
-    
-    response = requests.get(config.url + 'standup/active/v1', params={
-        'token': user1['token'],
-        'channel_id': channel1['channel_id']
+        'length': 1
     })
 
     assert response.status_code == 200 
-    assert response.json()['is_active'] == True
-
-def test_standup_ends_basic(clear,user1, channel1):
-    response1 = requests.post(config.url + 'standup/start/v1', json={
-        'token': user1['token'],
-        'channel_id': channel1['channel_id'],
-        'length': 5
-    })
-
-    assert response1.status_code == 200 
-    
-    response = requests.get(config.url + 'standup/active/v1', params={
-        'token': user1['token'],
-        'channel_id': channel1['channel_id']
-    })
-
-    assert response.status_code == 200 
-    assert response.json()['is_active'] == True
-    time.sleep(5)
-    
-    response = requests.get(config.url + 'standup/active/v1', params={
-        'token': user1['token'],
-        'channel_id': channel1['channel_id']
-    })
-
-    assert response.status_code == 200 
-    assert response.json()['is_active'] == False
-
-def test_standup_send_basic(clear, user1, channel1):
-
-    response1 = requests.post(config.url + 'standup/start/v1', json={
-        'token': user1['token'],
-        'channel_id': channel1['channel_id'],
-        'length': 5
-    })
-
-    assert response1.status_code == 200 
     
     response = requests.get(config.url + 'standup/active/v1', params={
         'token': user1['token'],
@@ -157,7 +139,7 @@ def test_standup_send_basic(clear, user1, channel1):
 
     assert response.status_code == 200
 
-    time.sleep(5)
+    time.sleep(1)
     
     response = requests.get(config.url + 'standup/active/v1', params={
         'token': user1['token'],
@@ -167,7 +149,4 @@ def test_standup_send_basic(clear, user1, channel1):
     assert response.status_code == 200 
     assert response.json()['is_active'] == False
 
-    
-
-    
 
