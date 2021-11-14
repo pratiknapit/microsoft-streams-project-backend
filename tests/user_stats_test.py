@@ -8,7 +8,7 @@ def clear():
     requests.delete(config.url + 'clear/v1')
 
 @pytest.fixture
-def user1(clear):
+def user1():
     email = "testmail@gamil.com"
     password = "Testpass12345"
     first_name = "firstone"
@@ -52,7 +52,7 @@ def user3():
 
 
 @pytest.fixture
-def channel2(user2):
+def channel1(user2):
     channel = requests.post(config.url + 'channels/create/v2', json={
         "token": user2['token'],
         "name": "User2Channel1",
@@ -65,6 +65,21 @@ def test_user_stat(clear, user1):
         'token': user1['token']
     })
     assert response.status_code == 200 
+
+def test_user_stats_valid(clear, user1, channel1):
+    requests.post(config.url + '/message/send/v2',
+        json={'token':user1['token'], 'channel_id':channel1['channel_id'], 'message':"TestMessage"})
+
+    resp1 = requests.get(config.url + 'user/stats/v1', params={'token': user1['token']})
+    resp = resp1.json()['user_stats']
+    assert len(resp['channels_joined']) == 1
+    assert len(resp['dms_joined']) == 1
+    assert len(resp['messages_sent']) == 1
+    #assert resp['involvement_rate'] == 1
+
+def test_user_stats_access_error(clear):
+    resp = requests.get(config.url + 'user/stats/v1', params={'token': 'bad.token.input'})
+    assert resp.status_code == 403
 
 def test_user_stat_function(clear, user1):
     channel = requests.post(config.url + 'channels/create/v2', json={
@@ -80,6 +95,17 @@ def test_user_stat_function(clear, user1):
     })
 
     assert response.status_code == 200
+
+def test_users_stats_valid(clear, user1, channel1):
+    requests.post(config.url + '/message/send/v2',
+        json={'token':user1['token'], 'channel_id':channel1['channel_id'], 'message':"TestMessage"})
+
+    resp1 = requests.get(config.url + 'users/stats/v1', params={'token': user1['token']})
+    resp = resp1.json()['workspace_stats']
+    #assert len(resp['channels_exist']) == 1
+    assert len(resp['dms_exist']) == 97
+    assert len(resp['messages_exist']) == 281
+    assert resp['utilization_rate'] == 0.5
     
 
 
