@@ -95,7 +95,6 @@ def test_invalid_time_sent(clear, token, dm_id, timestamp):
     }).status_code
     assert status_code == 400
 
-'''
 def test_message_send_later(clear, token, dm_id, timestamp):
     message_id = requests.post(config.url + 'message/sendlaterdm/v1', json={
         'token': token,
@@ -104,5 +103,3 @@ def test_message_send_later(clear, token, dm_id, timestamp):
         'time_sent': timestamp + 2.0
     }).json()['message_id']
     assert message_id == 1
-'''
-# IMPORTANT TO TEST WHEN MSG_SEND FIXED
