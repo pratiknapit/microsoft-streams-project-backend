@@ -1,5 +1,5 @@
 '''
-This file contains auth_login, auth_register
+This file contains auth_login, auth_register, auth_logout
 '''
 ###########
 #Functions#
