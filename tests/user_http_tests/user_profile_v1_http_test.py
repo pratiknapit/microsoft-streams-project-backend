@@ -44,6 +44,7 @@ def test_user_profile_v1_successful_case(clear, dummy_user):
                 "email": "dummy2@gmail.com",
                 "name_first": "Second",
                 "name_last": "Two",
-                "handle_str": "secondtwo" 
-            }       
+                "handle_str": "secondtwo",
+                "profile_img_url": []
+            }      
     }

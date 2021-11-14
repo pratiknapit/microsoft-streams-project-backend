@@ -127,6 +127,7 @@ def make_user(email, password, name_first, name_last, u_id):
             'channel_id_members': [],
             'is_global_owner': is_global_owner,
             'messages_created':[],
+            'profile_img_url': [],
             'session_list': [],
             'notifications': [],
             'sent_messages': [],
@@ -148,6 +149,7 @@ def make_user(email, password, name_first, name_last, u_id):
             },
             
 
+            'reset_code': ''
     }
 
 # Function to make message dictionary and returns message_id

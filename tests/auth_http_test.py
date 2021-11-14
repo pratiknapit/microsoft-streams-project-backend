@@ -114,7 +114,6 @@ def test_for_valid_request_and_reset_password(user1):
     resp = requests.post(config.url + "auth/passwordreset/request/v1", json={'email': 'jackyzhu@gmail.com'})
     assert resp.status_code == 200
 
-
 def test_for_invalid_request_and_reset_password(user1):
     requests.post(config.url + "auth/register/v2", json= user1)
     respo = requests.post(config.url + "auth/passwordreset/request/v1", json={'email': 'jokeame@gmail.com'})

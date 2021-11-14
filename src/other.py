@@ -10,6 +10,7 @@ def clear_v1():
     store['dms'] = []
     data_store.set(store)
 
+
 def notifications_get(token):
 
     if not is_valid_token(token):
