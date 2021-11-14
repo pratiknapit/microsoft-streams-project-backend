@@ -1,7 +1,7 @@
 import sys
 import signal
 from json import dump, dumps
-from flask import Flask, request
+from flask import Flask, request, send_file, send_from_directory
 from src.channel import channel_add_owner_v2, channel_join_v1, channel_details_v1, channel_leave_v2
 from src.channel import channel_remove_owner_v2, channel_invite_v1, channel_messages_v1
 from flask_cors import CORS
@@ -19,6 +19,8 @@ from src.user import user_profile_sethandle_v1, users_all_v1
 from src.dm import dm_create, dm_list, dm_remove, dm_details, dm_leave, dm_messages
 from src.standup import standup_active_v1, standup_start_v1, standup_send_v1
 from src.admin import admin_user_permission_change_v1
+from src.user import user_profile_uploadphoto_v1
+
 
 
 def quit_gracefully(*args):
@@ -36,7 +38,7 @@ def defaultHandler(err):
     response.content_type = 'application/json'
     return response
 
-APP = Flask(__name__)
+APP = Flask(__name__, static_url_path='/static/')
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
@@ -440,6 +442,19 @@ def admin_user_permission_change():
     data = request.get_json()
     admin_user_permission_change_v1(data['token'], data['u_id'], data['permission_id'])
     return dumps({})
+
+
+@APP.route("/src/static/<path:path>", methods=['GET'])
+def send_js(path):
+    return send_from_directory('', path)
+
+
+@APP.route("/user/profile/uploadphoto/v1", methods=['POST'])
+def user_profile_uploadphoto():
+    info = request.get_json()
+    result = user_profile_uploadphoto_v1(info['token'], info['img_url'], info['x_start'], info['y_start'],
+                                         info['x_end'], info['y_end'])
+    return dumps(result)
 
 
 #### NO NEED TO MODIFY BELOW THIS POINT

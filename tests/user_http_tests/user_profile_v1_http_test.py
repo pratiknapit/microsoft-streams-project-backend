@@ -46,5 +46,5 @@ def test_user_profile_v1_successful_case(clear, dummy_user):
                 "name_last": "Two",
                 "handle_str": "secondtwo",
                 "profile_img_url": []
-            }       
+            }      
     }

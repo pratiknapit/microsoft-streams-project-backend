@@ -9,6 +9,8 @@ import requests
 import urllib.request
 from PIL import Image
 import io
+import sys
+
 
 
 
@@ -43,7 +45,7 @@ def users_all_v1(token):
             'handle_str': user['handle_str'],
         }
         user_list.append(user)
-        user = {}  
+        # useless user = {}  
     return{"users": user_list}
 
 def user_profile_v1(token, u_id):
@@ -234,176 +236,48 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     Return Value:
         Returns {}, an empty dictionary on the condition that everything is correct
     '''
-
-      
-    
-    '''
-    if token_check(token) == False:
+    if is_valid_token(token) == False:
         raise AccessError("Token provided is not valid")
 
+    id = token_to_user_id(token)
 
-    img = Image.open(path)
-    width, height = img.size
-
-
-    response = requests.get(img_url)
-    if response.status_code != 200:
-        raise InputError("img_url returns an HTTP status other than 200.")
-
-    # check the format of the image
-    # image = Image.open(response.raw)
-    image = Image.open(io.BytesIO(response.content))
-
-    img_info = imgspy.info(img_url)
-    if img_info.get('type') != 'jpg':
-        raise InputError("Image uploaded is not a JPG.")
-
-    width, height = img.size
-    if (x_start < 0) or (x_end > width) or (y_start < 0) or (y_end > height):
-        raise InputError("Cropping outsize image dimensions")
-    if (x_start > x_end) or (y_start > y_end):
-        raise InputError("Cropping outsize image dimensions")
-
-    # save the original image locally
     path = 'src/static/'
     if not os.path.exists(path):
         os.mkdir(path)
-    path = path + str(user.u_id) + '.jpg'
-    user.image_path = path
-    # urllib.request.urlretrieve(img_url, path)
 
-    # crop the image
-    image_cropped = image.crop((x_start, y_start, x_end, y_end))
-    # overwrite the original image by the cropped image
-    image_cropped.save(path, format='JPEG')
+    path = path + str(id) + '.jpg'
 
-    # generate the image_url
-    user.image_url = 'http://127.0.0.1:10000/static/' + str(user.u_id) + '.jpg'
-    '''
-    
-
-    '''    
-    user = is_valid_token(token)
-
-    if token_check(token) == False:
-        raise AccessError("Token provided is not valid")
-
-    # get the image from url
     try:
-        response = requests.get(img_url, stream=True)
-    except requests.ConnectionError as e:
-        raise InputError(description="The input is not url") from e
-    if response.status_code != 200:
-        raise InputError(description="img_url returns an HTTP status other than 200.")
-
-    # check the format of the image
-    # image = Image.open(response.raw)
-    image = Image.open(io.BytesIO(response.content))
-    if image.format != 'JPEG':
-        raise InputError(description="Image uploaded is not a JPG")
-
-    # check whether the input bounds are valid
-    width, height = image.size
-    if (x_start < 0) or (x_end > width) or (y_start < 0) or (y_end > height):
-        raise InputError("Cropping outsize image dimensions")
-    if (x_start > x_end) or (y_start > y_end):
-        raise InputError("Cropping outsize image dimensions")
-
-    # save the original image locally
-    path = 'src/static/'
-    if not os.path.exists(path):
-        os.mkdir(path)
-    path = path + str(user.u_id) + '.jpg'
-    user.image_path = path
-    # urllib.request.urlretrieve(img_url, path)
-
-    # crop the image
-    image_cropped = image.crop((x_start, y_start, x_end, y_end))
-    # overwrite the original image by the cropped image
-    image_cropped.save(path, format='JPEG')
-
-    # generate the image_url
-    user.image_url = 'http://127.0.0.1:10000/static/' + str(user.u_id) + '.jpg'
-    '''
+        urllib.request.urlretrieve(img_url, path)
+    except Exception as ex:
+        raise InputError("Invalid URL") from ex
+    try:
+        imageObject = Image.open(path)
+    except Exception as ex:
+        raise InputError("Invalid URL") from ex
     
-
-
-
-
-
-    '''
-    if token_check(token) == False:
-        raise AccessError("Token provided is not valid")
-
-     # Fetch image via URL
-    try:  
-        requests.get(img_url).status_code
-    except Exception as e:
-        raise InputError from e
-
-    image_formats = ("image/jpeg", "image/jpg")
-    if requests.head(img_url).headers["content-type"] not in image_formats:
-        raise InputError
-        
-    urllib.request.urlretrieve(img_url, f"src/static/{auth_user_id}.jpg")
-
-    # Cropping image
-    imageObject = Image.open(f"src/static/{auth_user_id}.jpg")
 
     width, height = imageObject.size
-
     if (x_start < 0) or (x_end > width) or (y_start < 0) or (y_end > height):
-        raise InputError("Cropping outsize image dimensions")
+        raise InputError("Cropping is outside image dimensions")
     if (x_start > x_end) or (y_start > y_end):
-        raise InputError("Cropping outsize image dimensions")
-    
-    imageObject.crop((x_start, y_start, x_end, y_end)).save(f"src/static/{auth_user_id}.jpg")
-
-    # Serving image
-    data = data_load()
-
-    for user in data['users']:
-        if user['u_id'] == auth_user_id:
-            user['profile_img_url'] = f"{url}static/{auth_user_id}.jpg"
-
-    with open('data.json', 'w') as FILE:
-        json.dump(data, FILE)
-    '''
+        raise InputError("Cropping is outside image dimensions")
 
 
-
-    
-    tok = is_valid_token(token) # Also validates the token, raises AccessError when token is invalid
-    id = token_to_user_id(tok)
-
-    img_name = f"src/static/{id}.jpg"
-
-    try:
-        urllib.request.urlretrieve(img_url, img_name)
-    except Exception as ex:
-        raise InputError("Invalid URL") from ex
-    try:
-        img = Image.open(img_name)
-    except Exception as ex:
-        raise InputError("Invalid URL") from ex
-
-    width, height = img.size
-    if (x_start < 0) or (x_end > width) or (y_start < 0) or (y_end > height):
-        raise InputError("Cropping outsize image dimensions")
-    if (x_start > x_end) or (y_start > y_end):
-        raise InputError("Cropping outsize image dimensions")
     # crop the image
-    cropped_img = img.crop((x_start, y_start, x_end, y_end))
     # give the file a unique name for the user using their auth_user_id 
     # and save the image save the image
-    
-    cropped_img.save(img_name)
+
+    imageObject = Image.open(path)
+    cropped = imageObject.crop((x_start, y_start, x_end, y_end))
+    cropped.save(path)
+
 
     # update the user data
     data = data_store.get()
     for user in data['users']:
         if id == user['u_id']:
-            user['profile_img_url'] = img_name
+            user['profile_img_url'] = 'http://127.0.0.1:8237/static/' + str(id) + '.jpg'
             break
     save_data(data)
     
@@ -465,4 +339,5 @@ def users_stats_v1(token):
         }
     '''
     pass
+
 
