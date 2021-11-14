@@ -5,7 +5,6 @@ from src.error import AccessError, InputError
 from src.data_store import dm_id_check, is_user_in_channel, is_user_in_dm, is_valid_token, is_valid_user_id, is_user_in_dm
 from src.data_store import find_user, find_dm, find_channel, is_valid_dm_id, is_user_in_channel
 from src.data_store import data_store, save_data
-from src.helper import list_dm
 
 def dm_create(token, u_ids):
     '''
@@ -73,7 +72,13 @@ def dm_list(token):
     data = data_store.get()
 
     dm_list = []
-    list_dm(dm_list, decoded_token)
+    data = data_store.get()
+    for dm in data['dms']:
+        for member in dm['members']:
+            if member == decoded_token['auth_user_id']:
+                dm_list.append({'dm_id': dm['dm_id'],
+                                'name': dm['name']})
+                break
    
     save_data(data)            
     return {'dms': dm_list}
