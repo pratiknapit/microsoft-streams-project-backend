@@ -1,10 +1,10 @@
 '''
-This file contains auth_login, auth_register
+This file contains auth_login, auth_register, auth_logout
 '''
 ###########
 #Functions#
 ###########
-from src.data_store import data_store, add_user, login_email, create_token, hash_password, token_check
+from src.data_store import data_store, add_user, login_email, create_token, hash_password
 
 ##########################
 # Helper Check Functions #

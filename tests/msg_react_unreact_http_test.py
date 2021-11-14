@@ -268,5 +268,3 @@ def test_message_unreact(clear, user1, user2, channel1, channel2):
     })
 
     assert response.status_code == 200 
-
-

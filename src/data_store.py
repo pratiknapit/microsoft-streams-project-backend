@@ -147,9 +147,7 @@ def make_user(email, password, name_first, name_last, u_id):
                     'time_stamp': int(datetime.now().timestamp())
                 }]
             },
-            
-
-            'reset_code': ''
+            'reset_code': [],
     }
 
 # Function to make message dictionary and returns message_id

@@ -5,7 +5,7 @@ import json
 from src import config
 
 @pytest.fixture
-def user1(clear):
+def user1():
     user1 = requests.post(config.url + "auth/register/v2", json={
         "email": "pratik7@gmail.com",
         "password": "ronaldo",
@@ -27,7 +27,7 @@ def channel1(user1):
 def clear():
     requests.delete(config.url + 'clear/v1')
 
-def test_invalid_token():
+def test_invalid_token(clear):
     response = requests.post(config.url + 'channels/create/v2', json={
         "token": "random_token",
         "name": "FirstChannel",
@@ -35,7 +35,7 @@ def test_invalid_token():
         })
     assert response.status_code == 403
 
-def test_invalid_name_length1(user1):
+def test_invalid_name_length1(clear, user1):
     response = requests.post(config.url + 'channels/create/v2', json={
         "token": user1['token'],
         "name": "FirstChanneladfadkfjlkdsjfksdljfakdfajafdksjl",
@@ -43,7 +43,7 @@ def test_invalid_name_length1(user1):
         })
     assert response.status_code == 400
 
-def test_invalid_name_length2(user1):
+def test_invalid_name_length2(clear, user1):
     response = requests.post(config.url + 'channels/create/v2', json={
         "token": user1['token'],
         "name": "",
