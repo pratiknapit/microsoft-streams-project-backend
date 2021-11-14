@@ -227,7 +227,7 @@ def channel_id(owner, member):
     })
     return channel_id
 
-def test_invalid_token(clear, channel_id, member):
+def test_invalided_token(clear, channel_id, member):
     status_code = requests.post(config.url + 'channel/removeowner/v1', json={
         'token': "invalid_token",
         'channel_id': channel_id,
