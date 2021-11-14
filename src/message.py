@@ -28,13 +28,12 @@ def message_send(token, channel_id, message):
     Return Value:
         A dictionary containing the message_id of the message that was sent.
     '''
-
     data = data_store.get()
     
     if not token_check(token):
-        raise AccessError
+        raise AccessError('Unauthorised User')
     if not channel_id_check(channel_id):
-        raise InputError(description='Channel does not exist')
+        raise InputError('Channel does not exist')
     if (len(message) > 1000 or len(message) < 1): 
         raise InputError('Message is longer than 1000 characters or less than 1 character')
     if not check_if_user_is_channel_member(token, channel_id):
@@ -47,6 +46,12 @@ def message_send(token, channel_id, message):
 
     message_id = make_message(message, channel_id, user['u_id'])
     """
+    # Add to user stats; messages sent
+    user = find_user(token['auth_user_id'], data)
+    user['sent_messages'].insert(0, data['msg_counter'] + 1)
+        
+    user['user_stats']['messages_sent'].append({'num_messages_sent':len(user['sent_messages']), 'time_stamp':int(datetime.now().timestamp())})
+        
     tagged_handles = return_valid_tagged_handles(message, channel_id)
     notif_message = f"{tagged_handles[0]} tagged you in {channel_id}: {message}"
     for user in channel['members']:
@@ -63,14 +68,14 @@ def message_send(token, channel_id, message):
         'message_id': message_id,
     }
     
-def message_edit(token, message_id, new_message):
+def message_edit(token, message_id, message):
     '''
     Edits a current message  
 
     Arguments:
         token       (str) - A string which holds the token
         message_id  (int) - The message id of current message
-        new_message (str) - The message to replace current message
+        message     (str) - The message to replace current message
 
     Exceptions:
         InputError      - Message length is over 1000 characters
@@ -85,34 +90,52 @@ def message_edit(token, message_id, new_message):
 
     data = data_store.get()
 
-    if len(new_message) > 1000:
+    if len(message) > 1000:
         raise InputError('Message over 1000 characters.')
-    if message_id_check(message_id) == False:
-        raise InputError('message_id does not refer to a valid message within channel/DM')
+
     decoded_token = is_valid_token(token)
     if decoded_token is False:
         raise AccessError('Invalid Token.')
 
-    message = message_id_check(message_id)
+    token_user = find_user(decoded_token['auth_user_id'])
+    is_global_owner = token_user['permission_id'] == 1
 
-    is_owner = owner_channel_check(token, message['channel_id'])
-    u_id = token_to_user_id(token)
-    user = user_id_check(u_id)
+    source = None
+    found_message = None
+    for dm in data['dms']:
+        for dm_message in dm['messages']:
+            if dm_message['message_id'] == message_id:
+                if dm['creator'] == decoded_token['auth_user_id'] or dm_message['u_id'] == decoded_token['auth_user_id'] or is_global_owner:
+                    found_message = dm_message
+                    source = dm
+                    break
+                else:
+                    raise AccessError(
+                        description='Not authorised to edit message.')
+        if found_message is not None:
+            break
 
-    if user == False:
-        raise AccessError
+    if found_message is None:
+        for channel in data['channels']:
+            for channel_message in channel['Messages']:
+                if channel_message['message_id'] == message_id:
+                    if decoded_token['auth_user_id'] in channel['owner_members'] or channel_message['u_id'] == decoded_token['auth_user_id'] or is_global_owner:
+                        found_message = channel_message
+                        source = channel
+                        break
+                    else:
+                        raise AccessError(
+                            description='Not authorised to edit message.')
+            if found_message is not None:
+                break
 
-    is_sender = False
-    if user['u_id'] == message['u_id']:
-        is_sender = True
-
-    if (is_owner or is_sender) == False:
-        raise AccessError
-
-    if len(new_message) == 0:
-        user['messages_created'].remove(message_id)
-    else :
-        message['message'] = new_message
+    if found_message is not None:
+        if len(message) == 0:
+            source['Messages'].remove(found_message)
+        else:
+            found_message['message'] = message
+    else:
+        raise InputError(description='No message found.')
 
     save_data(data)
     return {}
@@ -235,8 +258,6 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         return {'shared_message_id': dm_send['message_id']}
         #send a dm msg
     
-    
-        
 
 def message_react_v1(token, message_id, react_id): 
     """
@@ -381,20 +402,33 @@ def message_senddm(token, dm_id, message):
     
     data['msg_counter'] += 1
     
-    #if len(data['dreams_stats']['messages_exist']) == 0:
-    #    messages_exist = 1
-    #else:
-    #    messages_exist = data['dreams_stats']['messages_exist'][-1]['num_messages_exist'] + 1
-
-    #data['dreams_stats']['messages_exist'].append({'num_messages_exist':messages_exist, 'time_stamp':int(datetime.now().timestamp())})
-    
     save_data(data)
 
     return {'message_id': message_id}
 
 
 def message_sendlater(token, channel_id, message, time_sent):
+    '''
+    Send a message from the authorised user to the channel specified by channel_id automatically at a specified time in the future.
 
+    Arguments:
+        token      (str) - A string which holds the token
+        channel_id (int) - The channel id of channel specified
+        message    (str) - The message to be sent
+        time_sent  (int) - The unix timestamps of time message to be sent 
+        
+    Exceptions:
+        InputError      - When message does not exist
+        InputError      - When channel id is invalid
+        InputError      - When length of message longer than 1000 characters
+        InputError      - Time of messgae to send is in the past
+        AccessError     - When token is invalid
+        AccessError     - When authorised user is invalid
+        AccessError     - When user not member of channel
+
+    Return Value:
+        The message dictionary
+    '''
     data = data_store.get()
     if not is_valid_token(token):
         raise AccessError("Invalid token id.")
@@ -420,6 +454,27 @@ def message_sendlater(token, channel_id, message, time_sent):
     return messageID_dict
 
 def message_sendlaterdm(token, dm_id, message, time_sent):
+    '''
+    Send a message from the authorised user to the DM specified by dm_id automatically at a specified time in the future.
+
+    Arguments:
+        token      (str) - A string which holds the token
+        dm_id      (int) - The dm id of dm specified
+        message    (str) - The message to be sent
+        time_sent  (int) - The unix timestamps of time message to be sent 
+        
+    Exceptions:
+        InputError      - When message does not exist
+        InputError      - When dm id is invalid
+        InputError      - When length of message longer than 1000 characters
+        InputError      - Time of messgae to send is in the past
+        AccessError     - When token is invalid
+        AccessError     - When authorised user is invalid
+        AccessError     - When user not member of DM
+
+    Return Value:
+        The message dictionary
+    '''
     data = data_store.get()
 
     if not is_valid_token(token):
@@ -447,6 +502,22 @@ def message_sendlaterdm(token, dm_id, message, time_sent):
     return messageID_dict
 
 def message_pin(token, message_id):
+    '''
+    Given a message within a channel or DM, mark it as "pinned".
+
+    Arguments:
+        token      (str) - A string which holds the token
+        message_id (int) - The message id of current message
+        
+    Exceptions:
+        InputError      - When message does not exist
+        AccessError     - When token is invalid
+        AccessError     - When authorised user is invalid
+        AccessError     - When user is not owner or sender
+
+    Return Value:
+        Empty dictionary
+    '''
     decoded_token = is_valid_token(token)
     if decoded_token is False:
         raise AccessError(description="Invalid Token.")
@@ -518,6 +589,22 @@ def message_pin(token, message_id):
 
 
 def message_unpin(token, message_id):
+    '''
+    Given a message within a channel or DM, remove its mark as pinned.
+
+    Arguments:
+        token      (str) - A string which holds the token
+        message_id (int) - The message id of current message
+        
+    Exceptions:
+        InputError      - When message does not exist
+        AccessError     - When token is invalid
+        AccessError     - When authorised user is invalid
+        AccessError     - When user is not owner or sender
+
+    Return Value:
+        Empty dictionary
+    '''
     decoded_token = is_valid_token(token)
     if decoded_token is False:
         raise AccessError("Invalid Token.")

@@ -14,7 +14,6 @@ def user0():
                                  json={'email': email, 'password': password, 'name_first': firstname, 'name_last': lastname})
     return json.loads(user.text)
 
-
 @pytest.fixture
 def owner():
     email = "dmcreator@gmail.com"

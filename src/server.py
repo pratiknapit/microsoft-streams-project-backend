@@ -9,8 +9,8 @@ from src.error import InputError
 from src import config
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.data_store import password_check, email_check, email_repeat_check
-from src.other import clear_v1, notifications_get
-from src.auth import auth_register_v1, auth_login_v1, auth_logout
+from src.other import clear_v1, notifications_get, search_v2
+from src.auth import auth_register_v1, auth_login_v1, auth_logout, auth_passwordreset_request, auth_passwordreset_reset
 from src.message import message_react_v1, message_send, message_edit, message_remove, message_share_v1, message_unreact_v1
 from src.standup import standup_start_v1
 from src.message import message_send, message_edit, message_remove, message_senddm, message_sendlater, message_sendlaterdm, message_pin, message_unpin
@@ -59,25 +59,19 @@ def clear():
     clear_v1()
     return dumps({})
 
+@APP.route("/search/v2", methods=['GET'])
+def searching():
+    data = request.args
+    return dumps(search_v2(data['token'], data['query_str']))
+
 @APP.route("/auth/register/v2", methods=["POST"])
 def register_auth():
     data = request.get_json()
 
-    email = data["email"]
-    password = data["password"]
-    name_first = data["name_first"]
-    name_last = data["name_last"]
-
-    if not email_check(email):
-        raise InputError(description="Email not valid")
-    if email_repeat_check(email):
-        raise InputError(description="Email already used")
-    if len(password) < 6:
-        raise InputError(description="Password less than 6 characters")
-    if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError(description="First name is invalid")
-    if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError(description="Last name is invalid")
+    email = data['email']
+    password = data['password']
+    name_first = data['name_first']
+    name_last = data['name_last']
 
     user = auth_register_v1(email, password, name_first, name_last)
     auth_uid = user['auth_user_id']
@@ -94,13 +88,6 @@ def login_auth():
 
     email = data["email"]
     password = data["password"]
-
-    if not email_check(email):
-        raise InputError(description="Email not valid")
-    if not email_repeat_check(email):
-        raise InputError(description="Email already used")
-    if not password_check(password):
-        raise InputError(description="Password incorrect")
 
     login_info = auth_login_v1(email, password)
     u_id = login_info['auth_user_id']
@@ -121,6 +108,17 @@ def logout_auth():
         'is_success': result
     })
 
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def auth_passwordreset_request_v1_http():
+    data = request.get_json()
+    auth_passwordreset_request(data['email'])
+    return dumps({})
+
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def auth_passwordreset_reset_v1_http():
+    data = request.get_json()
+    auth_passwordreset_reset(data['reset_code'], data['new_password'])
+    return dumps({})
 
 #Channels HTTP Server Wrappers
 
@@ -238,8 +236,7 @@ def c_invite():
     return dumps(out)
 
 @APP.route("/channel/messages/v2", methods=['GET'])
-def channel_msg():
-    
+def c_messages():
     token = request.args.get('token')
     channel_id = int(request.args.get('channel_id'))
     start = int(request.args.get('start'))
@@ -263,7 +260,7 @@ def edit_message():
 
     token = data['token']
     message_id = data['message_id']
-    message = data['new_message']
+    message = data['message']
     
     message_edit(token, message_id, message)
     return dumps({})

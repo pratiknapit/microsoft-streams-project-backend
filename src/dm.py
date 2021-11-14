@@ -90,7 +90,7 @@ def dm_remove(token, dm_id):
     Exceptions:
         AccessError  - Occurs when the token invalid or when the user is not the dm creator
         InputError   - Occurs when dm_id does not refer to a valid dm
-    Return Value:
+    Returns:
         Empty dictionary
     '''
     data = data_store.get()
@@ -134,7 +134,7 @@ def dm_details(token, dm_id):
         InputError: When dm_id is not a valid dm
         AccessError: raises if the authorised user is not a part of the dm
 
-    Return Value:
+    Returns:
         String of the name of the dm, 
         list of dicts with u_id, email, name_first, name_last and handle_str
     '''
@@ -179,7 +179,7 @@ def dm_leave(token, dm_id):
     Exceptions:
         AccessError - Occurs when the token is invalid and authorised user is not a member of the dm
         InputError  - Occurs when dm_id is invalid
-    Return Value:
+    Returns:
         Empty dictionary
     '''
     decoded_token = is_valid_token(token)
@@ -223,7 +223,7 @@ def dm_messages(token, dm_id, start):
         AccessError - Occurs when the token is invalid and authorised user is not a member of the dm
         InputError  - Occurs when dm_id is invalid and "start" is greater than
         the total number of messages in the dm
-    Return Value:
+    Returns:
         Returns {messages, start, end} where messages is a dictionary
     '''
     data = data_store.get()
