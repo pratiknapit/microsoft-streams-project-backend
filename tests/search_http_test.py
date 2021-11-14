@@ -1,14 +1,6 @@
 import pytest
 import requests
 from src import config
-from src.auth import auth_register_v1, auth_login_v1
-from src.error import AccessError, InputError
-from src.message import message_edit
-from src.channels import channels_create_v1
-from src.dm import dm_create, dm_messages
-from src.message import message_send, message_senddm
-from src.channel import channel_messages_v1
-
 
 @pytest.fixture(autouse=True)
 def clear():
