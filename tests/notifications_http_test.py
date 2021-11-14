@@ -109,4 +109,37 @@ def test_notifications_returns_correctly(clear, user1, user2, channel1):
     })
 
     assert resp.status_code == 200
+
+def test_notifications_structure(clear, user1, user2, channel1):
+    response = requests.post(config.url + 'channel/join/v2', json={
+        "token": user2['token'],
+        "channel_id": 1
+    })
+
+    assert response.status_code == 200
+
+    message_og = requests.post(config.url + 'message/send/v1', json= {
+        'token': user1['token'],
+        'channel_id': 1,
+        'message': 'Crypto will bounce after this dip.'
+    })
+
+    assert message_og.status_code == 200
+
+    msg_og = message_og.json() 
+
+    response = requests.post(config.url + 'message/react/v1', json= {
+        'token': user2['token'],
+        'message_id': msg_og['message_id'],
+        'react_id': 1 
+    })
+
+    assert response.status_code == 200
+
+    resp = requests.get(config.url + 'notifications/get/v1', params={
+        'token': user1['token']
+    })
+
+    assert resp.status_code == 200
+
     

@@ -326,7 +326,7 @@ def message_react_v1(token, message_id, react_id):
     #check if message id is valid id (exists in the datastore channel or dm) 
 
     message = message_id_check(message_id) #this will only check for messages in channels 
-    if message == None:
+    if message == False:
         raise InputError("Message_id does not exist within a channel.")
 
     react_user_id = token_to_user_id(token) 
@@ -383,12 +383,11 @@ def message_unreact_v1(token, message_id, react_id):
     user = token_to_user_id(token)
     
     message = message_id_check(message_id) #this will only check for messages in channels 
+    if message == False:
+        raise InputError("Message_id does not exist within a channel.") #this will only check for messages in channels 
     
     if react_id != 1:
         raise InputError("React id must be 1.")
-        
-    if message == None:
-        raise InputError("Message_id does not exist within a channel.")
     
     for react in message['reacts']:
         for user_id in react['u_ids']:
