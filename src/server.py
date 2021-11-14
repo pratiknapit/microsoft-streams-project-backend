@@ -114,8 +114,8 @@ def logout_auth():
 @APP.route("/auth/passwordreset/request/v1", methods=['POST'])
 def auth_passwordreset_request_v1_http():
     data = request.get_json()
-    auth_passwordreset_request(data['email'])
-    return dumps({})
+    response = auth_passwordreset_request(data['email'])
+    return dumps(response)
 
 @APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
 def auth_passwordreset_reset_v1_http():
