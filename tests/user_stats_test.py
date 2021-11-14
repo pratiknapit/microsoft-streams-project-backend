@@ -50,14 +50,6 @@ def user3():
     })
     return user3.json() 
 
-@pytest.fixture
-def channel1(user1):
-    channel = requests.post(config.url + 'channels/create/v2', json={
-        "token": user1['token'],
-        "name": "User1Channel1",
-        "is_public": True
-        })
-    return channel.json()
 
 @pytest.fixture
 def channel2(user2):
@@ -73,6 +65,23 @@ def test_user_stat(clear, user1, channel1):
         'token': user1['token']
     })
     assert response.status_code == 200 
+
+def test_user_stat_function(clear, user1):
+    channel = requests.post(config.url + 'channels/create/v2', json={
+        "token": user1['token'],
+        "name": "User1Channel1",
+        "is_public": True
+        })
+
+    assert channel.status_code == 200
+
+    response = requests.get(config.url + 'user/stats/v1', params={
+        'token': user1['token']
+    })
+
+    assert response.status_code == 200
+    stats = response.json() 
+
 
 def test_users_stat(clear, user1, channel1, channel2):
     response = requests.get(config.url + 'users/stats/v1')

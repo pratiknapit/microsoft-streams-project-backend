@@ -131,8 +131,6 @@ def test_message_share_invalid_ids2(clear, user1, channel1):
                         json={'token':user1['token'], 'channel_id':channel1['channel_id'], 'message':"TestMessage"})
     
     assert message.status_code == 200
-
-    msg_id = message.json()
     
     resp = requests.post(config.url + 'message/share/v1', json={'token': user1['token'], 'og_message_id': -1, 'message':'additional message','channel_id': 0, 'dm_id': 0})
     
