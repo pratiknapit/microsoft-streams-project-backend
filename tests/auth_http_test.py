@@ -1,7 +1,7 @@
 import requests
 import pytest
 from src import config
-from src.data_store import data_store
+from src.data_store import data_store, hash_password
 
 @pytest.fixture(autouse=True)
 def clear():
@@ -109,10 +109,23 @@ def test_valid_response(user1):
 #auth_passwordreset_request/reset#
 ##################################
 
-def test_for_request_and_reset_password(user1):
+def test_for_valid_request_and_reset_password(user1):
+    requests.post(config.url + "auth/register/v2", json= user1)
+    resp = requests.post(config.url + "auth/passwordreset/request/v1", json={'email': 'jackyzhu@gmail.com'})
+    assert resp.status_code == 200
+
+    users = data_store.get()['users']
+    for user in users:
+        if user['u_id'] == 1:
+            reset_code = user['reset_code']
+            resp = requests.post(config.url + "/auth/passwordreset/reset/v1", json={'reset_code': reset_code, 'new_password': "agoodpassword"})
+            break
+    #testing password reset 
+    assert resp.status_code == 200
+    resp_dict = resp.json()
+    assert resp_dict == {}
+
+def test_for_invalid_request_and_reset_password(user1):
     requests.post(config.url + "auth/register/v2", json= user1)
     respo = requests.post(config.url + "auth/passwordreset/request/v1", json={'email': 'jokeame@gmail.com'})
     assert respo.status_code == 400
-
-    resp = requests.post(config.url + "auth/passwordreset/request/v1", json={'email': 'jackyzhu@gmail.com'})
-    assert resp.status_code == 200
