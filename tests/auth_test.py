@@ -115,7 +115,8 @@ def test_auth_register_test_dummy(clear):
 #Auth_logout#
 #############
 def test_auth_logout_invalid():
-	assert not(auth_logout('This_is_a_wrong_token'))
+    with pytest.raises(AccessError):
+        auth_logout('This_is_a_wrong_token') 
 
 def test_auth_correct_return(clear, token):    
     assert auth_logout(token) == True
