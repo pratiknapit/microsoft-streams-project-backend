@@ -327,55 +327,6 @@ def users_stat():
         }
     }
 
-
-if __name__ == "__main__":
-    clear_v1()
-    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
-    time.sleep(1)
-    #print(user_stat(dummy_user_1['token']))
-    channels_create_v1(dummy_user_1['token'], "Yayyy", True)
-    time.sleep(1)
-    #print(user_stat(dummy_user_1['token']))
-    channels_create_v1(dummy_user_1['token'], "asdfay", True)
-    time.sleep(1)
-    #print(user_stat(dummy_user_1['token']))
-
-    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'psafasadf', 'Beta', 'nn')
-    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'yyfasadf', 'Jack', 'nn')
-    channels_create_v1(dummy_user_2['token'], "Conpect", True)
-    #print(user_stat(dummy_user_1['token']))
-
-    dm = dm_create(dummy_user_1['token'], [dummy_user_2['auth_user_id']])
-    print(user_stat(dummy_user_1['token']))
-
-    message_send(dummy_user_1['token'], 1, "hello")
-
-    print(user_stat(dummy_user_1['token']))
-
-    print(user_stat(dummy_user_2['token']))
-
-    print("______________________________________________")
-
-    print(users_stat()) 
-
-    print("______________________________________________")
-
-    message_remove(dummy_user_1['token'], 1)
-
-    print(users_stat())
-
-    message_senddm(dummy_user_1['token'], dm['dm_id'], "hello there")
-
-    print("______________________________________________")
-
-    print(users_stat())
-
-    dm_remove(dummy_user_1['token'], dm['dm_id'])
-
-    print("______________________________________________")
-
-    print(users_stat())
-
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     '''

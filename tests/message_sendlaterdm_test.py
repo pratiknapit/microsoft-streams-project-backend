@@ -50,9 +50,7 @@ def test_message_too_long(clear, token, dm_id, timestamp):
 def test_invalid_time_sent(clear, token, dm_id, timestamp):
     with pytest.raises(InputError):
         message_sendlaterdm(token, dm_id, "messageTest", timestamp - 2.0)
-'''
+
 def test_message_send_later(clear, token, dm_id, timestamp):
     message_id = message_sendlaterdm(token, dm_id, "messageTest", timestamp + 2.0)['message_id']
     assert message_id == 1
-'''
-# IMPORTANT TO TEST WHEN MSG_SEND FIXED
