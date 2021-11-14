@@ -258,8 +258,6 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         return {'shared_message_id': dm_send['message_id']}
         #send a dm msg
     
-    
-        
 
 def message_react_v1(token, message_id, react_id): 
     """
