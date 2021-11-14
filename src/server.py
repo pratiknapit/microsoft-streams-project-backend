@@ -1,6 +1,6 @@
 import sys
 import signal
-from json import dumps
+from json import dump, dumps
 from flask import Flask, request
 from src.channel import channel_add_owner_v2, channel_join_v1, channel_details_v1, channel_leave_v2
 from src.channel import channel_remove_owner_v2, channel_invite_v1, channel_messages_v1
@@ -9,12 +9,17 @@ from src.error import InputError
 from src import config
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.data_store import password_check, email_check, email_repeat_check
-from src.other import clear_v1
-from src.auth import auth_register_v1, auth_login_v1, auth_logout
-from src.message import message_send, message_edit, message_remove
+from src.other import clear_v1, notifications_get, search_v2
+from src.auth import auth_register_v1, auth_login_v1, auth_logout, auth_passwordreset_request, auth_passwordreset_reset
+from src.message import message_react_v1, message_send, message_edit, message_remove, message_share_v1, message_unreact_v1
+from src.standup import standup_start_v1
+from src.message import message_send, message_edit, message_remove, message_senddm, message_sendlater, message_sendlaterdm, message_pin, message_unpin
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
 from src.user import user_profile_sethandle_v1, users_all_v1
 from src.dm import dm_create, dm_list, dm_remove, dm_details, dm_leave, dm_messages
+from src.standup import standup_active_v1, standup_start_v1, standup_send_v1
+from src.admin import admin_user_permission_change_v1
+
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -54,25 +59,19 @@ def clear():
     clear_v1()
     return dumps({})
 
+@APP.route("/search/v2", methods=['GET'])
+def searching():
+    data = request.args
+    return dumps(search_v2(data['token'], data['query_str']))
+
 @APP.route("/auth/register/v2", methods=["POST"])
 def register_auth():
     data = request.get_json()
 
-    email = data["email"]
-    password = data["password"]
-    name_first = data["name_first"]
-    name_last = data["name_last"]
-
-    if not email_check(email):
-        raise InputError(description="Email not valid")
-    if email_repeat_check(email):
-        raise InputError(description="Email already used")
-    if len(password) < 6:
-        raise InputError(description="Password less than 6 characters")
-    if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError(description="First name is invalid")
-    if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError(description="Last name is invalid")
+    email = data['email']
+    password = data['password']
+    name_first = data['name_first']
+    name_last = data['name_last']
 
     user = auth_register_v1(email, password, name_first, name_last)
     auth_uid = user['auth_user_id']
@@ -89,13 +88,6 @@ def login_auth():
 
     email = data["email"]
     password = data["password"]
-
-    if not email_check(email):
-        raise InputError(description="Email not valid")
-    if not email_repeat_check(email):
-        raise InputError(description="Email already used")
-    if not password_check(password):
-        raise InputError(description="Password incorrect")
 
     login_info = auth_login_v1(email, password)
     u_id = login_info['auth_user_id']
@@ -116,6 +108,17 @@ def logout_auth():
         'is_success': result
     })
 
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def auth_passwordreset_request_v1_http():
+    data = request.get_json()
+    auth_passwordreset_request(data['email'])
+    return dumps({})
+
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def auth_passwordreset_reset_v1_http():
+    data = request.get_json()
+    auth_passwordreset_reset(data['reset_code'], data['new_password'])
+    return dumps({})
 
 #Channels HTTP Server Wrappers
 
@@ -234,7 +237,6 @@ def c_invite():
 
 @APP.route("/channel/messages/v2", methods=['GET'])
 def c_messages():
-    
     token = request.args.get('token')
     channel_id = int(request.args.get('channel_id'))
     start = int(request.args.get('start'))
@@ -271,6 +273,39 @@ def remove_message():
     message_id = int(data['message_id'])
     
     message_remove(token, message_id)   
+    return dumps({})
+
+@APP.route("/message/senddm/v1", methods=["POST"])
+def senddm_message():
+    data = request.get_json()
+    token = data['token']
+    dm_id = data['dm_id']
+    message = data['message']
+    message_id = message_senddm(token, dm_id, message)
+    return dumps(message_id)
+
+@APP.route("/message/sendlater/v1", methods=['POST'])
+def sendlater_message():
+    data = request.get_json()
+    message_id = message_sendlater(data['token'], data['channel_id'], data['message'], data['time_sent'])
+    return dumps(message_id)
+
+@APP.route("/message/sendlaterdm/v1", methods=['POST'])
+def sendlaterdm_message():
+    data = request.get_json()
+    message_id = message_sendlaterdm(data['token'], data['dm_id'], data['message'], data['time_sent'])
+    return dumps(message_id)
+
+@APP.route("/message/pin/v1", methods=["POST"])
+def pin_message():
+    data = request.get_json()
+    message_pin(data['token'], data['message_id'])
+    return dumps({})
+
+@APP.route("/message/unpin/v1", methods=["POST"])
+def unpin_message():
+    data = request.get_json()
+    message_unpin(data['token'], data['message_id'])
     return dumps({})
 
 @APP.route("/users/all/v1", methods=["GET"])
@@ -356,6 +391,56 @@ def messages_dm():
     start = request.args.get('start')
     messages_dict = dm_messages(token, dm_id, start)
     return dumps(messages_dict)
+
+@APP.route("/notifications/get/v1", methods=['GET'])
+def notifications():
+    token = request.args.get('token')
+    notification_return = notifications_get(token)
+    return dumps(notification_return)
+
+@APP.route("/standup/start/v1", methods = ['POST'])
+def standup_start():
+    data = request.get_json()
+    response = standup_start_v1(data['token'], data['channel_id'], data['length'])
+    return dumps(response) 
+
+@APP.route("/standup/active/v1", methods=['GET'])
+def standup_active():
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    response = standup_active_v1(token, channel_id)
+    return dumps(response) 
+
+@APP.route("/standup/send/v1", methods=['POST'])
+def standup_send():
+    data = request.get_json()
+    standup_send_v1(data['token'], data['channel_id'], data['message'])
+    return dumps({})
+
+@APP.route("/message/share/v1", methods=['POST'])
+def message_share():
+    data = request.get_json()
+    message_share_v1(data['token'], data['og_message_id'], data['message'], data['channel_id'], data['dm_id'] )
+    return dumps({})
+
+@APP.route("/message/react/v1", methods=['POST'])
+def message_react():
+    data = request.get_json()
+    message_react_v1(data['token'], data['message_id'], data['react_id'])
+    return dumps({})
+
+@APP.route("/message/unreact/v1", methods=['POST'])
+def message_unreact():
+    data = request.get_json()
+    message_unreact_v1(data['token'], data['message_id'], data['react_id'])
+    return dumps({})
+
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+def admin_user_permission_change():
+    data = request.get_json()
+    admin_user_permission_change_v1(data['token'], data['u_id'], data['permission_id'])
+    return dumps({})
+
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

@@ -1,6 +1,6 @@
 import requests
 from src import config
-from src.data_store import is_valid_token, login_token
+from src.data_store import is_valid_token, create_token
 
 
 def test_auth_user_id_nonexistent():

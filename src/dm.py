@@ -4,7 +4,7 @@ This file contains dm_create, dm_details, dm_leave, dm_list, dm_remove, dm_messa
 from src.error import AccessError, InputError
 from src.data_store import dm_id_check, is_user_in_channel, is_user_in_dm, is_valid_token, is_valid_user_id, is_user_in_dm
 from src.data_store import find_user, find_dm, find_channel, is_valid_dm_id, is_user_in_channel
-from src.data_store import data_store
+from src.data_store import data_store, save_data
 
 def dm_create(token, u_ids):
     '''
@@ -50,6 +50,7 @@ def dm_create(token, u_ids):
 
     dms.append(dm_dict)
 
+    save_data(store)
     return {'dm_id': dm_id}
 
 def dm_list(token):
@@ -89,7 +90,7 @@ def dm_remove(token, dm_id):
     Exceptions:
         AccessError  - Occurs when the token invalid or when the user is not the dm creator
         InputError   - Occurs when dm_id does not refer to a valid dm
-    Return Value:
+    Returns:
         Empty dictionary
     '''
     data = data_store.get()
@@ -118,6 +119,7 @@ def dm_remove(token, dm_id):
     if found_dm == False:
         raise InputError(description=f"Dm id was invalid")
 
+    save_data(data)
     return {}
     
 
@@ -132,7 +134,7 @@ def dm_details(token, dm_id):
         InputError: When dm_id is not a valid dm
         AccessError: raises if the authorised user is not a part of the dm
 
-    Return Value:
+    Returns:
         String of the name of the dm, 
         list of dicts with u_id, email, name_first, name_last and handle_str
     '''
@@ -177,7 +179,7 @@ def dm_leave(token, dm_id):
     Exceptions:
         AccessError - Occurs when the token is invalid and authorised user is not a member of the dm
         InputError  - Occurs when dm_id is invalid
-    Return Value:
+    Returns:
         Empty dictionary
     '''
     decoded_token = is_valid_token(token)
@@ -207,7 +209,7 @@ def dm_leave(token, dm_id):
         if dm['dm_id'] == dm_id:
             dm['members'].remove(decoded_token['auth_user_id'])
     
-    data_store.set(data)
+    save_data(data)
     return {}
 
 def dm_messages(token, dm_id, start):
@@ -221,7 +223,7 @@ def dm_messages(token, dm_id, start):
         AccessError - Occurs when the token is invalid and authorised user is not a member of the dm
         InputError  - Occurs when dm_id is invalid and "start" is greater than
         the total number of messages in the dm
-    Return Value:
+    Returns:
         Returns {messages, start, end} where messages is a dictionary
     '''
     data = data_store.get()
@@ -269,4 +271,5 @@ def dm_messages(token, dm_id, start):
         for i in range(start, end):
             messages_dict['messages'].append(dm_messages[i])
 
+    save_data(data)
     return messages_dict

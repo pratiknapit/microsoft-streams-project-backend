@@ -4,7 +4,7 @@ from src.auth import auth_register_v1
 from src.user import user_profile_setemail_v1
 from src.other import clear_v1
 from src.user import users_all_v1
-from src.data_store import login_token
+from src.data_store import create_token
 
 
 

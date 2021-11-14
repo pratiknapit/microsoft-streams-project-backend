@@ -24,10 +24,12 @@ Example usage:
     data_store.set(store)
 '''
 import re
-from json import dumps
 import jwt
 import json
+import hashlib
 from src.error import InputError
+from datetime import datetime, timezone
+import time
 
 initial_object = {
     'users': [    
@@ -36,6 +38,7 @@ initial_object = {
     ],
     'dms': [
     ],
+    'msg_counter': 0,
 }
 # Channels Helper Check Functions 
 
@@ -59,6 +62,12 @@ def make_channel(channel_id, name, is_public):
         'owner_members': [],
         'all_members': [],
         'Messages': [],
+        'standup': {
+            'is_active': False,
+            'time_finish': None,
+            'messages': "",
+            'user_id': -1
+        }
     }
         
 # Function to add_channel to list 
@@ -73,6 +82,7 @@ def add_channel(token, name, is_public):
     store['channels'].append(channel)
 
     data_store.set(store) 
+    save_data(store) 
     return channel
 
 # Function to add_user to list 
@@ -95,7 +105,7 @@ def make_user(email, password, name_first, name_last, u_id):
     return {
             'u_id': u_id,
             'email': email,  
-            'password': password, 
+            'password': hash_password(password), 
             'name_first': name_first,
             'name_last': name_last, 
             'handle_str': create_handle(name_first, name_last),
@@ -103,7 +113,11 @@ def make_user(email, password, name_first, name_last, u_id):
             'channel_id_members': [],
             'is_global_owner': is_global_owner,
             'messages_created':[],
-            'profile_img_url': []
+            # 'profile_img_url': []
+            'session_list': [],
+            'notifications': [],
+            'sent_messages': [],
+            'permission_id': is_global_owner
     }
 
 # Function to make message dictionary and returns message_id
@@ -115,20 +129,24 @@ def make_message(message, channel_id, u_id):
     message_id = m_id + 1
     user = user_id_check(u_id)
     user['messages_created'].append(message_id)
-
+    is_pinned = False
+    
     channel = channel_id_check(channel_id)
-    channel['Messages'].append({
+    channel['Messages'].insert(0, {
                             'channel_id': channel_id, 
                             'message_id': message_id, 
                             'u_id': u_id, 
-                            'message': message, 
+                            'message': message,
+                            'reacts': [],
+                            "time_created": datetime.now().replace(tzinfo=timezone.utc).timestamp(),
+                            'is_pinned': is_pinned,
                             })
     return message_id
 
 logged_in_users = []
-def login_token(user):
+def create_token(user, session_id):
     SECRET = 'abcdedweidjwijdokfwkfwoqkqfw'
-    token = jwt.encode({'auth_user_id': user['u_id']}, SECRET, algorithm='HS256')
+    token = jwt.encode({'auth_user_id': user['u_id'], 'session_id': session_id}, SECRET, algorithm='HS256')
     logged_in_users.append(token)
     return token
 
@@ -145,7 +163,8 @@ def is_valid_token(token):
         user = next(
             (user for user in data['users'] if user['u_id'] == payload['auth_user_id']), False)
         if user:
-            return payload
+            if user['session_list'].count(payload['session_id']) != 0:
+                return payload
         return False
 
 # Token checker for logged_in_users
@@ -154,6 +173,9 @@ def token_check(token):
     if token in store: 
         return token
     return False
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
 def is_valid_user_id(auth_user_id):
     store = data_store.get()
@@ -201,8 +223,35 @@ def user_channels(token):
                 user_list_channel['channels'].append(
                     {'channel_id': channel['channel_id'], 'name': channel['name']}
                 )
+    
+    save_data(store) 
         
     return user_list_channel
+
+def return_valid_tagged_handles(message, channel_id):
+    data = data_store.get()
+    split_message = message.split()
+    handles = []
+    for word in split_message:
+        if word.startswith('@'):
+            handles.append(word.strip('@'))
+
+    real_handles = []
+    for handle in handles:
+        if next((user for user in data['users'] if user['account_handle'] == handle), False):
+            real_handles.append(handle)
+
+    real_handles_in_channel = []
+    channel = next(
+        (channel for channel in data['channels'] if channel['channel_id'] == channel_id), False)
+    for handle in real_handles:
+        for member in channel['members']:
+            m_handle = next(user['account_handle']
+                            for user in data['users'] if user['user_id'] == member['user_id'])
+            if m_handle == handle:
+                real_handles_in_channel.append(handle)
+
+    return real_handles_in_channel
 
 # Function to list all channels in the database.
 
@@ -216,6 +265,8 @@ def user_all_channels(token):
         all_channels_list['channels'].append(
             {'channel_id': channel['channel_id'], 'name': channel['name']}
         )
+    
+    save_data(store) 
   
     return all_channels_list
 
@@ -314,7 +365,7 @@ def login_email(email):
 def password_check(password):
     data = data_store.get()
     for user in data['users']:
-        if user['password'] == password:
+        if user['password'] == hash_password(password):
             return user
     return False
 
@@ -325,7 +376,7 @@ def message_id_check(message_id):
         for message in channel['Messages']:
             if message['message_id'] == message_id:
                 return message
-    return None
+    return False
 
 def channel_id_check(channel_id):
     store = data_store.get()
@@ -397,7 +448,7 @@ def save_data(data):
 #Helper Function for message.py#
 ################################
 def owner_channel_check(token, channel_id):
-    u_id = token_to_user_id(token)                  #checks if it's a valid user
+    u_id = token_to_user_id(token)                  # checks if it's a valid user
     channel = channel_id_check(channel_id)
     if channel == None:
         raise InputError
@@ -406,10 +457,22 @@ def owner_channel_check(token, channel_id):
         if member == u_id:
             return True
     return False
+
+def find_message_source(message_id, data):
+    for channel in data['channels']:
+        for message in channel['Messages']:
+            if message['message_id'] == message_id:
+                return channel
+
+    for dm in data['dms']:
+        for message in dm['messages']:
+            if message['message_id'] == message_id:
+                return dm
+    return None
 #############################
 # Helper Functions for dm.py#
 #############################
-def find_user(u_id):
+def find_user(u_id):                                # == auth_user_id function
     store = data_store.get()
     for user in store['users']:
         if user['u_id'] == u_id:
@@ -437,8 +500,8 @@ def is_valid_dm_id(dm_id):
 def is_user_in_channel(channel_id, user_id):
     store = data_store.get()
     channel = find_channel(channel_id, store)
-    for member in channel['members']:
-        if member['user_id'] == user_id:
+    for member in channel['all_members']:
+        if member == user_id:
             return True
     return False
 
@@ -452,6 +515,11 @@ def is_user_in_dm(dm_id, user_id):
     if dm['creator'] == user_id:
         return True
     return False
+
+#################################
+# Helper Functions for message.py
+#################################
+
 
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 

@@ -6,9 +6,9 @@ from src.auth import auth_register_v1
 from src.channels import channels_create_v1
 from src.message import message_send
 from src.error import InputError, AccessError
-from src.other import clear_v1
+from src.other import clear_v1, notifications_get
 from src.channel import channel_messages_v1
-
+from src.data_store import data_store, find_user, is_valid_token
 @pytest.fixture
 def token():
     clear_v1
@@ -50,6 +50,23 @@ def test_invalid_channel_id(clear, token):
     with pytest.raises(InputError):
         message_send(token, 'channel_id', 'test message')
 
+def test_message_with_notification(clear, token, channel_id):
+    msg_id = message_send(token, channel_id, 'test message @firstNamelastName')['message_id']
+    assert isinstance(msg_id, int)
+
+'''
+def test_notification_message(clear, token, channel_id):
+    data = data_store.get()
+    message = 'test message @firstNamelastName'
+    message_send(token, channel_id, message)
+    notif = notifications_get(token)
+    assert len(notif['notifications']) == 1
+    channel_name = next(channel['name'] for channel in data['channels'] if channel['channel_id'] == channel_id)
+    user_handle = find_user(is_valid_token(token)['auth_user_id'])['handle_str']
+    assert notif['notifications'][0]['channel_id'] == channel_id
+    assert notif['notifications'][0]['dm_id'] == -1
+    assert notif['notifications'][0]['notification_message'] == f"{user_handle} tagged you in {channel_name}: {message[:20]}"
+'''
 #############################
 #General functionality check#
 #############################
@@ -80,7 +97,7 @@ def test_message_send():
         message_send(token1, ch_id2, "ilegal")
 
     #creating channel messages
-    message_send(token1, ch_id1, 'h'*1000)
+    message_send(token1, ch_id1, 'h'*999)
     message_send(token1, ch_id1, 'hey')
 
     message_send(token2, ch_id2, "hello")

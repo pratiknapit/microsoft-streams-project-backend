@@ -8,10 +8,10 @@ def clear():
 
 @pytest.fixture
 def token():
-    email = "testmail@gamil.com"
-    password = "Testpass12345"
-    first_name = "firstname"
-    last_name = "lastname"
+    email = "testmaile@gmail.com"
+    password = "Testispass12345"
+    first_name = "firstername"
+    last_name = "lastername"
     auth_resp = requests.post(config.url + '/auth/register/v2', json={
         'email': email,
         'password': password,
@@ -23,7 +23,7 @@ def token():
 
 @pytest.fixture
 def channel_id(token):
-    resp = requests.post(config.url + '/channels/create', json={
+    resp = requests.post(config.url + '/channels/create/v2', json={
         'token': token,
         'name': "channelName1",
         'is_public': True
@@ -31,23 +31,6 @@ def channel_id(token):
 
     channel_id = resp['channel_id']
     return channel_id
-'''
-def test_invalid_input(token, channel_id):
-    resp1 = requests.get(config.url + '/channel/messages/v2', params={
-        'token': token,
-        'channel_id': "abc",
-        'start': 0
-    })
-    resp2 = requests.get(config.url + '/channel/messages/v2', params={
-        'token': token,
-        'channel_id': channel_id,
-        'start': "ab"
-    })
-
-    status_code1 = resp1.status_code
-    status_code2 = resp2.status_code
-    assert status_code1 == 400
-    assert status_code2 == 400
 
 def test_invalid_token(clear, channel_id):
     resp = requests.get(config.url + '/channel/messages/v2', params={
@@ -107,8 +90,6 @@ def test_messages(clear, token, channel_id):
             'token': token,
             'channel_id': channel_id,
             'start': 0
-        })
-    resp_dict = messages_dict.json()
-    assert messages_dict.status_code == 200
-    assert 'messages' and 'start' and 'end' in resp_dict
-'''
+        }).json()
+
+    assert messages_dict['messages'][0]['message'] == '2'

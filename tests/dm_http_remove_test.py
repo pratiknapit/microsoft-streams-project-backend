@@ -14,7 +14,6 @@ def user0():
                                  json={'email': email, 'password': password, 'name_first': firstname, 'name_last': lastname})
     return json.loads(user.text)
 
-
 @pytest.fixture
 def owner():
     email = "dmcreator@gmail.com"
@@ -28,7 +27,7 @@ def owner():
 @pytest.fixture
 def dm(owner, user0):
     dm = requests.post(config.url + '/dm/create/v1',
-                        json={'token':owner['token'], 'u_ids':[user0['auth_user_id']]})
+                        json={'token': owner['token'], 'u_ids':[user0['auth_user_id']]})
     return json.loads(dm.text)
 
 @pytest.fixture
@@ -36,7 +35,6 @@ def owner_token():
     owner = requests.post(config.url + '/auth/login/v2',
                         json={'email': "dmcreator@gmail.com", 'password': "TestTest1"})
     return json.loads(owner.text)['token']
-
 
 @pytest.fixture
 def clear():

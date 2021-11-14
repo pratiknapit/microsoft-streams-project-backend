@@ -4,17 +4,34 @@ This file contains auth_login, auth_register
 ###########
 #Functions#
 ###########
-from src.data_store import data_store, add_user, login_email, login_token
+from src.data_store import data_store, add_user, login_email, create_token, hash_password
 
 ##########################
 # Helper Check Functions #
 ##########################
-from src.data_store import email_check, email_repeat_check, password_check, is_valid_token, token_to_user_id
+from src.data_store import email_check, email_repeat_check, password_check, is_valid_token, token_to_user_id, save_data
 
 ###################
 # Error Functions #
 ###################
 from src.error import InputError
+import random
+import string
+import uuid
+import json
+
+class uuidencode(json.JSONEncoder):
+    def default(self, uuid_id):
+        if isinstance(uuid_id, uuid.UUID):
+            return str(uuid_id)
+        return json.JSONEncoder.default(self, uuid_id)
+
+
+def create_session(user):
+    unique_id = uuid.uuid4()
+    unique_id_json = json.dumps(unique_id, cls=uuidencode)
+    user['session_list'].append(unique_id_json)
+    return unique_id_json
 
 def auth_register_v1(email, password, name_first, name_last):                     # Add_user
     '''
@@ -36,24 +53,30 @@ def auth_register_v1(email, password, name_first, name_last):                   
     Return Value:
         Returns auth_user_id and token on condition that the user is valid.
     '''
+
+    data = data_store.get()
+
     if not email_check(email):
-        raise InputError
+        raise InputError('Email Invalid')
     if email_repeat_check(email) is True:
-        raise InputError
+        raise InputError('Email already exists')
     if len(password) < 6:
-        raise InputError
+        raise InputError('Password too short')
     if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError
+        raise InputError('Invalid Length')
     if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError
+        raise InputError('Invalid Length')
 
     added_user = add_user(email, password, name_first, name_last)
-    token = login_token(added_user)                                                     # authorisation hash
-
+    session_id = create_session(added_user)
+    token = create_token(added_user, session_id)                                                     # authorisation hash
+    
     store = data_store.get()
     for user in store['users']:
         if user['u_id'] == added_user['u_id']:
             user['token'] = token
+
+    save_data(data)
 
     return {
         'auth_user_id': added_user['u_id'],
@@ -76,20 +99,28 @@ def auth_login_v1(email, password):
     Return Value:
         Returns auth_user_id and token on condition that the user is valid
     '''
+
+    data = data_store.get()
+
     if not email_check(email):
-        raise InputError
+        raise InputError('Email invalid')
     if email_repeat_check(email) is False:
         raise InputError
     if not password_check(password):
-        raise InputError
+        raise InputError('Incorrect Password Entered')
 
     cur_user = login_email(email)
-    token = login_token(cur_user)                                                     # authorisation hash
 
     store = data_store.get()
     for user in store['users']:
-        if user['u_id'] == cur_user['u_id']:
-            user['token'] = token
+        hashed_password = hash_password(password)
+        if user['u_id'] == cur_user['u_id'] and user['password'] == hashed_password:
+                session_id = create_session(user)
+                save_data(store)                                                        # Everytime made something
+                token = create_token(cur_user, session_id) 
+                user['token'] = token
+
+    save_data(data)
             
     return {
         'auth_user_id': cur_user['u_id'],
@@ -112,5 +143,39 @@ def auth_logout(token):
     for user in store['users']:
         if user['token'] == token:
             user.pop('token')
+            save_data(store)
             return True
+    save_data(store)
     return False
+
+def auth_passwordreset_request(email):
+    data = data_store.get()
+    if not email_repeat_check(email):
+        raise InputError('Invalid Email')
+
+    for user in data['users']:
+        if user['email'] == email:
+            reset_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+            user['reset_code'] = reset_code
+            break
+    save_data(data)
+    return reset_code
+
+def auth_passwordreset_reset(reset_code, new_password):
+    data = data_store.get()
+    if len(new_password) < 6:
+        raise InputError("Invalid password length")
+
+    found = False
+    for user in data['users']:
+        if user['reset_code'] == reset_code:
+            user['password'] = hash_password(new_password)
+            user['reset_code'] = 0
+            found = True
+            break
+
+    save_data(data)
+
+    if not found:
+        raise InputError("Invalid reset_code")
+    return {}

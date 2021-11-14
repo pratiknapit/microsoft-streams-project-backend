@@ -1,6 +1,7 @@
 import pytest
 from src.other import clear_v1
 from src.auth import auth_register_v1
+from src.message import message_senddm
 from src.dm import dm_create, dm_messages
 from src.error import InputError, AccessError
 
@@ -45,3 +46,28 @@ def test_invalid_start(token, dm_id):
     # this fail because no message is being sent to the dm yet
     with pytest.raises(InputError):
         dm_messages(token, dm_id, 51)
+
+def test_last_message(token, dm_id):
+    # Test if end = -1 when there are no more messages to load after the current return
+    message_senddm(token, dm_id, "Hi, everyone!")
+    end = dm_messages(token, dm_id, 0)['end']
+    assert end == -1
+
+def test_more_messages(token, dm_id):
+    count = 60
+    while count >= 0:
+        message_senddm(token, dm_id, f"{count}")
+        count -= 1
+
+    # Test first 50 newest messages
+    message_1 = dm_messages(token, dm_id, 0)['messages'][49]['message']
+    assert message_1 == "49"
+    # Test the first message in the returned message dictionary
+    message_2 = dm_messages(token, dm_id, 10)['messages'][0]['message']
+    assert message_2 == "10"
+    # Test the second message in the returned message dictionary
+    message_3 = dm_messages(token, dm_id, 30)['messages'][1]['message']
+    assert message_3 == '31'
+    # Test the earliest message that was sent to the dm
+    message_4 = dm_messages(token, dm_id, 60)['messages'][0]['message']
+    assert message_4 == '60'

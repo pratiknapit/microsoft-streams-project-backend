@@ -1,4 +1,6 @@
 from src.data_store import data_store
+from src.data_store import auth_user_id_check, token_to_user_id, is_valid_token
+from src.error import InputError, AccessError
 
 def clear_v1():
     store = data_store.get()
@@ -8,71 +10,65 @@ def clear_v1():
     store['dms'] = []
     data_store.set(store)
 
-def search_v1(token, query_str):
 
-    '''
-    Given a query string, it returns a collection of messages in all of the 
-    channels/DMs that the user has joined that contain the query.
+def notifications_get(token):
 
-    Arguments:
-        token (str)   - A jwt encoded dictionary with u_id key
-        query_str (str) - The query string which is being searched
+    if not is_valid_token(token):
+        raise AccessError(description="Not an authorised user invalid")
 
-    Exceptions:
-        AccessError     - Occurs when the token is invalid
-        InputError      - length of query_str is less than 1 or over 1000 characters
-    Return Value:
-        Returns {messages}, on the condition that everything is correct. Where messages is a 
-        list of dictionaries where each dictionary contains types { message_id, u_id, message, 
-        time_created, reacts, is_pinned  } 
-    '''
+    user_id = token_to_user_id(token)
+    user = auth_user_id_check(user_id)
     
+    return {'notifications': user['notifications'][:20]}
 
-    # Get list of all channels the user is in
-    all_channels = []
-    query_str = re.escape(query_str) # Treats special characters as normal text
-    for channel in data.channels:
-        check_u_id = [user.u_id for user in channel.all_members]
-        if user_id in check_u_id:
-            all_channels.append(channel)
+def search_v2(token, query_str):
+    '''
+    Given a query string, return a collection of messages in all of the channels/DMs that the user has joined that contain the query.
+    Arguments:
+        token     (str)    - an authorisation hash of the user who is adding the ownership of the user with u_id
+        query_str (str)    - query string for collection of messages
+        ...
+    Exceptions:
+        InputError  - query string is more than 1000 characters or less than 1 character
+        AccessError - token is invalid
+    Returns:
+        Returns {messages}
+    '''
+    decoded_token = is_valid_token(token)
+    if decoded_token is False:
+        raise AccessError('Not authorised to search.')
 
-    # Search each relevent channel for messages that match the query
-    return_messages = []
-    for channel in all_channels:
-        for message in channel.channel_messages:
-            if re.search(query_str, message.message):
-                return_messages.append(message.message_details())
-    return {
-        'messages': return_messages
-    }
+    if len(query_str) > 1000 or len(query_str) < 1:
+        raise InputError('Query string too long.')
 
-    if token_check(token) == False:
-        raise AccessError("Token provided is not valid")
+    messages = []
 
-    if len(query_str) > 1000:
-        raise InputError("Query string is too long")
+    data = data_store.get()
 
-
-
-    # Created empty list, looping through the channels. If the user is a member 
-    # of the channel and they have sent a DM, it will append this message to 
-    # the list as a dictionary and return this list 
-    messages_list = []
-    for channel in data["channels"]:
+    for channel in data['channels']:
+        is_in_channel = False
         for member in channel['all_members']:
-            if auth_user_id == member['auth_user_id'] and channel["dm_id"] == -1: 
-                for message in channel["messages"]:
-                    if query_str in  message["message"]:
-                        mess_dict = {
-                            "message_id": message["message_id"] ,
-                            "u_id": message["auth_user_id"] , 
-                            "message": message["message"], 
-                            "time_created": message["timestamp"],
-                        }
-                        messages_list.append(mess_dict)
-    return {
-        'messages': messages_list
-    }
-    # return {messages}
-    pass
+            if member == decoded_token['auth_user_id']:
+                is_in_channel = True
+                break
+        if decoded_token['auth_user_id'] in channel['owner_members']:
+            is_in_channel = True
+        if is_in_channel:
+            for channel_message in channel['Messages']:
+                if query_str in channel_message['message']:
+                    messages.append(channel_message)
 
+    for dm in data['dms']:
+        is_in_dm = False
+        if decoded_token['auth_user_id'] in dm['members']:
+            is_in_dm = True
+        if dm['creator'] == decoded_token['auth_user_id']:
+            is_in_dm = True
+        if is_in_dm:
+            for dm_message in dm['messages']:
+                if query_str in dm_message['message']:
+                    messages.append(dm_message)
+
+    return {
+        'messages': messages
+    }

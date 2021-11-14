@@ -1,8 +1,9 @@
 '''
 This file contains channels_list, channels_listall, channels_create.
 '''
-from src.data_store import token_check, user_channels, add_channel, user_all_channels
+from src.data_store import save_data, token_check, user_channels, add_channel, user_all_channels
 from src.error import AccessError, InputError
+from src.data_store import data_store
 
 
 def channels_list_v1(token):
@@ -20,10 +21,14 @@ def channels_list_v1(token):
         condition that auth_user_id is member of a channel.
         Returns an empty dictionary on condition that auth_user_id is not a member of any channel.
     """
+    data = data_store.get()
     if token_check(token) == False:
         raise AccessError(description="token not found")
 
-    return user_channels(token)
+    ret = user_channels(token)
+    save_data(data)
+    
+    return ret
 
 
 def channels_listall_v1(token):
@@ -41,10 +46,15 @@ def channels_listall_v1(token):
         every channel in the data store.
         Returns an empty dictionary on condition that there are no channels in the data store.
     """
+    data = data_store.get() 
     if token_check(token) == False:
         raise AccessError(description="token not found")
 
-    return user_all_channels(token)
+    ret = user_all_channels(token)
+
+    save_data(data)
+
+    return ret
 
 
 def channels_create_v1(token, name, is_public):
@@ -66,6 +76,8 @@ def channels_create_v1(token, name, is_public):
         Returns an empty dictionary on condition that there are no channels in the data store.
     """
 
+    data = data_store.get()
+
     if len(name) < 1 or len(name) > 20:
         raise InputError
     
@@ -74,6 +86,8 @@ def channels_create_v1(token, name, is_public):
 
     #The function below will add the new channel that is created to the database.
     added_channel = add_channel(token, name, is_public)
+
+    save_data(data)
 
     #Our return value is a dictionary with these keys, as per the spec requirements.
     return {
