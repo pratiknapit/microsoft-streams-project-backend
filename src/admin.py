@@ -3,8 +3,20 @@ from src.data_store import auth_user_id_check, data_store, is_valid_token, save_
 from src.auth import auth_register_v1
 
 OWNER_PERMISSION = 1
-
 MEMBER_PERMISSION = 2 
+
+def admin_user_remove_v1(token, u_id):
+    """
+    Need to remove from streams.
+    - Need to remove from all channels/DMs
+
+    - Need to remove from list of users.
+
+    - 
+
+
+
+    """
 
 def admin_user_permission_change_v1(token, u_id, permission_id): 
 
