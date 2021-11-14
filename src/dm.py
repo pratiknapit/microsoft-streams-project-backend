@@ -119,13 +119,7 @@ def dm_list(token):
                 dm_list.append({'dm_id': dm['dm_id'],
                                 'name': dm['name']})
                 break
-<<<<<<< HEAD
-
-    save_data(data)
-=======
-   
     save_data(data)            
->>>>>>> master
     return {'dms': dm_list}
 
 def dm_remove(token, dm_id):
