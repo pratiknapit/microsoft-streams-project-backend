@@ -1,5 +1,5 @@
 from json import load 
-from src.data_store import auth_user_id_check, channel_id_check, data_store, token_to_user_id, save_data
+from src.data_store import auth_user_id_check, channel_id_check, check_existing_member, data_store, token_to_user_id, save_data
 from src.data_store import is_valid_token
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
@@ -27,6 +27,10 @@ def standup_start_v1(token, channel_id, length):
     if standup_active_v1(token, channel_id)['is_active'] == True:
         raise InputError("an active standup is currently running in the channel")
 
+    auth_user = token_to_user_id(token)
+    if check_existing_member(auth_user, channel_id) == False:
+        raise AccessError("Channel_id is valid and authorised user is not a member of the channel")
+
     #check if length is negative 
 
     if length <= 0: 
@@ -41,8 +45,7 @@ def standup_start_v1(token, channel_id, length):
     channel['standup']['user_id'] = token_to_user_id(token) 
 
     global t
-
-    t = threading.Timer(length, standup_end, args=[token, channel_id, data])
+    t = threading.Timer(length, standup_end, args=[token, channel_id])
     t.start()
 
     save_data(data)
@@ -135,9 +138,4 @@ def standup_send_v1(token, channel_id, message):
 
     return {} 
 
-
-if __name__ == '__main__':
-    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
-    channel_user1 = channels_create_v1(dummy_user_1['token'], "channel1", True)
-    standup_start_v1(dummy_user_1['token'], channel_user1['channel_id'], 1)
     
