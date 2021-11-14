@@ -8,7 +8,7 @@ def clear():
     requests.delete(config.url + 'clear/v1')
 
 @pytest.fixture
-def user1(clear):
+def user1():
     email = "testmail@gamil.com"
     password = "Testpass12345"
     first_name = "firstone"
@@ -48,7 +48,7 @@ def user3():
         'name_first': first_name,
         'name_last': last_name
     })
-    return user3.json() 
+    return user3.json()
 
 @pytest.fixture
 def channel1(user1):
@@ -68,22 +68,115 @@ def channel2(user2):
         })
     return channel.json()
 
-@pytest.fixture
-def channel_priv(user1):
-    c_priv = requests.post(config.url + 'channels/create/v2', json={
-        "token": user1['token'],
-        "name": "User1PrivChannel1",
-        "is_public": False
-        })
-    return c_priv.json()
-
 #invalid token 
 
-#invalid channel 
+def test_invalid_token_r(clear, user1, channel1):
+    msg = requests.post(config.url + 'message/send/v1', json= {
+        'token': user1['token'],
+        'channel_id': channel1['channel_id'],
+        'message': 'Crypto will bounce after this dip.'
+    })
 
-#message id
+    assert msg.status_code == 200
 
-#og message does not refer to a valid message 
+    mog = msg.json()['message_id'] 
+ 
+    response = requests.post(config.url + 'message/react/v1', json= {
+        'token': 123123,
+        'message_id': mog,
+        'react_id': 1 
+    })
+
+    assert response.status_code == 403
+
+def test_invalid_token_unreact(clear, user1, channel1):
+    msg = requests.post(config.url + 'message/send/v1', json= {
+        'token': user1['token'],
+        'channel_id': channel1['channel_id'],
+        'message': 'Crypto will bounce after this dip.'
+    })
+
+    assert msg.status_code == 200
+
+    mog = msg.json()['message_id'] 
+
+    status_code = requests.post(config.url + 'message/unreact/v1', json={
+        'token': "invalid_token",
+        'message_id': mog,
+        'react_id': 1
+    }).status_code
+
+    assert status_code == 403
+
+def test_invalid_react_id1(clear, user1, channel1):
+    msg = requests.post(config.url + 'message/send/v1', json= {
+        'token': user1['token'],
+        'channel_id': channel1['channel_id'],
+        'message': 'Crypto will bounce after this dip.'
+    })
+
+    assert msg.status_code == 200
+
+    mog = msg.json()['message_id']
+
+    channel = requests.post(config.url + 'message/react/v1', json={
+        'token': user1['token'],
+        'message_id': mog,
+        'react_id': 0
+    })
+
+    assert channel.status_code == 400
+
+def test_invalid_react_id(clear, user1, channel1):
+    msg = requests.post(config.url + 'message/send/v1', json= {
+        'token': user1['token'],
+        'channel_id': channel1['channel_id'],
+        'message': 'Crypto will bounce after this dip.'
+    })
+
+    assert msg.status_code == 200
+
+    mog = msg.json()['message_id'] 
+    channel_status_code = requests.post(config.url + 'message/unreact/v1', json={
+        'token': user1['token'],
+        'message_id': mog,
+        'react_id': 0
+    }).status_code
+
+    assert channel_status_code == 400
+
+#Channel does not exist
+def test_reaction_channel_react(clear, user1, channel1):
+    msg = requests.post(config.url + 'message/send/v1', json= {
+        'token': user1['token'],
+        'channel_id': channel1['channel_id'],
+        'message': 'Crypto will bounce after this dip.'
+    })
+
+    assert msg.status_code == 200
+
+    mog = msg.json()['message_id'] 
+
+    channel_status_code = requests.post(config.url + 'message/unreact/v1',
+                                        json={'token': user1['token'], 'message_id': mog, 'react_id': 1}).status_code
+
+    assert channel_status_code == 200
+
+def test_reaction_channel_unreact(clear, user1, channel1):
+    msg = requests.post(config.url + 'message/send/v1', json= {
+        'token': user1['token'],
+        'channel_id': channel1['channel_id'],
+        'message': 'Crypto will bounce after this dip.'
+    })
+
+    assert msg.status_code == 200
+
+    mog = msg.json()['message_id'] 
+
+    channel_status_code = requests.post(config.url + 'message/react/v1',
+                                        json={'token': user1['token'], 'message_id': mog, 'react_id': 1}).status_code
+
+    assert channel_status_code == 200
 
 #1000 characters 
 
@@ -98,19 +191,19 @@ def test_message_react_to_channel_msg(clear, user1, user2, channel1):
 
     assert response.status_code == 200
 
-    message_og = requests.post(config.url + 'message/send/v1', json= {
+    msg = requests.post(config.url + 'message/send/v1', json= {
         'token': user1['token'],
-        'channel_id': 1,
+        'channel_id': channel1['channel_id'],
         'message': 'Crypto will bounce after this dip.'
     })
 
-    assert message_og.status_code == 200
+    assert msg.status_code == 200
 
-    msg_og = message_og.json() 
+    mog = msg.json()['message_id']  
 
     response = requests.post(config.url + 'message/react/v1', json= {
         'token': user2['token'],
-        'message_id': msg_og['message_id'],
+        'message_id': mog,
         'react_id': 1 
     })
 
@@ -124,19 +217,19 @@ def test_message_react_by_ownself(clear, user1, user2, channel1, channel2):
 
     assert response.status_code == 200
 
-    message_og = requests.post(config.url + 'message/send/v1', json= {
+    msg = requests.post(config.url + 'message/send/v1', json= {
         'token': user1['token'],
-        'channel_id': 1,
-        'message': 'Yes it will.'
+        'channel_id': channel1['channel_id'],
+        'message': 'Crypto will bounce after this dip.'
     })
 
-    assert message_og.status_code == 200
+    assert msg.status_code == 200
 
-    msg_og = message_og.json() 
+    mog = msg.json()['message_id']  
 
     response = requests.post(config.url + 'message/react/v1', json= {
         'token': user1['token'],
-        'message_id': msg_og['message_id'],
+        'message_id': mog,
         'react_id': 1 
     })
 
@@ -150,19 +243,19 @@ def test_message_unreact(clear, user1, user2, channel1, channel2):
 
     assert response.status_code == 200
 
-    message_og = requests.post(config.url + 'message/send/v1', json= {
+    msg = requests.post(config.url + 'message/send/v1', json= {
         'token': user1['token'],
-        'channel_id': 1,
-        'message': 'Yes it will.'
+        'channel_id': channel1['channel_id'],
+        'message': 'Crypto will bounce after this dip.'
     })
 
-    assert message_og.status_code == 200
+    assert msg.status_code == 200
 
-    msg_og = message_og.json() 
+    mog = msg.json()['message_id'] 
 
     response = requests.post(config.url + 'message/react/v1', json= {
         'token': user2['token'],
-        'message_id': msg_og['message_id'],
+        'message_id': mog,
         'react_id': 1 
     })
 
@@ -170,7 +263,7 @@ def test_message_unreact(clear, user1, user2, channel1, channel2):
 
     response = requests.post(config.url + 'message/unreact/v1', json= {
         'token': user2['token'],
-        'message_id': msg_og['message_id'],
+        'message_id': mog,
         'react_id': 1 
     })
 

@@ -73,4 +73,3 @@ def test_channel_implementation(clear, channel1,user2, user1):
 
     assert resp.status_code == 200
 
-
