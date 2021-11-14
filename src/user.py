@@ -1,9 +1,15 @@
-from src.data_store import data_store, user_id_check, token_check
+from src.data_store import auth_user_id_check, data_store, message_id_check, token_to_user_id, user_id_check, token_check
 from src.error import InputError, AccessError
 from src.data_store import handle_check, email_check, email_repeat_check, is_valid_token
 import json
 from src.data_store import save_data
-
+from datetime import datetime
+from src.auth import auth_register_v1 
+from src.channels import channels_create_v1, channels_list_v1
+from src.other import clear_v1
+import time
+from src.dm import dm_create, dm_remove
+from src.message import message_remove, message_send, message_senddm
 
 def users_all_v1(token):
 
@@ -28,15 +34,17 @@ def users_all_v1(token):
     user_list = []
     data = data_store.get()
     for user in data['users']:
-        user = {
-            'u_id': user['u_id'],
-            'email': user['email'],
-            'name_first': user['name_first'],
-            'name_last': user['name_last'],
-            'handle_str': user['handle_str'],
-        }
-        user_list.append(user)
-        user = {}  
+        if user['is_removed'] != True:
+            user = {
+                'u_id': user['u_id'],
+                'email': user['email'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last'],
+                'handle_str': user['handle_str'],
+            }
+            user_list.append(user)
+            #user = {}  
+
     return{"users": user_list}
 
 def user_profile_v1(token, u_id):
@@ -201,3 +209,116 @@ def user_profile_sethandle_v1(token, handle_str):
 
     save_data(data)        
     return {}
+
+
+def user_stat(token): 
+    """
+    
+    Fetches the required statistics about this user's use of UNSW Streams.
+    
+    """
+
+    data = data_store.get()
+
+    if not is_valid_token(token):
+        raise AccessError("Token Invalid")
+
+    user_id = token_to_user_id(token)
+
+    user = auth_user_id_check(user_id)
+
+    user_data = user['user_stats']
+    involvement_rate_nom = len(user_data['channels_joined']) + len(user_data['dms_joined']) 
+    + len(user_data['messages_sent'])
+
+    streams_data = data['workspace_stats']
+
+    involvement_rate_dem = len(streams_data['channels_exist']) + len(streams_data['dms_exist'])
+    + len(streams_data['messages_exist'])
+
+    involvement = involvement_rate_nom / involvement_rate_dem
+
+    save_data(data)
+    
+    return {
+        'user_stats': {
+                'channels_joined': user_data['channels_joined'],
+                'dms_joined': user_data['dms_joined'],
+                'messages_sent': user_data['messages_sent'],
+                'involvement_rate': involvement,
+            }
+    }
+
+    
+def users_stat():
+
+    data = data_store.get() 
+
+    workspace = data['workspace_stats']
+
+    count = 0
+    for user in data['users']:
+        if len(user['user_stats']['channels_joined']) > 1 or len(user['user_stats']['dms_joined']) > 1:
+            count += 1
+    
+    total_users = len(data['users'])
+
+    utilization = count/total_users
+
+    return {
+        'workspace_stats': {
+            'channels_exist': workspace['channels_exist'],
+            'dms_exist': workspace['dms_exist'],
+            'messages_exist': workspace['messages_exist'],
+            'utilization_rate': utilization    
+        }
+    }
+
+
+if __name__ == "__main__":
+    clear_v1()
+    dummy_user_1 = auth_register_v1('dummyuser1@gmail.com', 'passworddd', 'Alpha', 'AA')
+    time.sleep(1)
+    #print(user_stat(dummy_user_1['token']))
+    channels_create_v1(dummy_user_1['token'], "Yayyy", True)
+    time.sleep(1)
+    #print(user_stat(dummy_user_1['token']))
+    channels_create_v1(dummy_user_1['token'], "asdfay", True)
+    time.sleep(1)
+    #print(user_stat(dummy_user_1['token']))
+
+    dummy_user_2 = auth_register_v1('dummyuser2@gmail.com', 'psafasadf', 'Beta', 'nn')
+    dummy_user_3 = auth_register_v1('dummyuser3@gmail.com', 'yyfasadf', 'Jack', 'nn')
+    channels_create_v1(dummy_user_2['token'], "Conpect", True)
+    #print(user_stat(dummy_user_1['token']))
+
+    dm = dm_create(dummy_user_1['token'], [dummy_user_2['auth_user_id']])
+    print(user_stat(dummy_user_1['token']))
+
+    message_send(dummy_user_1['token'], 1, "hello")
+
+    print(user_stat(dummy_user_1['token']))
+
+    print(user_stat(dummy_user_2['token']))
+
+    print("______________________________________________")
+
+    print(users_stat()) 
+
+    print("______________________________________________")
+
+    message_remove(dummy_user_1['token'], 1)
+
+    print(users_stat())
+
+    message_senddm(dummy_user_1['token'], dm['dm_id'], "hello there")
+
+    print("______________________________________________")
+
+    print(users_stat())
+
+    dm_remove(dummy_user_1['token'], dm['dm_id'])
+
+    print("______________________________________________")
+
+    print(users_stat())

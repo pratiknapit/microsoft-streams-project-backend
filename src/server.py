@@ -1,7 +1,7 @@
 import sys
 import signal
 from json import dump, dumps
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from src.channel import channel_add_owner_v2, channel_join_v1, channel_details_v1, channel_leave_v2
 from src.channel import channel_remove_owner_v2, channel_invite_v1, channel_messages_v1
 from flask_cors import CORS
@@ -14,11 +14,12 @@ from src.auth import auth_register_v1, auth_login_v1, auth_logout, auth_password
 from src.message import message_react_v1, message_send, message_edit, message_remove, message_share_v1, message_unreact_v1
 from src.standup import standup_start_v1
 from src.message import message_send, message_edit, message_remove, message_senddm, message_sendlater, message_sendlaterdm, message_pin, message_unpin
-from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
-from src.user import user_profile_sethandle_v1, users_all_v1
+from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, users_stat
+from src.user import user_profile_sethandle_v1, users_all_v1, user_stat
 from src.dm import dm_create, dm_list, dm_remove, dm_details, dm_leave, dm_messages
 from src.standup import standup_active_v1, standup_start_v1, standup_send_v1
-from src.admin import admin_user_permission_change_v1
+from src.admin import admin_user_permission_change_v1, admin_user_remove_v1
+
 
 
 def quit_gracefully(*args):
@@ -435,11 +436,30 @@ def message_unreact():
     message_unreact_v1(data['token'], data['message_id'], data['react_id'])
     return dumps({})
 
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
+def admin_user_remove():
+    data = request.get_json()
+    admin_user_remove_v1(data['token'], data['u_id'])
+    return dumps({})
+
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def admin_user_permission_change():
     data = request.get_json()
     admin_user_permission_change_v1(data['token'], data['u_id'], data['permission_id'])
     return dumps({})
+
+@APP.route("/user/stats/v1", methods=['GET'])
+def u_stats():
+    token = request.args.get('token')
+    response = user_stat(token)
+    return dumps(response)
+
+@APP.route("/users/stats/v1", methods=['GET'])
+def all_users_stats():
+    response = users_stat()
+    return dumps(response) 
+
+
 
 
 #### NO NEED TO MODIFY BELOW THIS POINT

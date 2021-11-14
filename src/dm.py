@@ -2,9 +2,10 @@
 This file contains dm_create, dm_details, dm_leave, dm_list, dm_remove, dm_messages
 '''
 from src.error import AccessError, InputError
-from src.data_store import dm_id_check, is_user_in_channel, is_user_in_dm, is_valid_token, is_valid_user_id, is_user_in_dm
+from src.data_store import auth_user_id_check, dm_id_check, is_user_in_channel, is_user_in_dm, is_valid_token, is_valid_user_id, is_user_in_dm, token_to_user_id
 from src.data_store import find_user, find_dm, find_channel, is_valid_dm_id, is_user_in_channel
 from src.data_store import data_store, save_data
+from datetime import datetime
 
 def dm_create(token, u_ids):
     '''
@@ -20,8 +21,8 @@ def dm_create(token, u_ids):
         A dictionary containing dm_id
     '''
     
-    store = data_store.get()
-    dms = store['dms']
+    data = data_store.get()
+    dms = data['dms']
     dm_id = len(dms) + 1
 
     if not is_valid_token(token):
@@ -50,7 +51,46 @@ def dm_create(token, u_ids):
 
     dms.append(dm_dict)
 
-    save_data(store)
+    #User stats implementation
+
+    u_id = token_to_user_id(token)
+
+    for user in data['users']:
+        if user['u_id'] == u_id:
+            if len(user['user_stats']['dms_joined']) == 0:
+                dms_joined = 1
+            else:
+                dms_joined = user['user_stats']['dms_joined'][-1]['num_dms_joined'] + 1  
+            
+            user['user_stats']['dms_joined'].append({
+                'num_dms_joined': dms_joined, 
+                'time_stamp':int(datetime.now().timestamp())
+                })
+    
+    if len(data['workspace_stats']['dms_exist']) == 0:
+        dms_exist = 1
+    else:
+        dms_exist = data['workspace_stats']['dms_exist'][-1]['num_dms_exist'] + 1
+    
+    data['workspace_stats']['dms_exist'].append({
+        'num_dms_exist': dms_exist,
+        'time_stamp':int(datetime.now().timestamp())
+    })
+
+    for u in u_ids:
+        for user in data['users']:
+            if user['u_id'] == u:
+                if len(user['user_stats']['dms_joined']) == 0:
+                    dms_joined = 1
+                else:
+                    dms_joined = user['user_stats']['dms_joined'][-1]['num_dms_joined'] + 1  
+                
+                user['user_stats']['dms_joined'].append({
+                    'num_dms_joined': dms_joined, 
+                    'time_stamp':int(datetime.now().timestamp())
+                    })
+
+    save_data(data)
     return {'dm_id': dm_id}
 
 def dm_list(token):
@@ -79,6 +119,7 @@ def dm_list(token):
                                 'name': dm['name']})
                 break
 
+    save_data(data)
     return {'dms': dm_list}
 
 def dm_remove(token, dm_id):
@@ -119,6 +160,39 @@ def dm_remove(token, dm_id):
     if found_dm == False:
         raise InputError(description=f"Dm id was invalid")
 
+    #User stats implementation
+
+    u_id = token_to_user_id(token)
+
+    dm_members = dm_details(token, dm_id)['members']
+
+    mem_list = []
+    for mem in dm_members:
+        mem_list.append(mem['u_id'])
+        
+    for user in data['users']:
+        for m_id in mem_list: 
+            if user['u_id'] == m_id:
+                if len(user['user_stats']['dms_joined']) == 0:
+                    dms_joined = 1
+                else:
+                    dms_joined = user['user_stats']['dms_joined'][-1]['num_dms_joined'] - 1  
+                
+                user['user_stats']['dms_joined'].append({
+                    'num_dms_joined': dms_joined, 
+                    'time_stamp':int(datetime.now().timestamp())
+                    })
+    
+    if len(data['workspace_stats']['dms_exist']) == 0:
+        dms_exist = 1
+    else:
+        dms_exist = data['workspace_stats']['dms_exist'][-1]['num_dms_exist'] - 1
+    
+    data['workspace_stats']['dms_exist'].append({
+        'num_dms_exist': dms_exist,
+        'time_stamp':int(datetime.now().timestamp())
+    })
+        
     save_data(data)
     return {}
     
@@ -208,6 +282,33 @@ def dm_leave(token, dm_id):
     for dm in data['dms']:
         if dm['dm_id'] == dm_id:
             dm['members'].remove(decoded_token['auth_user_id'])
+
+    
+    #User stats implementation
+
+    u_id = token_to_user_id(token)
+        
+    for user in data['users']:
+        if user['u_id'] == u_id:
+            if len(user['user_stats']['dms_joined']) == 0:
+                dms_joined = 1
+            else:
+                dms_joined = user['user_stats']['dms_joined'][-1]['num_dms_joined'] - 1  
+            
+            user['user_stats']['dms_joined'].append({
+                'num_dms_joined': dms_joined, 
+                'time_stamp':int(datetime.now().timestamp())
+                })
+    
+    if len(data['workspace_stats']['dms_exist']) == 0:
+        dms_exist = 1
+    else:
+        dms_exist = data['workspace_stats']['dms_exist'][-1]['num_dms_exist'] - 1
+    
+    data['workspace_stats']['dms_exist'].append({
+        'num_dms_exist': dms_exist,
+        'time_stamp':int(datetime.now().timestamp())
+    })
     
     save_data(data)
     return {}
