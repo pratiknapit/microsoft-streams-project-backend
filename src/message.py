@@ -408,7 +408,6 @@ def message_senddm(token, dm_id, message):
         raise AccessError("Token invalid")
 
     auth_user_id = token_data['auth_user_id']
-    auth_user = find_user(auth_user_id)
 
     if len(message) > 1000 or len(message) < 1:
         raise InputError("message length invalid")

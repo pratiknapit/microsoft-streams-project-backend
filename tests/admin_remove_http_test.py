@@ -83,7 +83,7 @@ def test_invalid_input1(clear, member):
     status_code = resp.status_code
     assert status_code == 400
 
-def test_invalid_input(clear, member):
+def test_invalid_u_id_input(clear, member):
     resp = requests.delete(config.url + 'admin/user/remove/v1', json={
         'token': member,
         'u_id': "ab",
@@ -110,7 +110,7 @@ def test_not_auth(clear, member):
     status_code = resp.status_code
     assert status_code == 400
 
-def test_not_auth(clear, member, global_owner):
+def test_remove_global_owner(clear, member, global_owner):
     resp = requests.delete(config.url + 'admin/user/remove/v1', json={
         'token': member['token'],
         'u_id': global_owner['token'],

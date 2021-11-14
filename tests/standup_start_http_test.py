@@ -106,7 +106,7 @@ def test_invalid_channel(clear, user1, channel1):
 
 #test standup start while standup is already running 
 
-def test_standup_already_started(clear, user1, channel1):
+def test_standup_already_started1(clear, user1, channel1):
 
     response1 = requests.post(config.url + 'standup/start/v1', json={
         'token': user1['token'],
@@ -126,17 +126,6 @@ def test_standup_already_started(clear, user1, channel1):
 
 
 #test user start standup but user is not in the channel
-def test_standup_already_started(clear, user1, user2, channel1):
-
-    response1 = requests.post(config.url + 'standup/start/v1', json={
-        'token': user2['token'],
-        'channel_id': channel1['channel_id'],
-        'length': 1
-    })
-
-    assert response1.status_code == 403
-
-
 
 def test_standup_start_basic(clear, user1, channel1):
     response1 = requests.post(config.url + 'standup/start/v1', json={

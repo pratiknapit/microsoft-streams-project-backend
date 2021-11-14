@@ -162,8 +162,6 @@ def dm_remove(token, dm_id):
 
     #User stats implementation
 
-    u_id = token_to_user_id(token)
-
     dm_members = dm_details(token, dm_id)['members']
 
     mem_list = []
