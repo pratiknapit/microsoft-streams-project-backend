@@ -181,7 +181,7 @@ def test_standup_ends_basic(clear,user1, channel1):
     assert response.status_code == 200 
     assert response.json()['is_active'] == False
 
-def test_standup_send_basic(clear, user1, channel1):
+def test_standup_send_basic2(clear, user1, channel1):
 
     response1 = requests.post(config.url + 'standup/start/v1', json={
         'token': user1['token'],
