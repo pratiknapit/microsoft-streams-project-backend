@@ -1,7 +1,7 @@
 from src.error import AccessError, InputError
 from src.data_store import auth_user_id_check, data_store, is_valid_token, save_data, token_to_user_id
 from src.auth import auth_register_v1
-from src.helper import global_owner_check, remove_user_id_from_channels, remove_user_from_dms
+from src.data_store import global_owner_check, remove_user_id_from_channels, remove_user_from_dms
 
 
 
