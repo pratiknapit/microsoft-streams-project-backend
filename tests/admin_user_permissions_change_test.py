@@ -40,6 +40,34 @@ def user2():
     })
     return user2.json() 
 
+def test_invalid_token(clear, user1, user2):
+    response = requests.post(config.url + 'admin/userpermission/change/v1', json={
+        'token': 1238782,
+        'u_id': user2['auth_user_id'],
+        'permission_id': OWNER_PERMISSION
+    })
+
+    assert response.status_code == 403
+
+
+def test_invalid_user(clear, user1, user2):
+    response = requests.post(config.url + 'admin/userpermission/change/v1', json={
+        'token': user1['token'],
+        'u_id': 67,
+        'permission_id': OWNER_PERMISSION
+    })
+
+    assert response.status_code == 400
+
+def test_invalid_permission(clear, user1, user2):
+    response = requests.post(config.url + 'admin/userpermission/change/v1', json={
+        'token': user1['token'],
+        'u_id': user2['auth_user_id'],
+        'permission_id': 4
+    })
+
+    assert response.status_code == 400
+
 def test_permissions_change_basic(clear, user1, user2):
     response = requests.post(config.url + 'admin/userpermission/change/v1', json={
         'token': user1['token'],

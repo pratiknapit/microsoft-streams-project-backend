@@ -74,6 +74,15 @@ def dm_id(global_owner, member):
     return dm_id
 
 
+def test_invalid_input1(clear, member):
+    resp = requests.delete(config.url + 'admin/user/remove/v1', json={
+        'token': member,
+        'u_id': "ab",
+    })
+
+    status_code = resp.status_code
+    assert status_code == 400
+
 def test_invalid_input(clear, member):
     resp = requests.delete(config.url + 'admin/user/remove/v1', json={
         'token': member,
@@ -91,6 +100,24 @@ def test_invalid_input(clear, member):
 
     status_code = resp.status_code
     assert status_code == 403
+
+def test_not_auth(clear, member):
+    resp = requests.delete(config.url + 'admin/user/remove/v1', json={
+        'token': member['token'],
+        'u_id': 12,
+    })
+
+    status_code = resp.status_code
+    assert status_code == 400
+
+def test_not_auth(clear, member, global_owner):
+    resp = requests.delete(config.url + 'admin/user/remove/v1', json={
+        'token': member['token'],
+        'u_id': global_owner['token'],
+    })
+
+    status_code = resp.status_code
+    assert status_code == 400
 
 def test_user_in_channel(clear, global_owner, member, channel_id):
 
