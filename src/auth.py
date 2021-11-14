@@ -149,6 +149,17 @@ def auth_logout(token):
     return False
 
 def auth_passwordreset_request(email):
+    '''
+    Given authorised email returns a reset code to change password
+
+    Arguments:
+        <email> (str)       - <A string which holds the email of user>
+
+    Exceptions: Input error raised for emails only for sanity check
+
+    Return Value:
+        Returns reset code
+    '''
     data = data_store.get()
     if not email_repeat_check(email):
         raise InputError('Invalid Email')
@@ -162,6 +173,19 @@ def auth_passwordreset_request(email):
     return reset_code
 
 def auth_passwordreset_reset(reset_code, new_password):
+    '''
+    Given a reset code for a user, set that user's new password to the password provided.
+
+    Arguments:
+        <reset_code>    (str)           - Unique codes used to authorise password change
+        <new_password>  (new_password)  - New password to replace old password.
+
+    Exceptions: Input error raised for invalid reset codes
+                Input error raised for length of password less than 6 characters
+
+    Return Value:
+        None
+    '''
     data = data_store.get()
     if len(new_password) < 6:
         raise InputError("Invalid password length")
