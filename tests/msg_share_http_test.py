@@ -9,7 +9,7 @@ def clear():
 
 @pytest.fixture
 def user1(clear):
-    email = "testmail@gamil.com"
+    email = "testmail@gmail.com"
     password = "Testpass12345"
     first_name = "firstone"
     last_name = "lastone"
@@ -24,7 +24,7 @@ def user1(clear):
 
 @pytest.fixture
 def user2():
-    email = "testmail2@gamil.com"
+    email = "testmail2@gmail.com"
     password = "Testpass123456"
     first_name = "firsttwo"
     last_name = "lasttwo"
@@ -38,7 +38,7 @@ def user2():
 
 @pytest.fixture
 def user3():
-    email = "testmail3@gamil.com"
+    email = "testmail3@gmail.com"
     password = "Testpass1"
     first_name = "three"
     last_name = "lastname"
@@ -79,13 +79,79 @@ def channel_priv(user1):
 
 #invalid token 
 
+def test_message_share_access_error(clear, user1, channel1):
+    message = requests.post(config.url + '/message/send/v1',
+                        json={'token':user1['token'], 'channel_id':channel1['channel_id'], 'message':"TestMessage"})
+    msg_id = message.json()['message_id']
+    
+    resp = requests.post(config.url + 'message/share/v1', json={'token': 'bad.token.input', 'og_message_id':msg_id, 'message':'additional message','channel_id':channel1['channel_id'], 'dm_id':-1})
+    
+    assert resp.status_code == 403
+
+    response = requests.post(config.url + 'message/share/v1', json= {
+        'token': user1['token'],
+        'og_message_id': msg_id,
+        'message': 'Crypto will bounce after this dip.',
+        'channel_id': channel1['channel_id'],
+        'dm_id': -1 
+    })
+
+    assert response.status_code == 200
+
 #invalid channel 
 
-#message id
+def test_message_share_invalid_ids0(clear, user1, channel1):
+    message = requests.post(config.url + '/message/send/v1',
+                        json={'token':user1['token'], 'channel_id':channel1['channel_id'], 'message':"TestMessage"})
+    
+    assert message.status_code == 200
+
+    msg_id = message.json()
+    
+    resp = requests.post(config.url + 'message/share/v1', json={'token': user1['token'], 'og_message_id':msg_id['message_id'], 'message':'additional message','channel_id': -1, 'dm_id':-1})
+    
+    assert resp.status_code == 400
 
 #og message does not refer to a valid message 
 
-#1000 characters 
+def test_message_share_invalid_ids1(clear, user1, channel1):
+    message = requests.post(config.url + '/message/send/v1',
+                        json={'token':user1['token'], 'channel_id':channel1['channel_id'], 'message':"TestMessage"})
+    
+    assert message.status_code == 200
+
+    msg_id = message.json()
+    
+    resp = requests.post(config.url + 'message/share/v1', json={'token': user1['token'], 'og_message_id':msg_id['message_id'], 'message':'additional message','channel_id': 0, 'dm_id': 0})
+    
+    assert resp.status_code == 400
+
+def test_message_share_invalid_ids2(clear, user1, channel1):
+    message = requests.post(config.url + 'message/send/v1',
+                        json={'token':user1['token'], 'channel_id':channel1['channel_id'], 'message':"TestMessage"})
+    
+    assert message.status_code == 200
+
+    msg_id = message.json()
+    
+    resp = requests.post(config.url + 'message/share/v1', json={'token': user1['token'], 'og_message_id': -1, 'message':'additional message','channel_id': 0, 'dm_id': 0})
+    
+    assert resp.status_code == 400
+
+def test_message_share_invalid_ids3(clear, user1, channel1):
+    message = requests.post(config.url + 'message/send/v1',
+                        json={'token':user1['token'], 'channel_id':channel1['channel_id'], 'message':"TestMessage"})
+
+    assert message.status_code == 200
+
+    msg_id = message.json()
+
+    string_long = 'x' * 1001
+    
+    resp = requests.post(config.url + 'message/share/v1', json={'token': user1['token'], 'og_message_id':msg_id['message_id'], 'message':string_long,
+    'channel_id': channel1['channel_id'], 'dm_id': -1})
+    
+    assert resp.status_code == 400
 
 #pair of channel and dm_id are valid and the auth user has not
 #joined the channel or dm they are trying to share the message to

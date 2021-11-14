@@ -93,8 +93,6 @@ def test_dm_create(clear, user1, user2):
     for dm in dms:
         if dm['dm_id'] == dm_id:
             assert dm['creator'] == user1['auth_user_id']
-
-
     
 
 def test_message_share_to_same_channel(clear, user1, channel1):

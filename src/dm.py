@@ -298,16 +298,6 @@ def dm_leave(token, dm_id):
                 'time_stamp':int(datetime.now().timestamp())
                 })
     
-    if len(data['workspace_stats']['dms_exist']) == 0:
-        dms_exist = 1
-    else:
-        dms_exist = data['workspace_stats']['dms_exist'][-1]['num_dms_exist'] - 1
-    
-    data['workspace_stats']['dms_exist'].append({
-        'num_dms_exist': dms_exist,
-        'time_stamp':int(datetime.now().timestamp())
-    })
-    
     save_data(data)
     return {}
 
