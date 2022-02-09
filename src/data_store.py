@@ -153,16 +153,17 @@ def make_user(email, password, name_first, name_last, u_id):
 # Function to make message dictionary and returns message_id
 def make_message(message, channel_id, u_id): 
     m_id = 0
-    channels = data_store.get()['channels']
-    for channel in channels:
+    data = data_store.get()
+    for channel in data['channels']:
         m_id += len(channel['Messages'])
     message_id = m_id + 1
     user = user_id_check(u_id)
     user['messages_created'].append(message_id)
     is_pinned = False
     
-    channel = channel_id_check(channel_id)
-    channel['Messages'].insert(0, {
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            channel['Messages'].insert(0, {
                             'channel_id': channel_id, 
                             'message_id': message_id, 
                             'u_id': u_id, 
@@ -171,6 +172,8 @@ def make_message(message, channel_id, u_id):
                             "time_created": datetime.now().replace(tzinfo=timezone.utc).timestamp(),
                             'is_pinned': is_pinned,
                             })
+    
+    save_data(data)
     return message_id
 
 logged_in_users = []

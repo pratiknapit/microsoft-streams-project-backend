@@ -14,7 +14,7 @@ import os
 import time
 import requests
 import urllib.request
-from PIL import Image
+# from PIL import Image
 import io
 import sys
 
@@ -327,6 +327,7 @@ def users_stat():
         }
     }
 
+"""
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     '''
@@ -396,7 +397,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     save_data(data)
     
     return {}
-
+"""
 
 
 

@@ -20,7 +20,7 @@ from src.user import user_profile_sethandle_v1, users_all_v1, user_stat
 from src.dm import dm_create, dm_list, dm_remove, dm_details, dm_leave, dm_messages
 from src.standup import standup_active_v1, standup_start_v1, standup_send_v1
 from src.admin import admin_user_permission_change_v1, admin_user_remove_v1
-from src.user import user_profile_uploadphoto_v1
+#from src.user import user_profile_uploadphoto_v1
 
 
 
@@ -48,6 +48,7 @@ APP.register_error_handler(Exception, defaultHandler)
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
 # Example
+
 @APP.route("/echo", methods=['GET'])
 def echo():
     data = request.args.get('data')
@@ -56,6 +57,7 @@ def echo():
     return dumps({
         'data': data
     })
+
 
 @APP.route("/clear/v1", methods=["DELETE"])
 def clear():
@@ -462,20 +464,18 @@ def all_users_stats():
     return dumps(response) 
 
 
-
-
 @APP.route("/src/static/<path:path>", methods=['GET'])
 def send_js(path):
     return send_from_directory('', path)
 
-
+"""
 @APP.route("/user/profile/uploadphoto/v1", methods=['POST'])
 def user_profile_uploadphoto():
     info = request.get_json()
     result = user_profile_uploadphoto_v1(info['token'], info['img_url'], info['x_start'], info['y_start'],
                                          info['x_end'], info['y_end'])
     return dumps(result)
-
+"""
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
