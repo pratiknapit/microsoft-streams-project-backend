@@ -119,7 +119,7 @@ def channel_details_v1(token, channel_id):
     if check_if_user_is_channel_member(token, channel_id) is False:
         raise AccessError(description="User is already a channel member")
     """
-    
+
     #Create a new dictionary that will store all the channel_details
     channel_details_dictionary = {
     }

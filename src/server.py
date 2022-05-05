@@ -243,8 +243,10 @@ def c_invite():
 @APP.route("/channel/messages/v2", methods=['GET'])
 def c_messages():
     token = request.args.get('token')
-    channel_id = int(request.args.get('channel_id'))
-    start = int(request.args.get('start'))
+    channel_id = request.args.get('channel_id')
+    start = request.args.get('start')
+    channel_id = int(channel_id)
+    start = int(start)
     return_dict = channel_messages_v1(token, channel_id, start)
     return dumps(return_dict)
 
